@@ -1,3 +1,5 @@
+import GeoniMark from './GeoniMark'
+
 function scoreColor(score) {
   if (score >= 65) return 'var(--good)'
   if (score >= 40) return 'var(--warn)'
@@ -91,58 +93,67 @@ export default function ResultsPage({ result, onReset }) {
   } = result
 
   return (
-    <div className="results">
-      <div className="results__header">
-        <div>
-          <div className="results__domain">{domain}</div>
-          <h1 className="results__title">AI Görünürlük Raporu</h1>
+    <>
+      <header className="landing__nav">
+        <div className="landing__brand">
+          <GeoniMark />
+          <span className="landing__logo">GEONI</span>
         </div>
-        <button className="results__reset" onClick={onReset}>Yeni Tarama</button>
-      </div>
+      </header>
 
-      <div className="results__top">
-        <ScoreGauge score={score} />
-        <Breakdown breakdown={score_breakdown} />
-      </div>
+      <div className="results">
+        <div className="results__header">
+          <div>
+            <div className="results__domain">{domain}</div>
+            <h1 className="results__title">AI Görünürlük Raporu</h1>
+          </div>
+          <button className="results__reset" onClick={onReset}>Yeni Tarama</button>
+        </div>
 
-      <div className="results__stats">
-        <div className="results__stat">
-          <span className="results__stat-n">{total_pages}</span>
-          <span className="results__stat-l">Taranan Sayfa</span>
+        <div className="results__top">
+          <ScoreGauge score={score} />
+          <Breakdown breakdown={score_breakdown} />
         </div>
-        <div className="results__stat">
-          <span className="results__stat-n">{indexed_pages}</span>
-          <span className="results__stat-l">Dizinli Sayfa</span>
-        </div>
-        <div className="results__stat">
-          <span className="results__stat-n">{platforms?.chatgpt ? 'Evet' : 'Hayır'}</span>
-          <span className="results__stat-l">ChatGPT Erişimi</span>
-        </div>
-        <div className="results__stat">
-          <span className="results__stat-n">{platforms?.anthropic ? 'Evet' : 'Hayır'}</span>
-          <span className="results__stat-l">Claude Erişimi</span>
-        </div>
-      </div>
 
-      <div className="topics">
-        <div className="topics__col">
-          <h3><span className="topics__col-icon">✓</span> Güçlü Olduğunuz Konular</h3>
-          {top_topics.length > 0 ? (
-            top_topics.map((t, i) => <TopicCard topic={t} key={i} />)
-          ) : (
-            <div className="topics__empty">Henüz güçlü bir konu tespit edilmedi.</div>
-          )}
+        <div className="results__stats">
+          <div className="results__stat">
+            <span className="results__stat-n">{total_pages}</span>
+            <span className="results__stat-l">Taranan Sayfa</span>
+          </div>
+          <div className="results__stat">
+            <span className="results__stat-n">{indexed_pages}</span>
+            <span className="results__stat-l">Dizinli Sayfa</span>
+          </div>
+          <div className="results__stat">
+            <span className="results__stat-n">{platforms?.chatgpt ? 'Evet' : 'Hayır'}</span>
+            <span className="results__stat-l">ChatGPT Erişimi</span>
+          </div>
+          <div className="results__stat">
+            <span className="results__stat-n">{platforms?.anthropic ? 'Evet' : 'Hayır'}</span>
+            <span className="results__stat-l">Claude Erişimi</span>
+          </div>
         </div>
-        <div className="topics__col">
-          <h3><span className="topics__col-icon">→</span> Kaçırdığınız Fırsatlar</h3>
-          {opportunities.length > 0 ? (
-            opportunities.map((t, i) => <TopicCard topic={t} isOpportunity key={i} />)
-          ) : (
-            <div className="topics__empty">Fırsat alanı tespit edilmedi.</div>
-          )}
+
+        <div className="topics">
+          <div className="topics__col">
+            <h3><span className="topics__col-icon">✓</span> Güçlü Olduğunuz Konular</h3>
+            {top_topics.length > 0 ? (
+              top_topics.map((t, i) => <TopicCard topic={t} key={i} />)
+            ) : (
+              <div className="topics__empty">Henüz güçlü bir konu tespit edilmedi.</div>
+            )}
+          </div>
+          <div className="topics__col">
+            <h3><span className="topics__col-icon">→</span> Kaçırdığınız Fırsatlar</h3>
+            {opportunities.length > 0 ? (
+              opportunities.map((t, i) => <TopicCard topic={t} isOpportunity key={i} />)
+            ) : (
+              <div className="topics__empty">Fırsat alanı tespit edilmedi.</div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 

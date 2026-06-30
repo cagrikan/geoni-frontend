@@ -1,46 +1,97 @@
 import { useState } from 'react'
+import LandingPage from './LandingPage'
+import ResultsPage from './ResultsPage'
+import './App.css'
 
 function App() {
-  const [domain, setDomain] = useState('')
-  const [email, setEmail] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [view, setView] = useState('landing') // 'landing' | 'loading' | 'results'
   const [result, setResult] = useState(null)
+  const [error, setError] = useState(null)
+  const [statusText, setStatusText] = useState('queued')
 
-  const handleAudit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
+  const apiUrl = import.meta.env.VITE_API_URL || 'https://api.geoni.ai'
+
+  const pollJob = async (jobId) => {
+    const statusLabels = {
+      queued: 'Sıraya alındı',
+      crawling: 'Site taranıyor',
+      indexing: 'Dizin durumu kontrol ediliyor',
+      scoring: 'Skor hesaplanıyor',
+    }
+
+    const maxAttempts = 60 // ~3 minutes at 3s interval
+    for (let i = 0; i < maxAttempts; i++) {
+      await new Promise((r) => setTimeout(r, 3000))
+      try {
+        const res = await fetch(`${apiUrl}/api/audit/${jobId}`)
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}))
+          throw new Error(body.detail || 'Tarama başarısız oldu')
+        }
+        const data = await res.json()
+        if (data.status === 'complete') {
+          setResult(data.result)
+          setView('results')
+          return
+        }
+        if (data.status === 'failed') {
+          throw new Error('Tarama başarısız oldu')
+        }
+        setStatusText(statusLabels[data.status] || data.status)
+      } catch (err) {
+        setError(err.message)
+        setView('landing')
+        return
+      }
+    }
+    setError('Tarama zaman aşımına uğradı, lütfen tekrar deneyin.')
+    setView('landing')
+  }
+
+  const handleAudit = async (domain, email) => {
+    setError(null)
+    setView('loading')
+    setStatusText('queued')
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/audit/quick`, {
+      const res = await fetch(`${apiUrl}/api/audit/quick`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ domain, email, competitors: [] })
+        body: JSON.stringify({ domain, email, competitors: [] }),
       })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body.detail || 'İstek başarısız oldu')
+      }
       const data = await res.json()
-      setResult(data)
+      await pollJob(data.job_id)
     } catch (err) {
-      alert('Error: ' + err.message)
+      setError(err.message || 'Bağlantı hatası')
+      setView('landing')
     }
-    setLoading(false)
+  }
+
+  const handleReset = () => {
+    setResult(null)
+    setError(null)
+    setView('landing')
   }
 
   return (
-    <div style={{ maxWidth: '600px', margin: '50px auto', fontFamily: 'sans-serif' }}>
-      <h1>GEONI Visibility Scanner</h1>
-      {!result ? (
-        <form onSubmit={handleAudit}>
-          <input type="text" placeholder="Domain" value={domain} onChange={(e) => setDomain(e.target.value)} required style={{ width: '100%', padding: '8px', marginBottom: '10px' }} />
-          <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required style={{ width: '100%', padding: '8px', marginBottom: '10px' }} />
-          <button type="submit" disabled={loading}>{loading ? 'Running...' : 'Start Audit'}</button>
-        </form>
-      ) : (
-        <div>
-          <h2>Result</h2>
-          <pre>{JSON.stringify(result, null, 2)}</pre>
-          <button onClick={() => setResult(null)}>New Audit</button>
-        </div>
+    <div className="app-shell">
+      {view !== 'results' && (
+        <LandingPage
+          onSubmit={handleAudit}
+          loading={view === 'loading'}
+          statusText={statusText}
+          error={error}
+        />
+      )}
+      {view === 'results' && result && (
+        <ResultsPage result={result} onReset={handleReset} />
       )}
     </div>
   )
 }
 
 export default App
+

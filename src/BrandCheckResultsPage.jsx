@@ -1,15 +1,27 @@
 import GeoniMark from './GeoniMark'
 
+const MODEL_LABELS = {
+  claude: 'Claude',
+  openai: 'ChatGPT',
+  gemini: 'Gemini',
+}
+
 export default function BrandCheckResultsPage({ result, onReset }) {
-  const { name, topic, recognized, raw_list, created_at } = result
+  const { name, topic, recognized, recognition_count, model_results = {}, raw_list, created_at } = result
 
   const formattedDate = created_at
     ? new Date(created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })
     : null
 
-  const listItems = raw_list
-    ? raw_list.split('\n').filter(line => line.trim().startsWith('•'))
-    : []
+  const total = Object.keys(model_results).length || 3
+  const count = recognition_count ?? (recognized ? 1 : 0)
+
+  const statusLabel = count === 3 ? 'Yüksek AI Bilinirliği'
+    : count === 2 ? 'Orta AI Bilinirliği'
+    : count === 1 ? 'Düşük AI Bilinirliği'
+    : 'AI Bilinirliği Yok'
+
+  const statusClass = count >= 2 ? 'found' : count === 1 ? 'partial' : 'notfound'
 
   return (
     <>
@@ -33,51 +45,34 @@ export default function BrandCheckResultsPage({ result, onReset }) {
         </div>
 
         <div className="brand-check__hero">
-          <div className={`brand-check__status ${recognized ? 'brand-check__status--found' : 'brand-check__status--notfound'}`}>
-            <span className="brand-check__status-icon">{recognized ? '✓' : '✗'}</span>
+          <div className={`brand-check__status brand-check__status--${statusClass}`}>
+            <div className="brand-check__status-icon">
+              {count}/{total}
+            </div>
             <div>
-              <div className="brand-check__status-title">
-                {recognized
-                  ? 'AI sizi bu alanda tanıyor'
-                  : 'AI sizi bu alanda tanımıyor'}
-              </div>
+              <div className="brand-check__status-title">{statusLabel}</div>
               <div className="brand-check__status-sub">
-                <strong>{name}</strong> · {topic}
+                <strong>{name}</strong>{topic ? ` · ${topic}` : ''}
               </div>
             </div>
           </div>
         </div>
 
-        {listItems.length > 0 && (
-          <div className="brand-check__list-section">
-            <h3 className="brand-check__list-title">
-              AI'nın "{topic}" alanında tanıdığı isimler
-            </h3>
-            <div className="brand-check__list">
-              {listItems.map((item, i) => {
-                const cleanItem = item.replace(/^•\s*/, '')
-                const [namepart, ...rest] = cleanItem.split('—')
-                const isYou = recognized && namepart && namepart.toLowerCase().includes(name.toLowerCase().split(' ')[0])
-                return (
-                  <div key={i} className={`brand-check__list-item ${isYou ? 'brand-check__list-item--highlight' : ''}`}>
-                    <span className="brand-check__list-bullet">•</span>
-                    <span>
-                      <strong>{namepart?.trim()}</strong>
-                      {rest.length > 0 && <span className="brand-check__list-desc"> — {rest.join('—').trim()}</span>}
-                    </span>
-                    {isYou && <span className="brand-check__list-you">Siz</span>}
-                  </div>
-                )
-              })}
+        <div className="brand-check__models">
+          {Object.entries(model_results).map(([key, val]) => (
+            <div key={key} className={`brand-check__model-card ${val.recognized ? 'brand-check__model-card--found' : 'brand-check__model-card--notfound'}`}>
+              <span className="brand-check__model-icon">{val.recognized ? '✓' : '✗'}</span>
+              <span className="brand-check__model-name">{MODEL_LABELS[key] || val.model}</span>
+              <span className="brand-check__model-status">{val.recognized ? 'Tanıyor' : 'Tanımıyor'}</span>
             </div>
-          </div>
-        )}
+          ))}
+        </div>
 
         <div className="results__cta-compact" style={{ marginTop: 32 }}>
           <span className="results__cta-compact-text">
-            {recognized
+            {count > 0
               ? 'Web sitenizin tam AI görünürlüğünü de ölçelim'
-              : 'Bu skoru nasıl yükseltirsiniz? GEO ile AI\'da görünür olun'}
+              : 'GEO ile AI motorlarında görünür olun'}
           </span>
           <a href="https://geoni.ai#paketler" className="results__cta-compact-btn" target="_blank" rel="noopener">
             GEO Paketlerini İncele →
@@ -86,7 +81,7 @@ export default function BrandCheckResultsPage({ result, onReset }) {
 
         <div className="results__sticky-bar">
           <span className="results__sticky-text">
-            {recognized ? 'AI sizi tanıyor — peki web sitenizi buluyor mu?' : 'AI sizi tanımıyor — GEO ile bunu değiştirebilirsiniz'}
+            {count > 0 ? `${count}/${total} AI motoru sizi tanıyor` : 'Hiçbir AI motoru sizi tanımıyor — GEO ile değiştirin'}
           </span>
           <a href="https://geoni.ai#paketler" className="results__sticky-btn" target="_blank" rel="noopener">
             GEO Paketlerini İncele →

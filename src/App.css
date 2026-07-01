@@ -762,3 +762,52 @@ body {
   padding: 2px 8px;
   flex-shrink: 0;
 }
+
+/* ===== BRAND CHECK MODEL CARDS ===== */
+.brand-check__models {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.brand-check__model-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 16px;
+  border-radius: 12px;
+  border: 1px solid;
+  text-align: center;
+}
+.brand-check__model-card--found {
+  background: rgba(74,222,128,.05);
+  border-color: rgba(74,222,128,.25);
+}
+.brand-check__model-card--notfound {
+  background: rgba(248,113,113,.04);
+  border-color: rgba(248,113,113,.2);
+}
+.brand-check__model-icon {
+  font-size: 1.3rem;
+}
+.brand-check__model-card--found .brand-check__model-icon { color: #4ade80; }
+.brand-check__model-card--notfound .brand-check__model-icon { color: #f87171; }
+.brand-check__model-name {
+  font-family: var(--display);
+  font-size: .95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.brand-check__model-status {
+  font-family: var(--mono);
+  font-size: .72rem;
+  color: var(--text-muted);
+}
+.brand-check__status--partial {
+  background: rgba(251,191,36,.05);
+  border-color: rgba(251,191,36,.3);
+}
+@media (max-width: 600px) {
+  .brand-check__models { grid-template-columns: 1fr; }
+}

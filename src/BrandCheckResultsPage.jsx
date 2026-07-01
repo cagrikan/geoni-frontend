@@ -61,23 +61,25 @@ function TopicCard({ topic, isOpportunity }) {
   return (
     <div className="topic-card">
       <div className="topic-card__title">{topic.topic}</div>
-      {!isOpportunity && topic.source_url && (
-        <a
-          href={topic.source_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="topic-card__source"
-        >
-          {new URL(topic.source_url).hostname.replace('www.', '')} →
-        </a>
-      )}
-      <div className="topic-card__meta">
-        {(topic.platforms || []).map((p) => (
-          <span className="topic-badge topic-badge--platform" key={p}>{p}</span>
-        ))}
-        {isOpportunity && (topic.competitors || []).slice(0, 3).map((c) => (
-          <span className="topic-badge topic-badge--competitor" key={c}>{c}</span>
-        ))}
+      <div className="topic-card__footer">
+        <div className="topic-card__meta">
+          {(topic.platforms || []).map((p) => (
+            <span className="topic-badge topic-badge--platform" key={p}>{p}</span>
+          ))}
+          {isOpportunity && (topic.competitors || []).slice(0, 3).map((c) => (
+            <span className="topic-badge topic-badge--competitor" key={c}>{c}</span>
+          ))}
+        </div>
+        {!isOpportunity && topic.source_url && (
+          <a
+            href={topic.source_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="topic-card__source"
+          >
+            {(() => { try { return new URL(topic.source_url).hostname.replace('www.', '') } catch { return topic.source_url } })()} →
+          </a>
+        )}
       </div>
     </div>
   )
@@ -101,6 +103,14 @@ export default function BrandCheckResultsPage({ result, onReset }) {
     ? new Date(created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })
     : null
 
+  const formattedTime = created_at
+    ? new Date(created_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+    : null
+
+  const capitalizedName = name
+    ? name.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+    : name
+
   const total = Object.keys(model_results).length || 3
 
   return (
@@ -116,11 +126,15 @@ export default function BrandCheckResultsPage({ result, onReset }) {
         <div className="results__header">
           <div>
             <h1 className="results__title">AI Bilinirlik Raporu</h1>
-            {formattedDate && <div className="results__date">{formattedDate} tarihinde oluşturuldu</div>}
+            {formattedDate && (
+              <div className="results__date">
+                {formattedDate}{formattedTime && <span style={{ marginLeft: 8, opacity: .7 }}>{formattedTime}</span>} tarihinde oluşturuldu
+              </div>
+            )}
           </div>
           <div className="results__scanned">
             <span className="results__scanned-label">Sorgulanan</span>
-            <span className="results__scanned-value">{name}</span>
+            <span className="results__scanned-value">{capitalizedName}</span>
             {topic && topic !== name && (
               <span style={{ display: 'block', fontFamily: 'var(--mono)', fontSize: '.72rem', color: 'var(--text-muted)', marginTop: 2 }}>{topic}</span>
             )}
@@ -139,14 +153,14 @@ export default function BrandCheckResultsPage({ result, onReset }) {
           </a>
         </div>
 
-        <div className="results__stats">
+        <div className="results__stats results__stats--five">
           <div className="results__stat">
             <span className="results__stat-n">{recognition_count}/{total}</span>
             <span className="results__stat-l">Tanıyan Model</span>
           </div>
           <div className="results__stat">
             <span className="results__stat-n">{google_result_count}</span>
-            <span className="results__stat-l">Google Sonucu</span>
+            <span className="results__stat-l">Web Sonucu</span>
           </div>
           <div className="results__stat">
             <span className="results__stat-n" style={{ color: model_results?.claude?.recognized ? 'var(--good)' : 'var(--bad)' }}>
@@ -159,6 +173,12 @@ export default function BrandCheckResultsPage({ result, onReset }) {
               {model_results?.openai?.recognized ? 'Evet' : 'Hayır'}
             </span>
             <span className="results__stat-l">ChatGPT Tanıyor</span>
+          </div>
+          <div className="results__stat">
+            <span className="results__stat-n" style={{ color: model_results?.gemini?.recognized ? 'var(--good)' : 'var(--bad)' }}>
+              {model_results?.gemini?.recognized ? 'Evet' : 'Hayır'}
+            </span>
+            <span className="results__stat-l">Gemini Tanıyor</span>
           </div>
         </div>
 

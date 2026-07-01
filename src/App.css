@@ -988,3 +988,28 @@ body {
   transition: opacity .2s;
 }
 .topic-card__source:hover { opacity: 1; }
+
+/* ===== TOPIC CARD FOOTER (source link + badges in same row) ===== */
+.topic-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.topic-card__source {
+  font-family: var(--mono);
+  font-size: .72rem;
+  color: var(--accent-2);
+  text-decoration: none;
+  opacity: .8;
+  transition: opacity .2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.topic-card__source:hover { opacity: 1; }
+
+/* 5-column stats grid for brand check */
+.results__stats--five {
+  grid-template-columns: repeat(5, 1fr);
+}

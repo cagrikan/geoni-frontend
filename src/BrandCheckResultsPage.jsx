@@ -61,6 +61,16 @@ function TopicCard({ topic, isOpportunity }) {
   return (
     <div className="topic-card">
       <div className="topic-card__title">{topic.topic}</div>
+      {!isOpportunity && topic.source_url && (
+        <a
+          href={topic.source_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="topic-card__source"
+        >
+          {new URL(topic.source_url).hostname.replace('www.', '')} →
+        </a>
+      )}
       <div className="topic-card__meta">
         {(topic.platforms || []).map((p) => (
           <span className="topic-badge topic-badge--platform" key={p}>{p}</span>

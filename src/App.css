@@ -975,3 +975,16 @@ body {
   flex-shrink: 0;
   font-weight: 700;
 }
+
+/* ===== TOPIC CARD SOURCE LINK ===== */
+.topic-card__source {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: .72rem;
+  color: var(--accent-2);
+  text-decoration: none;
+  margin-bottom: 6px;
+  opacity: .8;
+  transition: opacity .2s;
+}
+.topic-card__source:hover { opacity: 1; }

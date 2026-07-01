@@ -300,22 +300,32 @@ body {
 .results__header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 40px;
+  align-items: flex-end;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border-mid);
   flex-wrap: wrap;
   gap: 16px;
 }
 .results__domain {
   font-family: var(--mono);
-  font-size: .8rem;
-  color: var(--text-muted);
-  letter-spacing: .04em;
-  margin-bottom: 6px;
+  font-size: .78rem;
+  color: var(--accent);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
 }
 .results__title {
   font-family: var(--display);
   font-size: clamp(1.6rem, 2.6vw, 2.2rem);
   font-weight: 700;
+  color: var(--text);
+  margin: 0 0 6px;
+}
+.results__date {
+  font-family: var(--mono);
+  font-size: .78rem;
+  color: var(--text-muted);
 }
 .results__reset {
   background: none;

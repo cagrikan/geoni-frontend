@@ -90,7 +90,12 @@ export default function ResultsPage({ result, onReset }) {
     platforms,
     top_topics = [],
     opportunities = [],
+    created_at,
   } = result
+
+  const formattedDate = created_at
+    ? new Date(created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })
+    : null
 
   return (
     <>
@@ -106,6 +111,7 @@ export default function ResultsPage({ result, onReset }) {
           <div>
             <div className="results__domain">{domain}</div>
             <h1 className="results__title">AI Görünürlük Raporu</h1>
+            {formattedDate && <div className="results__date">{formattedDate} tarihinde oluşturuldu</div>}
           </div>
           <button className="results__reset" onClick={onReset}>Yeni Tarama</button>
         </div>

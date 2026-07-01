@@ -85,6 +85,9 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
 
   return (
     <div className="landing">
+      <div className="landing__radar-wrap">
+        <BgRadar active={loading} />
+      </div>
       <header className="landing__nav">
         <div className="landing__brand">
           <GeoniMark />
@@ -93,9 +96,6 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
       </header>
 
       <section className="landing__hero">
-        <div className="landing__radar-wrap">
-          <BgRadar active={loading} />
-        </div>
         <div className="landing__hero-left">
 
           <div className="landing__hero-wrap">

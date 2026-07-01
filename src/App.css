@@ -78,9 +78,9 @@ body {
   position: relative;
 }
 .landing__radar-wrap {
-  position: absolute;
+  position: fixed;
   top: 50%;
-  left: 35%;
+  left: 28%;
   transform: translate(-50%, -50%);
   width: 875px;
   height: 875px;
@@ -282,11 +282,14 @@ body {
   display: flex;
   gap: 16px;
   align-items: flex-start;
-  background: var(--surface);
+  background: rgba(14, 14, 28, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 20px 22px;
   transition: border-color .25s, transform .25s;
+  opacity: 0.92;
 }
 .landing__how-item:hover {
   border-color: rgba(129, 140, 248, .45);

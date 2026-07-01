@@ -85,7 +85,7 @@ body {
   z-index: 1;
   margin-top: 10px;
   margin-left: auto;
-  max-width: 480px;
+  max-width: 560px;
 }
 .landing__eyebrow {
   font-family: var(--mono);
@@ -189,13 +189,14 @@ body {
 /* ===== BACKGROUND RADAR (contained within left column, shifted left) ===== */
 .bg-radar {
   position: absolute;
-  top: -260px;
-  left: -260px;
-  width: 1200px;
-  height: 1200px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 700px;
+  height: 700px;
   z-index: 0;
   pointer-events: none;
-  opacity: .45;
+  opacity: .35;
 }
 .bg-radar__ring { opacity: .3; }
 .bg-radar__sweep-group {

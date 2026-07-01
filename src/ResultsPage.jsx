@@ -98,6 +98,10 @@ export default function ResultsPage({ result, onReset }) {
     ? new Date(created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })
     : null
 
+  const formattedTime = created_at
+    ? new Date(created_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+    : null
+
   return (
     <>
       <header className="landing__nav">
@@ -111,7 +115,11 @@ export default function ResultsPage({ result, onReset }) {
         <div className="results__header">
           <div>
             <h1 className="results__title">AI Görünürlük Raporu</h1>
-            {formattedDate && <div className="results__date">{formattedDate} tarihinde oluşturuldu</div>}
+            {formattedDate && (
+              <div className="results__date">
+                {formattedDate}{formattedTime && <span style={{ marginLeft: 8, opacity: .7 }}>{formattedTime}</span>} tarihinde oluşturuldu
+              </div>
+            )}
           </div>
           <div className="results__scanned">
             <span className="results__scanned-label">Taranan Alan Adı</span>
@@ -131,7 +139,7 @@ export default function ResultsPage({ result, onReset }) {
           </a>
         </div>
 
-        <div className="results__stats">
+        <div className="results__stats results__stats--five">
           <div className="results__stat">
             <span className="results__stat-n">{total_pages}</span>
             <span className="results__stat-l">Taranan Sayfa</span>
@@ -141,12 +149,22 @@ export default function ResultsPage({ result, onReset }) {
             <span className="results__stat-l">Dizinli Sayfa</span>
           </div>
           <div className="results__stat">
-            <span className="results__stat-n">{platforms?.chatgpt ? 'Evet' : 'Hayır'}</span>
-            <span className="results__stat-l">ChatGPT Erişimi</span>
+            <span className="results__stat-n" style={{ color: platforms?.chatgpt ? 'var(--good)' : 'var(--bad)' }}>
+              {platforms?.chatgpt ? 'Evet' : 'Hayır'}
+            </span>
+            <span className="results__stat-l">ChatGPT Erişim İzni</span>
           </div>
           <div className="results__stat">
-            <span className="results__stat-n">{platforms?.anthropic ? 'Evet' : 'Hayır'}</span>
-            <span className="results__stat-l">Claude Erişimi</span>
+            <span className="results__stat-n" style={{ color: platforms?.anthropic ? 'var(--good)' : 'var(--bad)' }}>
+              {platforms?.anthropic ? 'Evet' : 'Hayır'}
+            </span>
+            <span className="results__stat-l">Claude Erişim İzni</span>
+          </div>
+          <div className="results__stat">
+            <span className="results__stat-n" style={{ color: platforms?.google ? 'var(--good)' : 'var(--bad)' }}>
+              {platforms?.google ? 'Evet' : 'Hayır'}
+            </span>
+            <span className="results__stat-l">Gemini Erişim İzni</span>
           </div>
         </div>
 

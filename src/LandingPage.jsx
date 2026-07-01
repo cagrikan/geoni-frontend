@@ -42,7 +42,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
       onSubmitAudit(domain, email)
     } else {
       if (!name) return
-      onSubmitBrandCheck(name, topic || name, email || 'anonymous@geoni.ai')
+      onSubmitBrandCheck(name, topic || '', email || 'anonymous@geoni.ai')
     }
   }
 

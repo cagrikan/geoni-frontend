@@ -28,14 +28,22 @@ function BgRadar({ active }) {
   )
 }
 
-export default function LandingPage({ onSubmit, loading, statusText, error }) {
+export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading, statusText, error }) {
+  const [mode, setMode] = useState('site') // 'site' | 'brand'
   const [domain, setDomain] = useState('')
   const [email, setEmail] = useState('')
+  const [name, setName] = useState('')
+  const [topic, setTopic] = useState('')
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (!domain || !email) return
-    onSubmit(domain, email)
+    if (mode === 'site') {
+      if (!domain || !email) return
+      onSubmitAudit(domain, email)
+    } else {
+      if (!name) return
+      onSubmitBrandCheck(name, topic || name, email || 'anonymous@geoni.ai')
+    }
   }
 
   return (
@@ -60,43 +68,104 @@ export default function LandingPage({ onSubmit, loading, statusText, error }) {
             </h1>
             <p className="landing__subhead">
               ChatGPT, Claude ve Perplexity artık tek bir yanıt veriyor — listelemiyor.
-              O yanıtta yer almayan marka, müşteri için yok hükmünde. Sitenizi tarayıp
-              şu anki AI görünürlüğünüzü ölçelim.
+              O yanıtta yer almayan marka, müşteri için yok hükmünde.
+              Sitenizi tarayıp şu anki AI görünürlüğünüzü ölçelim.
             </p>
 
-            <form className="landing__form" onSubmit={handleSubmit}>
-              <div className="landing__field">
-                <label htmlFor="domain">Web sitesi</label>
-                <input
-                  id="domain"
-                  type="text"
-                  placeholder="firmaniz.com"
-                  value={domain}
-                  onChange={(e) => setDomain(e.target.value)}
-                  disabled={loading}
-                  required
-                />
-              </div>
-              <div className="landing__field">
-                <label htmlFor="email">E-posta</label>
-                <input
-                  id="email"
-                  type="email"
-                  placeholder="ad@firmaniz.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={loading}
-                  required
-                />
-              </div>
-              <button type="submit" className="landing__submit" disabled={loading}>
-                {loading ? statusText + '…' : 'Ücretsiz Taramayı Başlat'}
+            <div className="mode-toggle">
+              <button
+                className={`mode-toggle__btn ${mode === 'site' ? 'mode-toggle__btn--active' : ''}`}
+                onClick={() => setMode('site')}
+                type="button"
+              >
+                Web Sitesi Tara
               </button>
+              <button
+                className={`mode-toggle__btn ${mode === 'brand' ? 'mode-toggle__btn--active' : ''}`}
+                onClick={() => setMode('brand')}
+                type="button"
+              >
+                İsim / Kurum Sorgula
+              </button>
+            </div>
+
+            <form className="landing__form" onSubmit={handleSubmit}>
+              {mode === 'site' ? (
+                <>
+                  <div className="landing__field">
+                    <label htmlFor="domain">Web sitesi</label>
+                    <input
+                      id="domain"
+                      type="text"
+                      placeholder="firmaniz.com"
+                      value={domain}
+                      onChange={(e) => setDomain(e.target.value)}
+                      disabled={loading}
+                      required
+                    />
+                  </div>
+                  <div className="landing__field">
+                    <label htmlFor="email">E-posta</label>
+                    <input
+                      id="email"
+                      type="email"
+                      placeholder="ad@firmaniz.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={loading}
+                      required
+                    />
+                  </div>
+                  <button type="submit" className="landing__submit" disabled={loading}>
+                    {loading ? statusText + '…' : 'Ücretsiz Taramayı Başlat'}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="landing__field">
+                    <label htmlFor="name">Adınız veya Kurum Adı</label>
+                    <input
+                      id="name"
+                      type="text"
+                      placeholder="Ahmet Yılmaz veya ACME A.Ş."
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      disabled={loading}
+                      required
+                    />
+                  </div>
+                  <div className="landing__field">
+                    <label htmlFor="topic">Alan / Konu <span style={{color:'var(--text-muted)',fontWeight:400}}>(isteğe bağlı)</span></label>
+                    <input
+                      id="topic"
+                      type="text"
+                      placeholder="dijital dönüşüm, siyaset, yatırım..."
+                      value={topic}
+                      onChange={(e) => setTopic(e.target.value)}
+                      disabled={loading}
+                    />
+                  </div>
+                  <div className="landing__field">
+                    <label htmlFor="brand-email">E-posta <span style={{color:'var(--text-muted)',fontWeight:400}}>(isteğe bağlı)</span></label>
+                    <input
+                      id="brand-email"
+                      type="email"
+                      placeholder="ad@firmaniz.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={loading}
+                    />
+                  </div>
+                  <button type="submit" className="landing__submit" disabled={loading}>
+                    {loading ? statusText + '…' : 'AI\'da Beni Ara'}
+                  </button>
+                </>
+              )}
             </form>
 
             {error && <p className="landing__error">{error}</p>}
 
-            <p className="landing__trust">Kredi kartı gerekmez · Sonuç ~60 saniyede hazır</p>
+            <p className="landing__trust">Kredi kartı gerekmez · Sonuç ~30 saniyede hazır</p>
           </div>
         </div>
 
@@ -131,4 +200,3 @@ export default function LandingPage({ onSubmit, loading, statusText, error }) {
     </div>
   )
 }
-

@@ -41,6 +41,7 @@ const BREAKDOWN_LABELS = {
   freshness: 'Tazelik',
   schema: 'Şema Bütünlüğü',
   engagement: 'Etkileşim',
+  brand_recall: 'Marka Bilinirliği',
 }
 
 function Breakdown({ breakdown }) {

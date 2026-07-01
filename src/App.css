@@ -70,15 +70,17 @@ body {
 .landing__hero {
   min-height: calc(100vh - 64px);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 56px;
   padding: 24px 48px 48px;
   max-width: 1400px;
   margin: 0 auto;
+  padding-top: 60px;
 }
 .landing__hero-left {
   flex: 1.1;
   position: relative;
+  min-height: 600px;
 }
 .landing__hero-wrap {
   position: relative;
@@ -238,8 +240,6 @@ body {
   border-left: 1px solid var(--border);
   padding-left: 56px;
   align-self: flex-start;
-  position: sticky;
-  top: 40px;
 }
 .landing__how-eyebrow {
   font-family: var(--mono);

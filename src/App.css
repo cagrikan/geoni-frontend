@@ -307,13 +307,24 @@ body {
   flex-wrap: wrap;
   gap: 16px;
 }
-.results__domain {
+.results__scanned {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+}
+.results__scanned-label {
   font-family: var(--mono);
-  font-size: .78rem;
-  color: var(--accent);
-  letter-spacing: .06em;
+  font-size: .7rem;
+  letter-spacing: .08em;
   text-transform: uppercase;
-  margin-bottom: 8px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+.results__scanned-value {
+  font-family: var(--mono);
+  font-size: .95rem;
+  color: var(--accent);
 }
 .results__title {
   font-family: var(--display);

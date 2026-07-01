@@ -109,11 +109,13 @@ export default function ResultsPage({ result, onReset }) {
       <div className="results">
         <div className="results__header">
           <div>
-            <div className="results__domain">{domain}</div>
             <h1 className="results__title">AI Görünürlük Raporu</h1>
             {formattedDate && <div className="results__date">{formattedDate} tarihinde oluşturuldu</div>}
           </div>
-          <button className="results__reset" onClick={onReset}>Yeni Tarama</button>
+          <div className="results__scanned">
+            <span className="results__scanned-label">Taranan Alan Adı</span>
+            <span className="results__scanned-value">{domain}</span>
+          </div>
         </div>
 
         <div className="results__top">

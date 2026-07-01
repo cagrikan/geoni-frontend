@@ -100,10 +100,10 @@ export default function ResultsPage({ result, onReset }) {
   return (
     <>
       <header className="landing__nav">
-        <div className="landing__brand">
+        <button className="landing__brand landing__brand--clickable" onClick={onReset}>
           <GeoniMark />
           <span className="landing__logo">GEONI</span>
-        </div>
+        </button>
       </header>
 
       <div className="results">

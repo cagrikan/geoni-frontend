@@ -47,6 +47,13 @@ body {
   align-items: center;
   gap: 10px;
 }
+.landing__brand--clickable {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+}
 .geoni-mark {
   width: 36px;
   height: 36px;

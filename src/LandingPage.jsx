@@ -93,8 +93,10 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
       </header>
 
       <section className="landing__hero">
-        <div className="landing__hero-left">
+        <div className="landing__radar-wrap">
           <BgRadar active={loading} />
+        </div>
+        <div className="landing__hero-left">
 
           <div className="landing__hero-wrap">
             <p className="landing__eyebrow">AI Görünürlük Taraması</p>

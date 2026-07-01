@@ -59,11 +59,12 @@ body {
   height: 36px;
 }
 .landing__logo {
-  font-family: var(--display);
-  font-weight: 400;
-  font-size: 1.2rem;
-  letter-spacing: .22em;
-  color: var(--text);
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 1.1rem;
+  letter-spacing: 0.22em;
+  color: #64748B;
+  text-transform: lowercase;
 }
 
 /* ===== HERO ===== */
@@ -80,7 +81,7 @@ body {
 .landing__radar-wrap {
   position: fixed;
   top: 50%;
-  left: 28%;
+  left: 58%;
   transform: translate(-50%, -50%);
   width: 875px;
   height: 875px;

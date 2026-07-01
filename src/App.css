@@ -1078,3 +1078,10 @@ body {
   transition: opacity .2s;
 }
 .identity-mismatch__btn:hover { opacity: .85; }
+
+/* Prevent label text wrapping in 2-col rows */
+.landing__field-row .landing__field label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

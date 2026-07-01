@@ -153,7 +153,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
                       <input id="person-role" type="text" placeholder="CTO, Avukat, Milletvekili..." value={personRole} onChange={e => setPersonRole(e.target.value)} disabled={loading} />
                     </div>
                     <div className="landing__field">
-                      <label htmlFor="person-company">Şirket / Kurum {OPT}</label>
+                      <label htmlFor="person-company">Şirket {OPT}</label>
                       <input id="person-company" type="text" placeholder="ARD Grup, Geoni.ai..." value={personCompany} onChange={e => setPersonCompany(e.target.value)} disabled={loading} />
                     </div>
                   </div>

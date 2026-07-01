@@ -115,6 +115,13 @@ export default function ResultsPage({ result, onReset }) {
           <Breakdown breakdown={score_breakdown} />
         </div>
 
+        <div className="results__cta-compact">
+          <span className="results__cta-compact-text">Bu skoru nasıl yükseltiriz?</span>
+          <a href="https://geoni.ai#paketler" className="results__cta-compact-btn" target="_blank" rel="noopener">
+            GEO Paketlerini İncele →
+          </a>
+        </div>
+
         <div className="results__stats">
           <div className="results__stat">
             <span className="results__stat-n">{total_pages}</span>
@@ -152,8 +159,25 @@ export default function ResultsPage({ result, onReset }) {
             )}
           </div>
         </div>
+
+        <div className="results__cta">
+          <div className="results__cta-inner">
+            <p className="results__cta-eyebrow">Sonraki Adım</p>
+            <h2 className="results__cta-title">Bu skoru nasıl yükseltiriz?</h2>
+            <p className="results__cta-sub">ChatGPT, Perplexity ve Claude'un sizi kaynak olarak göstermesi için sistematik GEO çalışması gerekiyor. Rakipleriniz bu yarışa çoktan girdi.</p>
+            <a href="https://geoni.ai#paketler" className="results__cta-btn" target="_blank" rel="noopener">
+              GEO Paketlerini İncele →
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div className="results__sticky-bar">
+        <span className="results__sticky-text">Skorunuzu yükseltmek ister misiniz?</span>
+        <a href="https://geoni.ai#paketler" className="results__sticky-btn" target="_blank" rel="noopener">
+          GEO Paketlerini İncele →
+        </a>
       </div>
     </>
   )
 }
-

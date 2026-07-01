@@ -491,3 +491,127 @@ body {
   .topics { grid-template-columns: 1fr; }
 }
 
+/* ===== RESULTS CTA ===== */
+.results__cta {
+  margin-top: 48px;
+  border-top: 1px solid var(--border);
+  padding-top: 48px;
+  padding-bottom: 48px;
+}
+.results__cta-inner {
+  background: linear-gradient(135deg, rgba(129,140,248,.08) 0%, rgba(34,211,238,.05) 100%);
+  border: 1px solid rgba(129,140,248,.25);
+  border-radius: 18px;
+  padding: 40px;
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto;
+}
+.results__cta-eyebrow {
+  font-family: var(--mono);
+  font-size: .75rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.results__cta-title {
+  font-family: var(--display);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+.results__cta-sub {
+  color: var(--text-sub);
+  font-size: .95rem;
+  line-height: 1.7;
+  margin-bottom: 28px;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.results__cta-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #0D0D1A;
+  padding: 14px 32px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: .95rem;
+  transition: opacity .2s, transform .15s;
+}
+.results__cta-btn:hover { opacity: .88; transform: translateY(-2px); }
+
+/* ===== RESULTS COMPACT CTA (below score section) ===== */
+.results__cta-compact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: rgba(129,140,248,.06);
+  border: 1px solid rgba(129,140,248,.2);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+.results__cta-compact-text {
+  color: var(--text-sub);
+  font-size: .92rem;
+}
+.results__cta-compact-btn {
+  background: var(--accent);
+  color: #0D0D1A;
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: .85rem;
+  white-space: nowrap;
+  transition: opacity .2s;
+}
+.results__cta-compact-btn:hover { opacity: .88; }
+
+/* ===== RESULTS STICKY BAR ===== */
+.results__sticky-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: rgba(14,14,28,.92);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(129,140,248,.3);
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.results__sticky-text {
+  color: var(--text-sub);
+  font-size: .88rem;
+}
+.results__sticky-btn {
+  background: var(--accent);
+  color: #0D0D1A;
+  padding: 10px 22px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: .85rem;
+  white-space: nowrap;
+  transition: opacity .2s, transform .15s;
+}
+.results__sticky-btn:hover { opacity: .88; transform: translateY(-1px); }
+
+/* Add bottom padding to results so sticky bar doesn't cover the CTA section */
+.results { padding-bottom: 100px; }
+
+@media (max-width: 600px) {
+  .results__cta-compact { flex-direction: column; align-items: stretch; text-align: center; }
+  .results__sticky-bar { flex-direction: column; gap: 8px; padding: 10px 16px; }
+}

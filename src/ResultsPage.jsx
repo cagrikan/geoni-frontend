@@ -1,4 +1,5 @@
 import GeoniMark from './GeoniMark'
+import ProBlur from './ProBlur'
 
 function scoreColor(score) {
   if (score >= 65) return 'var(--good)'
@@ -11,23 +12,14 @@ function ScoreGauge({ score }) {
   const circumference = 2 * Math.PI * radius
   const offset = circumference - (score / 100) * circumference
   const color = scoreColor(score)
-
   return (
     <div className="score-gauge">
       <svg viewBox="0 0 160 160" className="score-gauge__svg">
-        <circle
-          cx="80" cy="80" r={radius}
-          fill="none" stroke="var(--border)" strokeWidth="10"
-        />
-        <circle
-          cx="80" cy="80" r={radius}
-          fill="none" stroke={color} strokeWidth="10"
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          strokeLinecap="round"
-          transform="rotate(-90 80 80)"
-          style={{ transition: 'stroke-dashoffset 0.8s ease' }}
-        />
+        <circle cx="80" cy="80" r={radius} fill="none" stroke="var(--border)" strokeWidth="10" />
+        <circle cx="80" cy="80" r={radius} fill="none" stroke={color} strokeWidth="10"
+          strokeDasharray={circumference} strokeDashoffset={offset}
+          strokeLinecap="round" transform="rotate(-90 80 80)"
+          style={{ transition: 'stroke-dashoffset 0.8s ease' }} />
       </svg>
       <div className="score-gauge__num" style={{ color }}>{score}</div>
       <div className="score-gauge__label">AI Görünürlük Skoru</div>
@@ -54,10 +46,7 @@ function Breakdown({ breakdown }) {
             <span className="breakdown__row-value">{value}</span>
           </div>
           <div className="breakdown__bar-track">
-            <div
-              className="breakdown__bar-fill"
-              style={{ width: `${Math.min(value, 100)}%` }}
-            />
+            <div className="breakdown__bar-fill" style={{ width: `${Math.min(value, 100)}%` }} />
           </div>
         </div>
       ))}
@@ -83,24 +72,23 @@ function TopicCard({ topic, isOpportunity }) {
 
 export default function ResultsPage({ result, onReset }) {
   const {
-    domain,
-    score,
-    score_breakdown,
-    total_pages,
-    indexed_pages,
-    platforms,
-    top_topics = [],
-    opportunities = [],
+    domain, score, score_breakdown,
+    total_pages, indexed_pages, platforms,
+    top_topics = [], opportunities = [],
     created_at,
   } = result
 
   const formattedDate = created_at
     ? new Date(created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })
     : null
-
   const formattedTime = created_at
     ? new Date(created_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
     : null
+
+  const freeTopics = top_topics.slice(0, 2)
+  const paidTopics = top_topics.slice(2)
+  const freeOpps = opportunities.slice(0, 2)
+  const paidOpps = opportunities.slice(2)
 
   return (
     <>
@@ -127,9 +115,12 @@ export default function ResultsPage({ result, onReset }) {
           </div>
         </div>
 
+        {/* Skor + Breakdown (breakdown blur) */}
         <div className="results__top">
           <ScoreGauge score={score} />
-          <Breakdown breakdown={score_breakdown} />
+          <ProBlur label="Detaylı skor dökümü Pro planında">
+            <Breakdown breakdown={score_breakdown} />
+          </ProBlur>
         </div>
 
         <div className="results__cta-compact">
@@ -139,50 +130,64 @@ export default function ResultsPage({ result, onReset }) {
           </a>
         </div>
 
+        {/* Stats */}
         <div className="results__stats results__stats--five">
           <div className="results__stat">
             <span className="results__stat-n">{total_pages}</span>
             <span className="results__stat-l">Taranan Sayfa</span>
           </div>
           <div className="results__stat">
-            <span className="results__stat-n">{indexed_pages}</span>
-            <span className="results__stat-l">Dizinli Sayfa</span>
-          </div>
-          <div className="results__stat">
             <span className="results__stat-n" style={{ color: platforms?.chatgpt ? 'var(--good)' : 'var(--bad)' }}>
               {platforms?.chatgpt ? 'Evet' : 'Hayır'}
             </span>
-            <span className="results__stat-l">ChatGPT Erişim İzni</span>
+            <span className="results__stat-l">ChatGPT Bot İzni</span>
           </div>
           <div className="results__stat">
             <span className="results__stat-n" style={{ color: platforms?.anthropic ? 'var(--good)' : 'var(--bad)' }}>
               {platforms?.anthropic ? 'Evet' : 'Hayır'}
             </span>
-            <span className="results__stat-l">Claude Erişim İzni</span>
+            <span className="results__stat-l">Claude Bot İzni</span>
           </div>
           <div className="results__stat">
             <span className="results__stat-n" style={{ color: platforms?.google ? 'var(--good)' : 'var(--bad)' }}>
               {platforms?.google ? 'Evet' : 'Hayır'}
             </span>
-            <span className="results__stat-l">Gemini Erişim İzni</span>
+            <span className="results__stat-l">Gemini Bot İzni</span>
+          </div>
+          <div className="results__stat">
+            <ProBlur label="Pro">
+              <span className="results__stat-n">—</span>
+              <span className="results__stat-l">llm.txt</span>
+            </ProBlur>
           </div>
         </div>
 
+        {/* Topics */}
         <div className="topics">
           <div className="topics__col">
             <h3><span className="topics__col-icon">✓</span> Güçlü Olduğunuz Konular</h3>
-            {top_topics.length > 0 ? (
-              top_topics.map((t, i) => <TopicCard topic={t} key={i} />)
+            {freeTopics.length > 0 ? (
+              freeTopics.map((t, i) => <TopicCard topic={t} key={i} />)
             ) : (
               <div className="topics__empty">Henüz güçlü bir konu tespit edilmedi.</div>
+            )}
+            {paidTopics.length > 0 && (
+              <ProBlur label={`+${paidTopics.length} konu daha Pro planında`}>
+                {paidTopics.map((t, i) => <TopicCard topic={t} key={i} />)}
+              </ProBlur>
             )}
           </div>
           <div className="topics__col">
             <h3><span className="topics__col-icon">→</span> Kaçırdığınız Fırsatlar</h3>
-            {opportunities.length > 0 ? (
-              opportunities.map((t, i) => <TopicCard topic={t} isOpportunity key={i} />)
+            {freeOpps.length > 0 ? (
+              freeOpps.map((t, i) => <TopicCard topic={t} isOpportunity key={i} />)
             ) : (
               <div className="topics__empty">Fırsat alanı tespit edilmedi.</div>
+            )}
+            {paidOpps.length > 0 && (
+              <ProBlur label={`+${paidOpps.length} fırsat daha Pro planında`}>
+                {paidOpps.map((t, i) => <TopicCard topic={t} isOpportunity key={i} />)}
+              </ProBlur>
             )}
           </div>
         </div>

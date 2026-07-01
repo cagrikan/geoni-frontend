@@ -1,4 +1,5 @@
 import GeoniMark from './GeoniMark'
+import ProBlur from './ProBlur'
 
 function scoreColor(score) {
   if (score >= 65) return 'var(--good)'
@@ -113,6 +114,11 @@ export default function BrandCheckResultsPage({ result, onReset }) {
 
   const total = Object.keys(model_results).length || 3
 
+  const freePerforming = performing_topics.slice(0, 2)
+  const paidPerforming = performing_topics.slice(2)
+  const freeOpps = opportunity_topics.slice(0, 2)
+  const paidOpps = opportunity_topics.slice(2)
+
   return (
     <>
       <header className="landing__nav">
@@ -143,7 +149,9 @@ export default function BrandCheckResultsPage({ result, onReset }) {
 
         <div className="results__top">
           <ScoreGauge score={score} />
-          <Breakdown breakdown={score_breakdown} />
+          <ProBlur label="Detaylı skor dökümü Pro planında">
+            <Breakdown breakdown={score_breakdown} />
+          </ProBlur>
         </div>
 
         <div className="results__cta-compact">
@@ -185,18 +193,28 @@ export default function BrandCheckResultsPage({ result, onReset }) {
         <div className="topics">
           <div className="topics__col">
             <h3><span className="topics__col-icon">✓</span> Güçlü Olduğunuz Konular</h3>
-            {performing_topics.length > 0 ? (
-              performing_topics.map((t, i) => <TopicCard topic={t} key={i} />)
+            {freePerforming.length > 0 ? (
+              freePerforming.map((t, i) => <TopicCard topic={t} key={i} />)
             ) : (
               <div className="topics__empty">Henüz güçlü bir konu tespit edilmedi.</div>
+            )}
+            {paidPerforming.length > 0 && (
+              <ProBlur label={`+${paidPerforming.length} konu daha Pro planında`}>
+                {paidPerforming.map((t, i) => <TopicCard topic={t} key={i} />)}
+              </ProBlur>
             )}
           </div>
           <div className="topics__col">
             <h3><span className="topics__col-icon">→</span> Kaçırdığınız Fırsatlar</h3>
-            {opportunity_topics.length > 0 ? (
-              opportunity_topics.map((t, i) => <TopicCard topic={t} isOpportunity key={i} />)
+            {freeOpps.length > 0 ? (
+              freeOpps.map((t, i) => <TopicCard topic={t} isOpportunity key={i} />)
             ) : (
               <div className="topics__empty">Fırsat alanı tespit edilmedi.</div>
+            )}
+            {paidOpps.length > 0 && (
+              <ProBlur label={`+${paidOpps.length} fırsat daha Pro planında`}>
+                {paidOpps.map((t, i) => <TopicCard topic={t} isOpportunity key={i} />)}
+              </ProBlur>
             )}
           </div>
         </div>

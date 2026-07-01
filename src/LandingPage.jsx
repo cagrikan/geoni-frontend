@@ -103,11 +103,6 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
               <br />
               <em>Siz yoksunuz.</em>
             </h1>
-            <p className="landing__subhead">
-              ChatGPT, Claude ve Perplexity artık tek bir yanıt veriyor — listelemiyor.
-              O yanıtta yer almayan marka, müşteri için yok hükmünde.
-              Sitenizi tarayıp şu anki AI görünürlüğünüzü ölçelim.
-            </p>
 
             <div className="mode-toggle">
               <button className={`mode-toggle__btn ${mode === 'site' ? 'mode-toggle__btn--active' : ''}`} onClick={() => setMode('site')} type="button">
@@ -220,6 +215,11 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
         </div>
 
         <div className="landing__hero-right">
+          <p className="landing__subhead" style={{ marginBottom: 32 }}>
+            ChatGPT, Claude ve Perplexity artık tek bir yanıt veriyor — listelemiyor.
+            O yanıtta yer almayan marka, müşteri için yok hükmünde.
+            Sitenizi tarayıp şu anki AI görünürlüğünüzü ölçelim.
+          </p>
           <p className="landing__how-eyebrow">Süreç</p>
           <h2 className="landing__how-title-main">Nasıl çalışır</h2>
           <div className="landing__how-list">

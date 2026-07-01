@@ -28,21 +28,58 @@ function BgRadar({ active }) {
   )
 }
 
+const OPT = <span style={{color:'var(--text-muted)',fontWeight:400,fontSize:'.8em'}}>(isteğe bağlı)</span>
+
 export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading, statusText, error }) {
-  const [mode, setMode] = useState('site') // 'site' | 'brand'
-  const [domain, setDomain] = useState('')
-  const [email, setEmail] = useState('')
-  const [name, setName] = useState('')
-  const [topic, setTopic] = useState('')
+  const [mode, setMode] = useState('site') // 'site' | 'person' | 'brand'
+
+  // site
+  const [domain, setDomain]     = useState('')
+  const [siteEmail, setSiteEmail] = useState('')
+
+  // person
+  const [personName, setPersonName]         = useState('')
+  const [personRole, setPersonRole]         = useState('')
+  const [personCompany, setPersonCompany]   = useState('')
+  const [personCity, setPersonCity]         = useState('')
+  const [personTopic, setPersonTopic]       = useState('')
+  const [personLinkedin, setPersonLinkedin] = useState('')
+  const [personEmail, setPersonEmail]       = useState('')
+
+  // brand
+  const [brandName, setBrandName]     = useState('')
+  const [brandSector, setBrandSector] = useState('')
+  const [brandCity, setBrandCity]     = useState('')
+  const [brandWebsite, setBrandWebsite] = useState('')
+  const [brandEmail, setBrandEmail]   = useState('')
 
   const handleSubmit = (e) => {
     e.preventDefault()
     if (mode === 'site') {
-      if (!domain || !email) return
-      onSubmitAudit(domain, email)
+      if (!domain || !siteEmail) return
+      onSubmitAudit(domain, siteEmail)
+    } else if (mode === 'person') {
+      if (!personName) return
+      onSubmitBrandCheck({
+        type: 'person',
+        name: personName,
+        role: personRole,
+        company: personCompany,
+        location: personCity,
+        topic: personTopic,
+        linkedin_url: personLinkedin,
+        email: personEmail || 'anonymous@geoni.ai',
+      })
     } else {
-      if (!name) return
-      onSubmitBrandCheck(name, topic || '', email || 'anonymous@geoni.ai')
+      if (!brandName) return
+      onSubmitBrandCheck({
+        type: 'brand',
+        name: brandName,
+        sector: brandSector,
+        location: brandCity,
+        website: brandWebsite,
+        email: brandEmail || 'anonymous@geoni.ai',
+      })
     }
   }
 
@@ -73,98 +110,111 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
             </p>
 
             <div className="mode-toggle">
-              <button
-                className={`mode-toggle__btn ${mode === 'site' ? 'mode-toggle__btn--active' : ''}`}
-                onClick={() => setMode('site')}
-                type="button"
-              >
-                Web Sitesi Tara
+              <button className={`mode-toggle__btn ${mode === 'site' ? 'mode-toggle__btn--active' : ''}`} onClick={() => setMode('site')} type="button">
+                Web Sitesi
               </button>
-              <button
-                className={`mode-toggle__btn ${mode === 'brand' ? 'mode-toggle__btn--active' : ''}`}
-                onClick={() => setMode('brand')}
-                type="button"
-              >
-                İsim / Kurum Sorgula
+              <button className={`mode-toggle__btn ${mode === 'person' ? 'mode-toggle__btn--active' : ''}`} onClick={() => setMode('person')} type="button">
+                Kişi
+              </button>
+              <button className={`mode-toggle__btn ${mode === 'brand' ? 'mode-toggle__btn--active' : ''}`} onClick={() => setMode('brand')} type="button">
+                Marka / Şirket
               </button>
             </div>
 
             <form className="landing__form" onSubmit={handleSubmit}>
-              {mode === 'site' ? (
+
+              {/* ── WEB SİTESİ ── */}
+              {mode === 'site' && (
                 <>
                   <div className="landing__field">
                     <label htmlFor="domain">Web sitesi</label>
-                    <input
-                      id="domain"
-                      type="text"
-                      placeholder="firmaniz.com"
-                      value={domain}
-                      onChange={(e) => setDomain(e.target.value)}
-                      disabled={loading}
-                      required
-                    />
+                    <input id="domain" type="text" placeholder="firmaniz.com" value={domain} onChange={e => setDomain(e.target.value)} disabled={loading} required />
                   </div>
                   <div className="landing__field">
-                    <label htmlFor="email">E-posta</label>
-                    <input
-                      id="email"
-                      type="email"
-                      placeholder="ad@firmaniz.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      disabled={loading}
-                      required
-                    />
+                    <label htmlFor="site-email">E-posta</label>
+                    <input id="site-email" type="email" placeholder="ad@firmaniz.com" value={siteEmail} onChange={e => setSiteEmail(e.target.value)} disabled={loading} required />
                   </div>
                   <button type="submit" className="landing__submit" disabled={loading}>
                     {loading ? statusText + '…' : 'Ücretsiz Taramayı Başlat'}
                   </button>
                 </>
-              ) : (
+              )}
+
+              {/* ── KİŞİ ── */}
+              {mode === 'person' && (
                 <>
                   <div className="landing__field">
-                    <label htmlFor="name">Adınız veya Kurum Adı</label>
-                    <input
-                      id="name"
-                      type="text"
-                      placeholder="Ahmet Yılmaz veya ACME A.Ş."
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      disabled={loading}
-                      required
-                    />
+                    <label htmlFor="person-name">Ad Soyad</label>
+                    <input id="person-name" type="text" placeholder="Ahmet Yılmaz" value={personName} onChange={e => setPersonName(e.target.value)} disabled={loading} required />
+                  </div>
+                  <div className="landing__field-row">
+                    <div className="landing__field">
+                      <label htmlFor="person-role">Unvan / Rol {OPT}</label>
+                      <input id="person-role" type="text" placeholder="CTO, Avukat, Milletvekili..." value={personRole} onChange={e => setPersonRole(e.target.value)} disabled={loading} />
+                    </div>
+                    <div className="landing__field">
+                      <label htmlFor="person-company">Şirket / Kurum {OPT}</label>
+                      <input id="person-company" type="text" placeholder="ARD Grup, Geoni.ai..." value={personCompany} onChange={e => setPersonCompany(e.target.value)} disabled={loading} />
+                    </div>
+                  </div>
+                  <div className="landing__field-row">
+                    <div className="landing__field">
+                      <label htmlFor="person-city">Şehir {OPT}</label>
+                      <input id="person-city" type="text" placeholder="Ankara" value={personCity} onChange={e => setPersonCity(e.target.value)} disabled={loading} />
+                    </div>
+                    <div className="landing__field">
+                      <label htmlFor="person-topic">Konu / Alan {OPT}</label>
+                      <input id="person-topic" type="text" placeholder="dijital dönüşüm, siyaset..." value={personTopic} onChange={e => setPersonTopic(e.target.value)} disabled={loading} />
+                    </div>
                   </div>
                   <div className="landing__field">
-                    <label htmlFor="topic">Alan / Konu <span style={{color:'var(--text-muted)',fontWeight:400}}>(isteğe bağlı)</span></label>
-                    <input
-                      id="topic"
-                      type="text"
-                      placeholder="dijital dönüşüm, siyaset, yatırım..."
-                      value={topic}
-                      onChange={(e) => setTopic(e.target.value)}
-                      disabled={loading}
-                    />
+                    <label htmlFor="person-linkedin">LinkedIn URL {OPT}</label>
+                    <input id="person-linkedin" type="url" placeholder="https://linkedin.com/in/..." value={personLinkedin} onChange={e => setPersonLinkedin(e.target.value)} disabled={loading} />
                   </div>
                   <div className="landing__field">
-                    <label htmlFor="brand-email">E-posta <span style={{color:'var(--text-muted)',fontWeight:400}}>(isteğe bağlı)</span></label>
-                    <input
-                      id="brand-email"
-                      type="email"
-                      placeholder="ad@firmaniz.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      disabled={loading}
-                    />
+                    <label htmlFor="person-email">E-posta {OPT}</label>
+                    <input id="person-email" type="email" placeholder="ad@firmaniz.com" value={personEmail} onChange={e => setPersonEmail(e.target.value)} disabled={loading} />
                   </div>
                   <button type="submit" className="landing__submit" disabled={loading}>
                     {loading ? statusText + '…' : 'AI\'da Beni Ara'}
                   </button>
                 </>
               )}
+
+              {/* ── MARKA / ŞİRKET ── */}
+              {mode === 'brand' && (
+                <>
+                  <div className="landing__field">
+                    <label htmlFor="brand-name">Marka / Şirket Adı</label>
+                    <input id="brand-name" type="text" placeholder="Geoni.ai, ARD Grup..." value={brandName} onChange={e => setBrandName(e.target.value)} disabled={loading} required />
+                  </div>
+                  <div className="landing__field-row">
+                    <div className="landing__field">
+                      <label htmlFor="brand-sector">Sektör {OPT}</label>
+                      <input id="brand-sector" type="text" placeholder="Teknoloji, Hukuk, Finans..." value={brandSector} onChange={e => setBrandSector(e.target.value)} disabled={loading} />
+                    </div>
+                    <div className="landing__field">
+                      <label htmlFor="brand-city">Şehir {OPT}</label>
+                      <input id="brand-city" type="text" placeholder="İstanbul, Ankara..." value={brandCity} onChange={e => setBrandCity(e.target.value)} disabled={loading} />
+                    </div>
+                  </div>
+                  <div className="landing__field">
+                    <label htmlFor="brand-website">Web Sitesi {OPT}</label>
+                    <input id="brand-website" type="text" placeholder="firmaniz.com" value={brandWebsite} onChange={e => setBrandWebsite(e.target.value)} disabled={loading} />
+                  </div>
+                  <div className="landing__field">
+                    <label htmlFor="brand-email">E-posta {OPT}</label>
+                    <input id="brand-email" type="email" placeholder="ad@firmaniz.com" value={brandEmail} onChange={e => setBrandEmail(e.target.value)} disabled={loading} />
+                  </div>
+                  <button type="submit" className="landing__submit" disabled={loading}>
+                    {loading ? statusText + '…' : 'Markamı Sorgula'}
+                  </button>
+                </>
+              )}
+
             </form>
 
             {error && <p className="landing__error">{error}</p>}
-
             <p className="landing__trust">Kredi kartı gerekmez · Sonuç ~30 saniyede hazır</p>
           </div>
         </div>

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import LandingPage from './LandingPage'
 import ResultsPage from './ResultsPage'
 import BrandCheckResultsPage from './BrandCheckResultsPage'
+import IdentityMismatchPage from './IdentityMismatchPage'
 import './App.css'
 
 function App() {
@@ -97,7 +98,7 @@ function App() {
     }
   }
 
-  const handleBrandCheck = async (name, topic, email) => {
+  const handleBrandCheck = async (payload) => {
     setError(null)
     setView('loading')
     setStatusText('AI sorgulanıyor')
@@ -105,13 +106,18 @@ function App() {
       const res = await fetch(`${apiUrl}/api/brand-check`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, topic, email }),
+        body: JSON.stringify(payload),
       })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
         throw new Error(body.detail || 'İstek başarısız oldu')
       }
       const data = await res.json()
+      if (data.identity_mismatch) {
+        setBrandResult({ identity_mismatch: true, match_score: data.match_score, name: payload.name })
+        setView('brand_results')
+        return
+      }
       await pollBrandCheckJob(data.job_id)
     } catch (err) {
       setError(err.message || 'Bağlantı hatası')
@@ -140,8 +146,11 @@ function App() {
       {view === 'results' && result && (
         <ResultsPage result={result} onReset={handleReset} />
       )}
-      {view === 'brand_results' && brandResult && (
+      {view === 'brand_results' && brandResult && !brandResult.identity_mismatch && (
         <BrandCheckResultsPage result={brandResult} onReset={handleReset} />
+      )}
+      {view === 'brand_results' && brandResult && brandResult.identity_mismatch && (
+        <IdentityMismatchPage result={brandResult} onReset={handleReset} />
       )}
     </div>
   )

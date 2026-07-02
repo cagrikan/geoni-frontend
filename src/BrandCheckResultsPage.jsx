@@ -86,7 +86,7 @@ function TopicCard({ topic, isOpportunity }) {
   )
 }
 
-export default function BrandCheckResultsPage({ result, onReset, user, onLogin, onDashboard }) {
+export default function BrandCheckResultsPage({ result, onReset, user, onLogin, onDashboard, isPro = false }) {
   const {
     name,
     topic,
@@ -153,7 +153,7 @@ export default function BrandCheckResultsPage({ result, onReset, user, onLogin, 
 
         <div className="results__top">
           <ScoreGauge score={score} />
-          <ProBlur label="Detaylı skor dökümü Pro planında">
+          <ProBlur isPro={isPro} label="Detaylı skor dökümü Pro planında">
             <Breakdown breakdown={score_breakdown} />
           </ProBlur>
         </div>
@@ -203,7 +203,7 @@ export default function BrandCheckResultsPage({ result, onReset, user, onLogin, 
               <div className="topics__empty">Henüz güçlü bir konu tespit edilmedi.</div>
             )}
             {paidPerforming.length > 0 && (
-              <ProBlur label={`+${paidPerforming.length} konu daha Pro planında`}>
+              <ProBlur isPro={isPro} label={`+${paidPerforming.length} konu daha Pro planında`}>
                 {paidPerforming.map((t, i) => <TopicCard topic={t} key={i} />)}
               </ProBlur>
             )}
@@ -216,7 +216,7 @@ export default function BrandCheckResultsPage({ result, onReset, user, onLogin, 
               <div className="topics__empty">Fırsat alanı tespit edilmedi.</div>
             )}
             {paidOpps.length > 0 && (
-              <ProBlur label={`+${paidOpps.length} fırsat daha Pro planında`}>
+              <ProBlur isPro={isPro} label={`+${paidOpps.length} fırsat daha Pro planında`}>
                 {paidOpps.map((t, i) => <TopicCard topic={t} isOpportunity key={i} />)}
               </ProBlur>
             )}

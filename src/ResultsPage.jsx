@@ -122,7 +122,7 @@ export default function ResultsPage({ result, onReset }) {
         {/* Skor + Breakdown (breakdown blur) */}
         <div className="results__top">
           <ScoreGauge score={score} />
-          <ProBlur label="Detaylı skor dökümü Pro planında">
+          <ProBlur isPro={isPro} label="Detaylı skor dökümü Pro planında">
             <Breakdown breakdown={score_breakdown} />
           </ProBlur>
         </div>
@@ -159,7 +159,7 @@ export default function ResultsPage({ result, onReset }) {
             <span className="results__stat-l">Gemini Bot İzni</span>
           </div>
           <div className="results__stat">
-            <ProBlur label="Pro">
+            <ProBlur isPro={isPro} label="Pro">
               <span className="results__stat-n">—</span>
               <span className="results__stat-l">llm.txt</span>
             </ProBlur>
@@ -176,7 +176,7 @@ export default function ResultsPage({ result, onReset }) {
               <div className="topics__empty">Henüz güçlü bir konu tespit edilmedi.</div>
             )}
             {paidTopics.length > 0 && (
-              <ProBlur label={`+${paidTopics.length} konu daha Pro planında`}>
+              <ProBlur isPro={isPro} label={`+${paidTopics.length} konu daha Pro planında`}>
                 {paidTopics.map((t, i) => <TopicCard topic={t} key={i} />)}
               </ProBlur>
             )}
@@ -189,7 +189,7 @@ export default function ResultsPage({ result, onReset }) {
               <div className="topics__empty">Fırsat alanı tespit edilmedi.</div>
             )}
             {paidOpps.length > 0 && (
-              <ProBlur label={`+${paidOpps.length} fırsat daha Pro planında`}>
+              <ProBlur isPro={isPro} label={`+${paidOpps.length} fırsat daha Pro planında`}>
                 {paidOpps.map((t, i) => <TopicCard topic={t} isOpportunity key={i} />)}
               </ProBlur>
             )}

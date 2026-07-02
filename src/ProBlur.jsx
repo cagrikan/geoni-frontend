@@ -1,4 +1,5 @@
-export default function ProBlur({ children, label = "Pro içerik" }) {
+export default function ProBlur({ children, label = "Pro içerik", isPro = false }) {
+  if (isPro) return <>{children}</>
   return (
     <div className="pro-blur">
       <div className="pro-blur__content">{children}</div>

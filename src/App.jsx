@@ -12,7 +12,7 @@ import './App.css'
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.geoni.ai'
 
 function AppInner() {
-  const { user, loading: authLoading, refreshProfile } = useAuth()
+  const { user, profile, loading: authLoading, refreshProfile } = useAuth()
   const [view, setView] = useState(() => {
     if (window.location.pathname === '/auth/callback') return 'auth_callback'
     if (window.location.pathname === '/dashboard') return 'dashboard'
@@ -156,9 +156,9 @@ function AppInner() {
           onLogin={() => navigateTo('login')}
         />
       )}
-      {view === 'results' && result && <ResultsPage result={result} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} />}
+      {view === 'results' && result && <ResultsPage result={result} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} isPro={profile?.is_admin || (profile?.credit_balance > 0 && profile?.total_credits_purchased > 0)} />}
       {view === 'brand_results' && brandResult && !brandResult.identity_mismatch && (
-        <BrandCheckResultsPage result={brandResult} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} />
+        <BrandCheckResultsPage result={brandResult} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} isPro={profile?.is_admin || (profile?.credit_balance > 0 && profile?.total_credits_purchased > 0)} />
       )}
       {view === 'brand_results' && brandResult?.identity_mismatch && (
         <IdentityMismatchPage result={brandResult} onReset={handleReset} />

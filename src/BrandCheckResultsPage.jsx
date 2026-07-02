@@ -86,7 +86,7 @@ function TopicCard({ topic, isOpportunity }) {
   )
 }
 
-export default function BrandCheckResultsPage({ result, onReset }) {
+export default function BrandCheckResultsPage({ result, onReset, user, onLogin, onDashboard }) {
   const {
     name,
     topic,

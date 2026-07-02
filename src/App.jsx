@@ -1,159 +1,143 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { AuthProvider, useAuth } from './lib/AuthContext'
 import LandingPage from './LandingPage'
 import ResultsPage from './ResultsPage'
 import BrandCheckResultsPage from './BrandCheckResultsPage'
 import IdentityMismatchPage from './IdentityMismatchPage'
+import LoginPage from './pages/LoginPage'
+import AuthCallback from './pages/AuthCallback'
+import DashboardPage from './pages/DashboardPage'
 import './App.css'
 
-function App() {
-  const [view, setView] = useState('landing') // 'landing' | 'loading' | 'results' | 'brand_results'
+const API_URL = import.meta.env.VITE_API_URL || 'https://api.geoni.ai'
+
+function AppInner() {
+  const { user, loading: authLoading } = useAuth()
+  const [view, setView] = useState(() => {
+    if (window.location.pathname === '/auth/callback') return 'auth_callback'
+    if (window.location.pathname === '/dashboard') return 'dashboard'
+    if (window.location.pathname === '/login') return 'login'
+    return 'landing'
+  })
   const [result, setResult] = useState(null)
   const [brandResult, setBrandResult] = useState(null)
   const [error, setError] = useState(null)
   const [statusText, setStatusText] = useState('queued')
 
-  const apiUrl = import.meta.env.VITE_API_URL || 'https://api.geoni.ai'
+  // Sync URL with view
+  useEffect(() => {
+    const path = window.location.pathname
+    if (path === '/auth/callback') setView('auth_callback')
+    else if (path === '/dashboard') setView(user ? 'dashboard' : 'login')
+    else if (path === '/login') setView('login')
+  }, [user])
 
-  const pollAuditJob = async (jobId) => {
-    const statusLabels = {
-      queued: 'Sıraya alındı',
-      crawling: 'Site taranıyor',
-      indexing: 'Dizin durumu kontrol ediliyor',
-      scoring: 'Skor hesaplanıyor',
-    }
-    const maxAttempts = 60
-    for (let i = 0; i < maxAttempts; i++) {
-      await new Promise((r) => setTimeout(r, 3000))
-      try {
-        const res = await fetch(`${apiUrl}/api/audit/${jobId}`)
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}))
-          throw new Error(body.detail || 'Tarama başarısız oldu')
-        }
-        const data = await res.json()
-        if (data.status === 'complete') {
-          setResult(data.result)
-          setView('results')
-          return
-        }
-        if (data.status === 'failed') throw new Error('Tarama başarısız oldu')
-        setStatusText(statusLabels[data.status] || data.status)
-      } catch (err) {
-        setError(err.message)
-        setView('landing')
-        return
-      }
-    }
-    setError('Tarama zaman aşımına uğradı, lütfen tekrar deneyin.')
-    setView('landing')
+  const navigateTo = (v) => {
+    setView(v)
+    const paths = { dashboard: '/dashboard', login: '/login', landing: '/', results: '/', brand_results: '/' }
+    window.history.pushState({}, '', paths[v] || '/')
   }
 
-  const pollBrandCheckJob = async (jobId) => {
-    const maxAttempts = 20
-    for (let i = 0; i < maxAttempts; i++) {
-      await new Promise((r) => setTimeout(r, 2000))
+  const pollAuditJob = async (jobId) => {
+    const labels = { queued: 'Sıraya alındı', crawling: 'Site taranıyor', indexing: 'Dizin kontrol ediliyor', scoring: 'Skor hesaplanıyor' }
+    for (let i = 0; i < 60; i++) {
+      await new Promise(r => setTimeout(r, 3000))
       try {
-        const res = await fetch(`${apiUrl}/api/brand-check/${jobId}`)
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}))
-          throw new Error(body.detail || 'Sorgu başarısız oldu')
-        }
+        const res = await fetch(`${API_URL}/api/audit/${jobId}`)
+        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'Tarama başarısız')
         const data = await res.json()
-        if (data.status === 'complete') {
-          setBrandResult(data.result)
-          setView('brand_results')
-          return
-        }
-        if (data.status === 'failed') throw new Error('Sorgu başarısız oldu')
-        setStatusText('AI sorgulanıyor')
-      } catch (err) {
-        setError(err.message)
-        setView('landing')
-        return
-      }
+        if (data.status === 'complete') { setResult(data.result); setView('results'); return }
+        if (data.status === 'failed') throw new Error('Tarama başarısız')
+        setStatusText(labels[data.status] || data.status)
+      } catch (err) { setError(err.message); setView('landing'); return }
     }
-    setError('Sorgu zaman aşımına uğradı, lütfen tekrar deneyin.')
-    setView('landing')
+    setError('Tarama zaman aşımına uğradı.'); setView('landing')
+  }
+
+  const pollBrandJob = async (jobId) => {
+    for (let i = 0; i < 25; i++) {
+      await new Promise(r => setTimeout(r, 2000))
+      try {
+        const res = await fetch(`${API_URL}/api/brand-check/${jobId}`)
+        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'Sorgu başarısız')
+        const data = await res.json()
+        if (data.status === 'complete') { setBrandResult(data.result); setView('brand_results'); return }
+        if (data.status === 'failed') throw new Error('Sorgu başarısız')
+        setStatusText('AI sorgulanıyor')
+      } catch (err) { setError(err.message); setView('landing'); return }
+    }
+    setError('Sorgu zaman aşımına uğradı.'); setView('landing')
   }
 
   const handleAudit = async (domain, email) => {
-    setError(null)
-    setView('loading')
-    setStatusText('queued')
+    setError(null); setView('loading'); setStatusText('queued')
     try {
-      const res = await fetch(`${apiUrl}/api/audit/quick`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ domain, email, competitors: [] }),
+      const res = await fetch(`${API_URL}/api/audit/quick`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domain, email: email || user?.email || 'anonymous@geoni.ai', competitors: [] }),
       })
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}))
-        throw new Error(body.detail || 'İstek başarısız oldu')
-      }
-      const data = await res.json()
-      await pollAuditJob(data.job_id)
-    } catch (err) {
-      setError(err.message || 'Bağlantı hatası')
-      setView('landing')
-    }
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'İstek başarısız')
+      await pollAuditJob((await res.json()).job_id)
+    } catch (err) { setError(err.message || 'Bağlantı hatası'); setView('landing') }
   }
 
   const handleBrandCheck = async (payload) => {
-    setError(null)
-    setView('loading')
-    setStatusText('AI sorgulanıyor')
+    setError(null); setView('loading'); setStatusText('AI sorgulanıyor')
     try {
-      const res = await fetch(`${apiUrl}/api/brand-check`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+      const res = await fetch(`${API_URL}/api/brand-check`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...payload, email: payload.email || user?.email || 'anonymous@geoni.ai' }),
       })
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}))
-        throw new Error(body.detail || 'İstek başarısız oldu')
-      }
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'İstek başarısız')
       const data = await res.json()
       if (data.identity_mismatch) {
         setBrandResult({ identity_mismatch: true, match_score: data.match_score, name: payload.name })
-        setView('brand_results')
-        return
+        setView('brand_results'); return
       }
-      await pollBrandCheckJob(data.job_id)
-    } catch (err) {
-      setError(err.message || 'Bağlantı hatası')
-      setView('landing')
-    }
+      await pollBrandJob(data.job_id)
+    } catch (err) { setError(err.message || 'Bağlantı hatası'); setView('landing') }
   }
 
-  const handleReset = () => {
-    setResult(null)
-    setBrandResult(null)
-    setError(null)
-    setView('landing')
-  }
+  const handleReset = () => { setResult(null); setBrandResult(null); setError(null); navigateTo('landing') }
+
+  if (authLoading) return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--bg)' }}>
+      <div className="spinner" />
+    </div>
+  )
 
   return (
     <div className="app-shell">
-      {view !== 'results' && view !== 'brand_results' && (
+      {view === 'auth_callback' && <AuthCallback onDone={navigateTo} />}
+      {view === 'login' && <LoginPage onSuccess={() => navigateTo('dashboard')} />}
+      {view === 'dashboard' && <DashboardPage onReset={handleReset} onNewScan={() => navigateTo('landing')} />}
+      {(view === 'landing' || view === 'loading') && (
         <LandingPage
           onSubmitAudit={handleAudit}
           onSubmitBrandCheck={handleBrandCheck}
           loading={view === 'loading'}
           statusText={statusText}
           error={error}
+          user={user}
+          onDashboard={() => navigateTo('dashboard')}
+          onLogin={() => navigateTo('login')}
         />
       )}
-      {view === 'results' && result && (
-        <ResultsPage result={result} onReset={handleReset} />
-      )}
+      {view === 'results' && result && <ResultsPage result={result} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} />}
       {view === 'brand_results' && brandResult && !brandResult.identity_mismatch && (
-        <BrandCheckResultsPage result={brandResult} onReset={handleReset} />
+        <BrandCheckResultsPage result={brandResult} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} />
       )}
-      {view === 'brand_results' && brandResult && brandResult.identity_mismatch && (
+      {view === 'brand_results' && brandResult?.identity_mismatch && (
         <IdentityMismatchPage result={brandResult} onReset={handleReset} />
       )}
     </div>
   )
 }
 
-export default App
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppInner />
+    </AuthProvider>
+  )
+}

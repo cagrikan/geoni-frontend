@@ -30,7 +30,7 @@ function BgRadar({ active }) {
 
 const OPT = <span style={{color:'var(--text-muted)',fontWeight:400,fontSize:'.8em'}}>(isteğe bağlı)</span>
 
-export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading, statusText, error }) {
+export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading, statusText, error, user, onDashboard, onLogin }) {
   const [mode, setMode] = useState('site') // 'site' | 'person' | 'brand'
 
   // site
@@ -92,6 +92,16 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
         <div className="landing__brand">
           <GeoniMark />
           <span className="landing__logo">GEONI</span>
+        </div>
+        <div className="nav-auth">
+          {user ? (
+            <button className="nav-dashboard-btn" onClick={onDashboard}>Dashboard</button>
+          ) : (
+            <>
+              <button className="nav-login-btn" onClick={onLogin}>Giriş Yap</button>
+              <button className="nav-dashboard-btn" onClick={onLogin}>Ücretsiz Başla</button>
+            </>
+          )}
         </div>
       </header>
 

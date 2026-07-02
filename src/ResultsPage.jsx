@@ -97,6 +97,10 @@ export default function ResultsPage({ result, onReset }) {
           <GeoniMark />
           <span className="landing__logo">GEONI</span>
         </button>
+        <div className="nav-auth">
+          {onDashboard && <button className="nav-dashboard-btn" onClick={onDashboard}>← Dashboard</button>}
+          {!user && onLogin && <button className="nav-login-btn" onClick={onLogin}>Giriş Yap</button>}
+        </div>
       </header>
 
       <div className="results">

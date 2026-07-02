@@ -18,7 +18,7 @@ function ScoreBadge({ score }) {
   return <span className="dash-score-badge" style={{ color, borderColor: color }}>{score}</span>
 }
 
-export default function DashboardPage({ onReset, onNewScan }) {
+export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
   const { user, profile, signOut } = useAuth()
   const [audits, setAudits] = useState([])
   const [loading, setLoading] = useState(true)
@@ -137,10 +137,10 @@ export default function DashboardPage({ onReset, onNewScan }) {
               ) : (
                 <div className="dash-audit-list">
                   {audits.map(audit => (
-                    <div key={audit.id} className="dash-audit-row">
+                    <div key={audit.id} className="dash-audit-row" onClick={() => audit.result_json && onViewAudit && onViewAudit(audit)} style={{ cursor: audit.result_json ? 'pointer' : 'default' }}>
                       <span className="dash-audit-icon">{typeIcon[audit.type] || '📄'}</span>
                       <div className="dash-audit-info">
-                        <div className="dash-audit-name">{audit.domain || audit.name || '—'}</div>
+                        <div className="dash-audit-name">{audit.domain || (audit.name?.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')) || '—'}</div>
                         <div className="dash-audit-meta">
                           {typeLabel[audit.type]} · {formatDate(audit.created_at)}
                         </div>
@@ -148,6 +148,7 @@ export default function DashboardPage({ onReset, onNewScan }) {
                       <div className="dash-audit-right">
                         {audit.score != null ? <ScoreBadge score={audit.score} /> : <span className="dash-audit-pending">İşleniyor</span>}
                         <span className="dash-audit-credits">-{audit.credits_spent} ◈</span>
+                        {audit.result_json && <span style={{ color: 'var(--accent)', fontSize: '.75rem' }}>→</span>}
                       </div>
                     </div>
                   ))}

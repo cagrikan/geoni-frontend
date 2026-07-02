@@ -12,7 +12,7 @@ import './App.css'
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.geoni.ai'
 
 function AppInner() {
-  const { user, loading: authLoading } = useAuth()
+  const { user, loading: authLoading, refreshProfile } = useAuth()
   const [view, setView] = useState(() => {
     if (window.location.pathname === '/auth/callback') return 'auth_callback'
     if (window.location.pathname === '/dashboard') return 'dashboard'
@@ -46,7 +46,7 @@ function AppInner() {
         const res = await fetch(`${API_URL}/api/audit/${jobId}`)
         if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'Tarama başarısız')
         const data = await res.json()
-        if (data.status === 'complete') { setResult(data.result); setView('results'); return }
+        if (data.status === 'complete') { setResult(data.result); setView('results'); if (refreshProfile) refreshProfile(); return }
         if (data.status === 'failed') throw new Error('Tarama başarısız')
         setStatusText(labels[data.status] || data.status)
       } catch (err) { setError(err.message); setView('landing'); return }
@@ -61,7 +61,7 @@ function AppInner() {
         const res = await fetch(`${API_URL}/api/brand-check/${jobId}`)
         if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'Sorgu başarısız')
         const data = await res.json()
-        if (data.status === 'complete') { setBrandResult(data.result); setView('brand_results'); return }
+        if (data.status === 'complete') { setBrandResult(data.result); setView('brand_results'); if (refreshProfile) refreshProfile(); return }
         if (data.status === 'failed') throw new Error('Sorgu başarısız')
         setStatusText('AI sorgulanıyor')
       } catch (err) { setError(err.message); setView('landing'); return }
@@ -106,6 +106,21 @@ function AppInner() {
 
   const handleReset = () => { setResult(null); setBrandResult(null); setError(null); navigateTo('landing') }
 
+  const handleViewAudit = (audit) => {
+    const resultJson = audit.result_json
+    if (!resultJson) return
+    if (audit.type === 'web') {
+      setResult(resultJson)
+      setView('results')
+    } else {
+      setBrandResult(resultJson)
+      setView('brand_results')
+    }
+    window.history.pushState({}, '', '/')
+  }
+
+  const handleDashboard = () => navigateTo('dashboard')
+
   if (authLoading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--bg)' }}>
       <div className="spinner" />
@@ -116,7 +131,7 @@ function AppInner() {
     <div className="app-shell">
       {view === 'auth_callback' && <AuthCallback onDone={navigateTo} />}
       {view === 'login' && <LoginPage onSuccess={() => navigateTo('dashboard')} />}
-      {view === 'dashboard' && <DashboardPage onReset={handleReset} onNewScan={() => navigateTo('landing')} />}
+      {view === 'dashboard' && <DashboardPage onReset={handleReset} onNewScan={() => navigateTo('landing')} onViewAudit={handleViewAudit} />}
       {(view === 'landing' || view === 'loading') && (
         <LandingPage
           onSubmitAudit={handleAudit}
@@ -129,9 +144,9 @@ function AppInner() {
           onLogin={() => navigateTo('login')}
         />
       )}
-      {view === 'results' && result && <ResultsPage result={result} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} />}
+      {view === 'results' && result && <ResultsPage result={result} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} />}
       {view === 'brand_results' && brandResult && !brandResult.identity_mismatch && (
-        <BrandCheckResultsPage result={brandResult} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} />
+        <BrandCheckResultsPage result={brandResult} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} />
       )}
       {view === 'brand_results' && brandResult?.identity_mismatch && (
         <IdentityMismatchPage result={brandResult} onReset={handleReset} />

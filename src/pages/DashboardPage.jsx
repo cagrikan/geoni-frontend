@@ -119,7 +119,7 @@ export default function DashboardPage({ onReset, onNewScan }) {
             />
             <StatCard
               label="Son Tarama"
-              value={audits[0] ? formatDate(audits[0].created_at).split(' ')[0] : '—'}
+              value={audits[0] ? new Date(audits[0].created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }) : '—'}
             />
           </div>
 

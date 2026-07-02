@@ -110,10 +110,22 @@ function AppInner() {
     const resultJson = audit.result_json
     if (!resultJson) return
     if (audit.type === 'web') {
-      setResult(resultJson)
+      // Ensure domain audit result has required fields
+      setResult({ ...resultJson, domain: audit.domain || resultJson.domain })
       setView('results')
     } else {
-      setBrandResult(resultJson)
+      // Ensure brand check result has required fields
+      setBrandResult({
+        ...resultJson,
+        name: audit.name || resultJson.name,
+        topic: audit.topic || resultJson.topic || '',
+        recognition_count: resultJson.recognition_count ?? 0,
+        model_results: resultJson.model_results ?? {},
+        score_breakdown: resultJson.score_breakdown ?? {},
+        performing_topics: resultJson.performing_topics ?? [],
+        opportunity_topics: resultJson.opportunity_topics ?? [],
+        google_result_count: resultJson.google_result_count ?? 0,
+      })
       setView('brand_results')
     }
     window.history.pushState({}, '', '/')

@@ -39,6 +39,13 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
     setLoading(false)
   }
 
+  const deleteAudit = async (e, auditId) => {
+    e.stopPropagation()
+    if (!window.confirm('Bu taramayı silmek istediğinize emin misiniz?')) return
+    await supabase.from('audits').delete().eq('id', auditId)
+    setAudits(prev => prev.filter(a => a.id !== auditId))
+  }
+
   const formatDate = (d) => new Date(d).toLocaleDateString('tr-TR', {
     day: 'numeric', month: 'short', year: 'numeric',
     hour: '2-digit', minute: '2-digit'
@@ -149,6 +156,11 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
                         {audit.score != null ? <ScoreBadge score={audit.score} /> : <span className="dash-audit-pending">İşleniyor</span>}
                         <span className="dash-audit-credits">-{audit.credits_spent} ◈</span>
                         {audit.result_json && <span style={{ color: 'var(--accent)', fontSize: '.75rem' }}>→</span>}
+                        <button
+                          onClick={(e) => deleteAudit(e, audit.id)}
+                          className="dash-audit-delete"
+                          title="Sil"
+                        >✕</button>
                       </div>
                     </div>
                   ))}

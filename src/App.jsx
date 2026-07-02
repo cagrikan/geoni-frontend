@@ -72,8 +72,11 @@ function AppInner() {
   const handleAudit = async (domain, email) => {
     setError(null); setView('loading'); setStatusText('queued')
     try {
+      const session = (await import('./lib/supabase')).supabase.auth.getSession ? await (await import('./lib/supabase')).supabase.auth.getSession() : null
+      const token = session?.data?.session?.access_token || ''
       const res = await fetch(`${API_URL}/api/audit/quick`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
         body: JSON.stringify({ domain, email: email || user?.email || 'anonymous@geoni.ai', competitors: [] }),
       })
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'İstek başarısız')
@@ -84,8 +87,11 @@ function AppInner() {
   const handleBrandCheck = async (payload) => {
     setError(null); setView('loading'); setStatusText('AI sorgulanıyor')
     try {
+      const session2 = (await import('./lib/supabase')).supabase.auth.getSession ? await (await import('./lib/supabase')).supabase.auth.getSession() : null
+      const token2 = session2?.data?.session?.access_token || ''
       const res = await fetch(`${API_URL}/api/brand-check`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(token2 ? { 'Authorization': `Bearer ${token2}` } : {}) },
         body: JSON.stringify({ ...payload, email: payload.email || user?.email || 'anonymous@geoni.ai' }),
       })
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'İstek başarısız')

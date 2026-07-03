@@ -1440,9 +1440,13 @@ body {
   background: rgba(255,255,255,.03);
   border: 1px solid var(--border);
   border-radius: 10px;
-  transition: border-color .2s;
+  transition: border-color .2s, transform .15s, box-shadow .15s;
 }
 .dash-audit-row:hover { border-color: rgba(129,140,248,.3); }
+.dash-audit-row--clickable:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.18);
+}
 .dash-audit-icon { color: var(--text-muted); flex-shrink: 0; }
 .dash-audit-info { flex: 1; min-width: 0; }
 .dash-audit-name { font-weight: 600; color: var(--text); font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -1553,6 +1557,32 @@ body {
   align-self: flex-start;
 }
 .dash-signout-full:hover { background: rgba(248,113,113,.08); }
+
+/* Skeleton loading (Premium Oneri Dok. 2.3) */
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,.04) 25%, rgba(255,255,255,.10) 50%, rgba(255,255,255,.04) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+  border-radius: 6px;
+}
+.dash-skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.dash-skeleton-icon { width: 18px; height: 18px; flex-shrink: 0; }
+.dash-skeleton-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.dash-skeleton-line--name { width: 40%; height: 12px; }
+.dash-skeleton-line--meta { width: 60%; height: 10px; }
+.dash-skeleton-badge { width: 48px; height: 22px; flex-shrink: 0; }
 
 /* Spinner */
 .spinner {

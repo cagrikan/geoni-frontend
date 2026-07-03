@@ -8,6 +8,19 @@ import {
   TrendingUp, TrendingDown, ChevronRight, X,
 } from 'lucide-react'
 
+function SkeletonRow() {
+  return (
+    <div className="dash-skeleton-row">
+      <div className="skeleton dash-skeleton-icon" />
+      <div className="dash-skeleton-info">
+        <div className="skeleton dash-skeleton-line--name" />
+        <div className="skeleton dash-skeleton-line--meta" />
+      </div>
+      <div className="skeleton dash-skeleton-badge" />
+    </div>
+  )
+}
+
 function StatCard({ label, value, sub }) {
   return (
     <div className="dash-stat">
@@ -209,7 +222,9 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
             <div className="dash-section">
               <h2 className="dash-section__title">Tarama Geçmişi</h2>
               {loading ? (
-                <div className="dash-empty">Yükleniyor...</div>
+                <div className="dash-audit-list">
+                  {Array.from({ length: 4 }).map((_, i) => <SkeletonRow key={i} />)}
+                </div>
               ) : audits.length === 0 ? (
                 <div className="dash-empty">
                   <p>Henüz tarama yapmadınız.</p>
@@ -218,7 +233,7 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
               ) : (
                 <div className="dash-audit-list">
                   {audits.map(audit => (
-                    <div key={audit.id} className="dash-audit-row" onClick={() => audit.result_json && onViewAudit && onViewAudit(audit)} style={{ cursor: audit.result_json ? 'pointer' : 'default' }}>
+                    <div key={audit.id} className={`dash-audit-row ${audit.result_json ? 'dash-audit-row--clickable' : ''}`} onClick={() => audit.result_json && onViewAudit && onViewAudit(audit)} style={{ cursor: audit.result_json ? 'pointer' : 'default' }}>
                       {(() => {
                         const TypeIcon = typeIcon[audit.type] || FileText
                         return <TypeIcon size={18} strokeWidth={1.5} className="dash-audit-icon" />

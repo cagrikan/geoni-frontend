@@ -171,10 +171,10 @@ body {
 }
 .landing__field { display: flex; flex-direction: column; gap: 6px; }
 .landing__field label {
-  font-family: var(--mono);
-  font-size: .72rem;
-  letter-spacing: .06em;
-  text-transform: uppercase;
+  font-family: var(--body);
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .02em;
   color: var(--text-muted);
 }
 .landing__field input {
@@ -209,8 +209,9 @@ body {
   margin-bottom: -4px;
 }
 .wizard-progress__count {
-  font-family: var(--mono);
-  font-size: .72rem;
+  font-family: var(--body);
+  font-size: .78rem;
+  font-weight: 600;
   color: var(--text-muted);
   flex-shrink: 0;
 }

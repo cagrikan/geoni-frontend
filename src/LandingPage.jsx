@@ -176,7 +176,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
                 {step === 1 && (
                   <div className="landing__field">
                     <label htmlFor="site-email">Raporu hangi e-postaya gönderelim?</label>
-                    <input id="site-email" type="email" placeholder="Örn: ad@firmaniz.com" value={siteEmail} onChange={e => setSiteEmail(e.target.value)} disabled={loading} required autoFocus />
+                    <input id="site-email" type="email" placeholder="Örn: ad@alanadiniz.com" value={siteEmail} onChange={e => setSiteEmail(e.target.value)} disabled={loading} required autoFocus />
                   </div>
                 )}
 
@@ -232,7 +232,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
                     </div>
                     <div className="landing__field">
                       <label htmlFor="person-email">Raporu hangi e-postaya gönderelim? {OPT}</label>
-                      <input id="person-email" type="email" placeholder="Örn: ad@firmaniz.com" value={personEmail} onChange={e => setPersonEmail(e.target.value)} disabled={loading} />
+                      <input id="person-email" type="email" placeholder="Örn: ad@alanadiniz.com" value={personEmail} onChange={e => setPersonEmail(e.target.value)} disabled={loading} />
                     </div>
                   </>
                 )}
@@ -277,7 +277,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
                     </div>
                     <div className="landing__field">
                       <label htmlFor="brand-email">Raporu hangi e-postaya gönderelim? {OPT}</label>
-                      <input id="brand-email" type="email" placeholder="Örn: ad@firmaniz.com" value={brandEmail} onChange={e => setBrandEmail(e.target.value)} disabled={loading} />
+                      <input id="brand-email" type="email" placeholder="Örn: ad@alanadiniz.com" value={brandEmail} onChange={e => setBrandEmail(e.target.value)} disabled={loading} />
                     </div>
                   </>
                 )}

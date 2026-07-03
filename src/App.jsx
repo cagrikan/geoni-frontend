@@ -93,7 +93,7 @@ function AppInner() {
         const data = await res.json()
         if (data.status === 'complete') { setBrandResult(data.result); setView('brand_results'); if (refreshProfile) refreshProfile(); return }
         if (data.status === 'failed') throw new Error('Sorgu başarısız')
-        setStatusText('AI sorgulanıyor')
+        // statusText artik SSE stream'inden geliyor (bkz. handleBrandCheck); burada ezilmiyor.
       } catch (err) { setError(err.message); setView('landing'); return }
     }
     setError('Sorgu zaman aşımına uğradı.'); setView('landing')
@@ -130,7 +130,22 @@ function AppInner() {
         setBrandResult({ identity_mismatch: true, match_score: data.match_score, name: payload.name })
         setView('brand_results'); return
       }
+      // Canlı model-bazli ilerleme (SSE) — sadece statusText'i besler,
+      // is tamamlanma karari hala pollBrandJob'daki polling'de.
+      let es
+      try {
+        es = new EventSource(`${API_URL}/api/brand-check/${data.job_id}/stream`)
+        es.onmessage = (evt) => {
+          try {
+            const parsed = JSON.parse(evt.data)
+            if (parsed.message) setStatusText(parsed.message)
+            if (parsed.done) es.close()
+          } catch { /* ignore malformed event */ }
+        }
+        es.onerror = () => es.close()
+      } catch { /* EventSource desteklenmiyorsa polling zaten yeterli */ }
       await pollBrandJob(data.job_id)
+      es?.close()
     } catch (err) { setError(err.message || 'Bağlantı hatası'); setView('landing') }
   }
 

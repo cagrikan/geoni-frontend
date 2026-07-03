@@ -94,17 +94,18 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
     }
   }
 
-  const WizardProgress = ({ total, titles }) => (
-    <div className="wizard-header">
-      <div className="wizard-progress">
-        <span className="wizard-progress__count">Adım {step + 1}/{total + 1}</span>
-        <div className="wizard-progress__dots">
-          {Array.from({ length: total + 1 }).map((_, i) => (
-            <span key={i} className={`wizard-dot ${i <= step ? 'wizard-dot--active' : ''}`} />
-          ))}
-        </div>
+  const StepTitle = ({ titles }) => (
+    titles[step] ? <h2 className="wizard-step-title">{titles[step]}</h2> : null
+  )
+
+  const WizardProgress = ({ total }) => (
+    <div className="wizard-progress">
+      <span className="wizard-progress__count">Adım {step + 1}/{total + 1}</span>
+      <div className="wizard-progress__dots">
+        {Array.from({ length: total + 1 }).map((_, i) => (
+          <span key={i} className={`wizard-dot ${i <= step ? 'wizard-dot--active' : ''}`} />
+        ))}
       </div>
-      {titles[step] && <h2 className="wizard-step-title">{titles[step]}</h2>}
     </div>
   )
 
@@ -165,7 +166,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
             {/* ── WEB SİTESİ (2 adımlı wizard, diğer modlarla tutarlı) ── */}
             {mode === 'site' && (
               <>
-                <WizardProgress total={SITE_LAST_STEP} titles={SITE_STEP_TITLES} />
+                <StepTitle titles={SITE_STEP_TITLES} />
 
                 {step === 0 && (
                   <div className="landing__field landing__field--hero">
@@ -181,6 +182,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
                 )}
 
                 <div className="wizard-nav">
+                  <WizardProgress total={SITE_LAST_STEP} />
                   {step > 0 && <button type="button" className="wizard-back" onClick={() => setStep(s => s - 1)}>← Geri</button>}
                   <button type="submit" className="landing__submit" disabled={loading}>
                     {loading ? statusText + '…' : step < SITE_LAST_STEP ? 'İleri →' : 'Ücretsiz Taramayı Başlat'}
@@ -192,7 +194,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
             {/* ── KİŞİ (4 adımlı wizard) ── */}
             {mode === 'person' && (
               <>
-                <WizardProgress total={PERSON_LAST_STEP} titles={PERSON_STEP_TITLES} />
+                <StepTitle titles={PERSON_STEP_TITLES} />
 
                 {step === 0 && (
                   <div className="landing__field landing__field--hero">
@@ -238,6 +240,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
                 )}
 
                 <div className="wizard-nav">
+                  <WizardProgress total={PERSON_LAST_STEP} />
                   {step > 0 && <button type="button" className="wizard-back" onClick={() => setStep(s => s - 1)}>← Geri</button>}
                   <button type="submit" className="landing__submit" disabled={loading}>
                     {loading ? statusText + '…' : step < PERSON_LAST_STEP ? 'İleri →' : 'AI\'da Beni Ara'}
@@ -249,7 +252,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
             {/* ── MARKA / ŞİRKET (3 adımlı wizard) ── */}
             {mode === 'brand' && (
               <>
-                <WizardProgress total={BRAND_LAST_STEP} titles={BRAND_STEP_TITLES} />
+                <StepTitle titles={BRAND_STEP_TITLES} />
 
                 {step === 0 && (
                   <div className="landing__field landing__field--hero">
@@ -283,6 +286,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
                 )}
 
                 <div className="wizard-nav">
+                  <WizardProgress total={BRAND_LAST_STEP} />
                   {step > 0 && <button type="button" className="wizard-back" onClick={() => setStep(s => s - 1)}>← Geri</button>}
                   <button type="submit" className="landing__submit" disabled={loading}>
                     {loading ? statusText + '…' : step < BRAND_LAST_STEP ? 'İleri →' : 'Markamı Sorgula'}

@@ -203,11 +203,6 @@ body {
 .landing__field--hero label { font-size: .84rem; }
 
 /* Wizard ilerleme noktaları */
-.wizard-header {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
 .wizard-step-title {
   font-family: var(--display);
   font-size: 1rem;
@@ -217,7 +212,8 @@ body {
 .wizard-progress {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  flex-shrink: 0;
 }
 .wizard-progress__count {
   font-family: var(--body);

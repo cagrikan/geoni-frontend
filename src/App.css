@@ -408,6 +408,7 @@ body {
   font-family: var(--display);
   font-size: 2.6rem;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 .score-gauge__label {
   font-family: var(--mono);
@@ -436,7 +437,7 @@ body {
   font-size: .85rem;
 }
 .breakdown__row-label { color: var(--text-sub); }
-.breakdown__row-value { font-family: var(--mono); color: var(--text); }
+.breakdown__row-value { font-family: var(--mono); color: var(--text); font-variant-numeric: tabular-nums; }
 .breakdown__bar-track {
   height: 6px;
   background: var(--border);
@@ -1265,7 +1266,7 @@ body {
   padding: 6px 14px;
 }
 .dash-credit-icon { color: var(--accent); font-size: 1rem; }
-.dash-credit-val { font-family: var(--display); font-weight: 700; color: var(--text); }
+.dash-credit-val { font-family: var(--display); font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
 .dash-credit-label { font-family: var(--mono); font-size: .72rem; color: var(--text-muted); }
 .dash-avatar {
   width: 36px; height: 36px;
@@ -1354,6 +1355,7 @@ body {
   font-size: 1.8rem;
   font-weight: 700;
   color: var(--text);
+  font-variant-numeric: tabular-nums;
 }
 .dash-stat__label { font-size: .8rem; color: var(--text-muted); margin-top: 4px; }
 .dash-stat__sub { font-size: .72rem; color: var(--text-muted); font-family: var(--mono); }
@@ -1401,12 +1403,51 @@ body {
   font-family: var(--display);
   font-weight: 700;
   font-size: 1rem;
+  font-variant-numeric: tabular-nums;
   border: 1px solid;
   border-radius: 6px;
   padding: 2px 8px;
 }
-.dash-audit-credits { font-family: var(--mono); font-size: .75rem; color: var(--text-muted); }
+.dash-audit-credits { font-family: var(--mono); font-size: .75rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
 .dash-audit-pending { font-size: .8rem; color: var(--warn); }
+.dash-delta-badge {
+  font-family: var(--mono);
+  font-size: .72rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Genel Skor Trendi kartı */
+.dash-trend-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+}
+.dash-trend-card__title {
+  font-family: var(--display);
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.dash-trend-card__meta {
+  font-size: .72rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+}
+.sparkline { flex-shrink: 0; display: block; }
 .dash-credit-summary {
   display: flex;
   align-items: center;
@@ -1418,7 +1459,7 @@ body {
   margin-bottom: 20px;
 }
 .dash-credit-big { text-align: center; }
-.dash-credit-big__val { font-family: var(--display); font-size: 3rem; font-weight: 700; color: var(--accent); display: block; }
+.dash-credit-big__val { font-family: var(--display); font-size: 3rem; font-weight: 700; color: var(--accent); display: block; font-variant-numeric: tabular-nums; }
 .dash-credit-big__label { font-size: .8rem; color: var(--text-muted); }
 .dash-credit-info { display: flex; flex-direction: column; gap: 8px; font-size: .9rem; color: var(--text-sub); }
 .dash-buy-btn {

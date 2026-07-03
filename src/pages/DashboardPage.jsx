@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
 import GeoniMark from '../GeoniMark'
+import Sparkline from '../components/Sparkline'
 
 function StatCard({ label, value, sub }) {
   return (
@@ -16,6 +17,24 @@ function StatCard({ label, value, sub }) {
 function ScoreBadge({ score }) {
   const color = score >= 65 ? 'var(--good)' : score >= 40 ? 'var(--warn)' : 'var(--bad)'
   return <span className="dash-score-badge" style={{ color, borderColor: color }}>{score}</span>
+}
+
+function DeltaBadge({ delta }) {
+  if (delta == null || delta === 0) return null
+  const positive = delta > 0
+  const color = positive ? 'var(--good)' : 'var(--bad)'
+  return (
+    <span className="dash-delta-badge" style={{ color }}>
+      {positive ? '▲' : '▼'} {positive ? '+' : ''}{delta}
+    </span>
+  )
+}
+
+// Bir taramayı, aynı hedefin (domain/isim) kronolojik geçmişindeki
+// bir öncekiyle karşılaştırıp skor deltasını döndürür.
+function targetKey(audit) {
+  const raw = audit.type === 'web' ? audit.domain : audit.name
+  return raw ? raw.toLowerCase().trim() : null
 }
 
 export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
@@ -38,6 +57,42 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
     setAudits(data || [])
     setLoading(false)
   }
+
+  // Hedef bazlı (domain/isim) kronolojik skor geçmişi — aynı siteyi/kişiyi
+  // birden çok kez tarayan kullanıcılar için sparkline + delta hesaplanır.
+  const trendsByTarget = useMemo(() => {
+    const map = {}
+    audits.filter(a => a.score != null).forEach(a => {
+      const key = targetKey(a)
+      if (!key) return
+      if (!map[key]) map[key] = []
+      map[key].push({ date: a.created_at, score: a.score, scoring_version: a.result_json?.scoring_version })
+    })
+    Object.values(map).forEach(arr => arr.sort((a, b) => new Date(a.date) - new Date(b.date)))
+    return map
+  }, [audits])
+
+  const deltaFor = (audit) => {
+    const key = targetKey(audit)
+    if (!key) return null
+    const series = trendsByTarget[key]
+    if (!series || series.length < 2) return null
+    const idx = series.findIndex(p => p.date === audit.created_at)
+    if (idx <= 0) return null
+    return audit.score - series[idx - 1].score
+  }
+
+  // Genel trend: tüm hedeflerden bağımsız, kronolojik son taramalar.
+  const overallTrend = useMemo(() => {
+    return audits
+      .filter(a => a.score != null)
+      .map(a => ({ date: a.created_at, score: a.score, scoring_version: a.result_json?.scoring_version }))
+      .sort((a, b) => new Date(a.date) - new Date(b.date))
+      .slice(-20)
+  }, [audits])
+  const overallDelta = overallTrend.length >= 2
+    ? overallTrend[overallTrend.length - 1].score - overallTrend[overallTrend.length - 2].score
+    : null
 
   const deleteAudit = async (e, auditId) => {
     e.stopPropagation()
@@ -130,6 +185,20 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
             />
           </div>
 
+          {/* Genel Skor Trendi */}
+          {tab === 'audits' && overallTrend.length >= 2 && (
+            <div className="dash-trend-card">
+              <div className="dash-trend-card__info">
+                <div className="dash-trend-card__title">Genel Skor Trendi</div>
+                <div className="dash-trend-card__meta">
+                  Son {overallTrend.length} puanlı tarama
+                  {overallDelta != null && <DeltaBadge delta={overallDelta} />}
+                </div>
+              </div>
+              <Sparkline points={overallTrend} width={220} height={44} />
+            </div>
+          )}
+
           {/* Audits tab */}
           {tab === 'audits' && (
             <div className="dash-section">
@@ -153,7 +222,12 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
                         </div>
                       </div>
                       <div className="dash-audit-right">
-                        {audit.score != null ? <ScoreBadge score={audit.score} /> : <span className="dash-audit-pending">İşleniyor</span>}
+                        {audit.score != null ? (
+                          <>
+                            <DeltaBadge delta={deltaFor(audit)} />
+                            <ScoreBadge score={audit.score} />
+                          </>
+                        ) : <span className="dash-audit-pending">İşleniyor</span>}
                         <span className="dash-audit-credits">-{audit.credits_spent} ◈</span>
                         {audit.result_json && <span style={{ color: 'var(--accent)', fontSize: '.75rem' }}>→</span>}
                         <button

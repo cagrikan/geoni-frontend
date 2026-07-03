@@ -22,6 +22,10 @@ const SITE_LAST_STEP = 1
 const PERSON_LAST_STEP = 3
 const BRAND_LAST_STEP = 2
 
+const SITE_STEP_TITLES = ['Web Siteniz', 'İletişim Bilginiz']
+const PERSON_STEP_TITLES = ['Kimliğiniz', 'Meslek Bilginiz', 'Konum ve Uzmanlık Alanınız', 'İletişim Bilginiz']
+const BRAND_STEP_TITLES = ['Marka Bilginiz', 'Sektör ve Konum', 'İletişim Bilginiz']
+
 export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading = false, statusText = '', error, user, onDashboard, onLogin, onViewSample }) {
   const [mode, setMode] = useState('site') // 'site' | 'person' | 'brand'
   const [step, setStep] = useState(0)
@@ -90,14 +94,17 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
     }
   }
 
-  const WizardProgress = ({ total }) => (
-    <div className="wizard-progress">
-      <span className="wizard-progress__count">Adım {step + 1}/{total + 1}</span>
-      <div className="wizard-progress__dots">
-        {Array.from({ length: total + 1 }).map((_, i) => (
-          <span key={i} className={`wizard-dot ${i <= step ? 'wizard-dot--active' : ''}`} />
-        ))}
+  const WizardProgress = ({ total, titles }) => (
+    <div className="wizard-header">
+      <div className="wizard-progress">
+        <span className="wizard-progress__count">Adım {step + 1}/{total + 1}</span>
+        <div className="wizard-progress__dots">
+          {Array.from({ length: total + 1 }).map((_, i) => (
+            <span key={i} className={`wizard-dot ${i <= step ? 'wizard-dot--active' : ''}`} />
+          ))}
+        </div>
       </div>
+      <h2 className="wizard-step-title">{titles[step]}</h2>
     </div>
   )
 
@@ -158,18 +165,18 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
             {/* ── WEB SİTESİ (2 adımlı wizard, diğer modlarla tutarlı) ── */}
             {mode === 'site' && (
               <>
-                <WizardProgress total={SITE_LAST_STEP} />
+                <WizardProgress total={SITE_LAST_STEP} titles={SITE_STEP_TITLES} />
 
                 {step === 0 && (
                   <div className="landing__field landing__field--hero">
-                    <label htmlFor="domain">Web sitesi</label>
-                    <input id="domain" type="text" placeholder="firmaniz.com" value={domain} onChange={e => setDomain(e.target.value)} disabled={loading} required autoFocus />
+                    <label htmlFor="domain">Web sitenizin adresi nedir?</label>
+                    <input id="domain" type="text" placeholder="Örn: firmaniz.com" value={domain} onChange={e => setDomain(e.target.value)} disabled={loading} required autoFocus />
                   </div>
                 )}
                 {step === 1 && (
                   <div className="landing__field">
-                    <label htmlFor="site-email">E-posta</label>
-                    <input id="site-email" type="email" placeholder="ad@firmaniz.com" value={siteEmail} onChange={e => setSiteEmail(e.target.value)} disabled={loading} required autoFocus />
+                    <label htmlFor="site-email">Raporu hangi e-postaya gönderelim?</label>
+                    <input id="site-email" type="email" placeholder="Örn: ad@firmaniz.com" value={siteEmail} onChange={e => setSiteEmail(e.target.value)} disabled={loading} required autoFocus />
                   </div>
                 )}
 
@@ -185,47 +192,47 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
             {/* ── KİŞİ (4 adımlı wizard) ── */}
             {mode === 'person' && (
               <>
-                <WizardProgress total={PERSON_LAST_STEP} />
+                <WizardProgress total={PERSON_LAST_STEP} titles={PERSON_STEP_TITLES} />
 
                 {step === 0 && (
                   <div className="landing__field landing__field--hero">
-                    <label htmlFor="person-name">Ad Soyad</label>
-                    <input id="person-name" type="text" placeholder="Ahmet Yılmaz" value={personName} onChange={e => setPersonName(e.target.value)} disabled={loading} required autoFocus />
+                    <label htmlFor="person-name">Adınız ve soyadınız nedir?</label>
+                    <input id="person-name" type="text" placeholder="Örn: Ahmet Yılmaz" value={personName} onChange={e => setPersonName(e.target.value)} disabled={loading} required autoFocus />
                   </div>
                 )}
                 {step === 1 && (
                   <div className="landing__field-row">
                     <div className="landing__field">
-                      <label htmlFor="person-role">Unvan / Rol {OPT}</label>
-                      <input id="person-role" type="text" placeholder="CTO, Avukat, Milletvekili..." value={personRole} onChange={e => setPersonRole(e.target.value)} disabled={loading} autoFocus />
+                      <label htmlFor="person-role">Unvanınız {OPT}</label>
+                      <input id="person-role" type="text" placeholder="Örn: CTO, Avukat, Milletvekili" value={personRole} onChange={e => setPersonRole(e.target.value)} disabled={loading} autoFocus />
                     </div>
                     <div className="landing__field">
-                      <label htmlFor="person-company">Şirket {OPT}</label>
-                      <input id="person-company" type="text" placeholder="ARD Grup, Geoni.ai..." value={personCompany} onChange={e => setPersonCompany(e.target.value)} disabled={loading} />
+                      <label htmlFor="person-company">Çalıştığınız şirket {OPT}</label>
+                      <input id="person-company" type="text" placeholder="Örn: ARD Grup" value={personCompany} onChange={e => setPersonCompany(e.target.value)} disabled={loading} />
                     </div>
                   </div>
                 )}
                 {step === 2 && (
                   <div className="landing__field-row">
                     <div className="landing__field">
-                      <label htmlFor="person-city">Şehir {OPT}</label>
-                      <input id="person-city" type="text" placeholder="Ankara" value={personCity} onChange={e => setPersonCity(e.target.value)} disabled={loading} autoFocus />
+                      <label htmlFor="person-city">Bulunduğunuz şehir {OPT}</label>
+                      <input id="person-city" type="text" placeholder="Örn: Ankara" value={personCity} onChange={e => setPersonCity(e.target.value)} disabled={loading} autoFocus />
                     </div>
                     <div className="landing__field">
-                      <label htmlFor="person-topic">Konu / Alan {OPT}</label>
-                      <input id="person-topic" type="text" placeholder="dijital dönüşüm, siyaset..." value={personTopic} onChange={e => setPersonTopic(e.target.value)} disabled={loading} />
+                      <label htmlFor="person-topic">Tanındığınız alan {OPT}</label>
+                      <input id="person-topic" type="text" placeholder="Örn: dijital dönüşüm, siyaset" value={personTopic} onChange={e => setPersonTopic(e.target.value)} disabled={loading} />
                     </div>
                   </div>
                 )}
                 {step === 3 && (
                   <>
                     <div className="landing__field">
-                      <label htmlFor="person-linkedin">LinkedIn URL {OPT}</label>
+                      <label htmlFor="person-linkedin">LinkedIn profiliniz {OPT}</label>
                       <input id="person-linkedin" type="url" placeholder="https://linkedin.com/in/..." value={personLinkedin} onChange={e => setPersonLinkedin(e.target.value)} disabled={loading} autoFocus />
                     </div>
                     <div className="landing__field">
-                      <label htmlFor="person-email">E-posta {OPT}</label>
-                      <input id="person-email" type="email" placeholder="ad@firmaniz.com" value={personEmail} onChange={e => setPersonEmail(e.target.value)} disabled={loading} />
+                      <label htmlFor="person-email">Raporu hangi e-postaya gönderelim? {OPT}</label>
+                      <input id="person-email" type="email" placeholder="Örn: ad@firmaniz.com" value={personEmail} onChange={e => setPersonEmail(e.target.value)} disabled={loading} />
                     </div>
                   </>
                 )}
@@ -242,35 +249,35 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
             {/* ── MARKA / ŞİRKET (3 adımlı wizard) ── */}
             {mode === 'brand' && (
               <>
-                <WizardProgress total={BRAND_LAST_STEP} />
+                <WizardProgress total={BRAND_LAST_STEP} titles={BRAND_STEP_TITLES} />
 
                 {step === 0 && (
                   <div className="landing__field landing__field--hero">
-                    <label htmlFor="brand-name">Marka / Şirket Adı</label>
-                    <input id="brand-name" type="text" placeholder="Geoni.ai, ARD Grup..." value={brandName} onChange={e => setBrandName(e.target.value)} disabled={loading} required autoFocus />
+                    <label htmlFor="brand-name">Marka veya şirket adınız nedir?</label>
+                    <input id="brand-name" type="text" placeholder="Örn: Geoni.ai, ARD Grup" value={brandName} onChange={e => setBrandName(e.target.value)} disabled={loading} required autoFocus />
                   </div>
                 )}
                 {step === 1 && (
                   <div className="landing__field-row">
                     <div className="landing__field">
-                      <label htmlFor="brand-sector">Sektör {OPT}</label>
-                      <input id="brand-sector" type="text" placeholder="Teknoloji, Hukuk, Finans..." value={brandSector} onChange={e => setBrandSector(e.target.value)} disabled={loading} autoFocus />
+                      <label htmlFor="brand-sector">Faaliyet sektörünüz {OPT}</label>
+                      <input id="brand-sector" type="text" placeholder="Örn: Teknoloji, Hukuk, Finans" value={brandSector} onChange={e => setBrandSector(e.target.value)} disabled={loading} autoFocus />
                     </div>
                     <div className="landing__field">
-                      <label htmlFor="brand-city">Şehir {OPT}</label>
-                      <input id="brand-city" type="text" placeholder="İstanbul, Ankara..." value={brandCity} onChange={e => setBrandCity(e.target.value)} disabled={loading} />
+                      <label htmlFor="brand-city">Bulunduğunuz şehir {OPT}</label>
+                      <input id="brand-city" type="text" placeholder="Örn: İstanbul, Ankara" value={brandCity} onChange={e => setBrandCity(e.target.value)} disabled={loading} />
                     </div>
                   </div>
                 )}
                 {step === 2 && (
                   <>
                     <div className="landing__field">
-                      <label htmlFor="brand-website">Web Sitesi {OPT}</label>
-                      <input id="brand-website" type="text" placeholder="firmaniz.com" value={brandWebsite} onChange={e => setBrandWebsite(e.target.value)} disabled={loading} autoFocus />
+                      <label htmlFor="brand-website">Şirketinizin web sitesi {OPT}</label>
+                      <input id="brand-website" type="text" placeholder="Örn: firmaniz.com" value={brandWebsite} onChange={e => setBrandWebsite(e.target.value)} disabled={loading} autoFocus />
                     </div>
                     <div className="landing__field">
-                      <label htmlFor="brand-email">E-posta {OPT}</label>
-                      <input id="brand-email" type="email" placeholder="ad@firmaniz.com" value={brandEmail} onChange={e => setBrandEmail(e.target.value)} disabled={loading} />
+                      <label htmlFor="brand-email">Raporu hangi e-postaya gönderelim? {OPT}</label>
+                      <input id="brand-email" type="email" placeholder="Örn: ad@firmaniz.com" value={brandEmail} onChange={e => setBrandEmail(e.target.value)} disabled={loading} />
                     </div>
                   </>
                 )}

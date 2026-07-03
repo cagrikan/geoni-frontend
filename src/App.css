@@ -496,7 +496,7 @@ body {
   align-items: center;
   gap: 8px;
 }
-.topics__col-icon { font-size: 1rem; }
+.topics__col-icon { color: var(--accent); flex-shrink: 0; }
 .topic-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -1078,7 +1078,6 @@ body {
   border-radius: 20px;
 }
 .identity-mismatch__icon {
-  font-size: 3rem;
   color: #f87171;
   margin-bottom: 20px;
 }
@@ -1154,7 +1153,7 @@ body {
   padding: 16px 20px;
 }
 .pro-blur__lock {
-  font-size: 1.4rem;
+  color: var(--accent);
 }
 .pro-blur__label {
   font-family: var(--mono);
@@ -1265,7 +1264,7 @@ body {
   border-radius: 20px;
   padding: 6px 14px;
 }
-.dash-credit-icon { color: var(--accent); font-size: 1rem; }
+.dash-credit-icon { color: var(--accent); flex-shrink: 0; }
 .dash-credit-val { font-family: var(--display); font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
 .dash-credit-label { font-family: var(--mono); font-size: .72rem; color: var(--text-muted); }
 .dash-avatar {
@@ -1320,11 +1319,13 @@ body {
 .dash-user__email { font-size: .75rem; color: var(--text-muted); margin-top: 2px; }
 .dash-nav { display: flex; flex-direction: column; gap: 4px; }
 .dash-nav__item {
+  display: flex; align-items: center; gap: 10px;
   background: none; border: none; border-radius: 10px;
   padding: 10px 14px; text-align: left;
   color: var(--text-sub); font-size: .9rem; cursor: pointer;
   transition: background .2s, color .2s;
 }
+.dash-nav__item svg { flex-shrink: 0; }
 .dash-nav__item:hover { background: rgba(255,255,255,.05); color: var(--text); }
 .dash-nav__item--active { background: rgba(129,140,248,.12); color: var(--accent); font-weight: 600; }
 .dash-new-scan {
@@ -1394,7 +1395,7 @@ body {
   transition: border-color .2s;
 }
 .dash-audit-row:hover { border-color: rgba(129,140,248,.3); }
-.dash-audit-icon { font-size: 1.2rem; flex-shrink: 0; }
+.dash-audit-icon { color: var(--text-muted); flex-shrink: 0; }
 .dash-audit-info { flex: 1; min-width: 0; }
 .dash-audit-name { font-weight: 600; color: var(--text); font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .dash-audit-meta { font-size: .75rem; color: var(--text-muted); margin-top: 2px; }
@@ -1408,7 +1409,7 @@ body {
   border-radius: 6px;
   padding: 2px 8px;
 }
-.dash-audit-credits { font-family: var(--mono); font-size: .75rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.dash-audit-credits { font-family: var(--mono); font-size: .75rem; color: var(--text-muted); font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; gap: 3px; }
 .dash-audit-pending { font-size: .8rem; color: var(--warn); }
 .dash-delta-badge {
   font-family: var(--mono);

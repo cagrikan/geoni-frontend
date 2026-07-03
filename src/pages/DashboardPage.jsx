@@ -3,6 +3,10 @@ import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
 import GeoniMark from '../GeoniMark'
 import Sparkline from '../components/Sparkline'
+import {
+  Gem, History, Bookmark, Settings, Globe, User, Building2, FileText,
+  TrendingUp, TrendingDown, ChevronRight, X,
+} from 'lucide-react'
 
 function StatCard({ label, value, sub }) {
   return (
@@ -23,9 +27,10 @@ function DeltaBadge({ delta }) {
   if (delta == null || delta === 0) return null
   const positive = delta > 0
   const color = positive ? 'var(--good)' : 'var(--bad)'
+  const TrendIcon = positive ? TrendingUp : TrendingDown
   return (
     <span className="dash-delta-badge" style={{ color }}>
-      {positive ? '▲' : '▼'} {positive ? '+' : ''}{delta}
+      <TrendIcon size={12} strokeWidth={2} /> {positive ? '+' : ''}{delta}
     </span>
   )
 }
@@ -107,7 +112,7 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
   })
 
   const typeLabel = { web: 'Web Sitesi', person: 'Kişi', brand: 'Marka' }
-  const typeIcon = { web: '🌐', person: '👤', brand: '🏢' }
+  const typeIcon = { web: Globe, person: User, brand: Building2 }
 
   return (
     <div className="dashboard">
@@ -119,7 +124,7 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
         </button>
         <div className="dash-nav-right">
           <div className="dash-credit-badge">
-            <span className="dash-credit-icon">◈</span>
+            <Gem size={14} strokeWidth={1.5} className="dash-credit-icon" />
             <span className="dash-credit-val">{profile?.credit_balance ?? '—'}</span>
             <span className="dash-credit-label">kontör</span>
           </div>
@@ -151,16 +156,16 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
 
           <nav className="dash-nav">
             <button className={`dash-nav__item ${tab === 'audits' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('audits')}>
-              📊 Tarama Geçmişi
+              <History size={16} strokeWidth={1.5} /> Tarama Geçmişi
             </button>
             <button className={`dash-nav__item ${tab === 'assets' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('assets')}>
-              📌 Takip Listesi
+              <Bookmark size={16} strokeWidth={1.5} /> Takip Listesi
             </button>
             <button className={`dash-nav__item ${tab === 'credits' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('credits')}>
-              ◈ Kontörlerim
+              <Gem size={16} strokeWidth={1.5} /> Kontörlerim
             </button>
             <button className={`dash-nav__item ${tab === 'settings' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('settings')}>
-              ⚙ Ayarlar
+              <Settings size={16} strokeWidth={1.5} /> Ayarlar
             </button>
           </nav>
 
@@ -214,7 +219,10 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
                 <div className="dash-audit-list">
                   {audits.map(audit => (
                     <div key={audit.id} className="dash-audit-row" onClick={() => audit.result_json && onViewAudit && onViewAudit(audit)} style={{ cursor: audit.result_json ? 'pointer' : 'default' }}>
-                      <span className="dash-audit-icon">{typeIcon[audit.type] || '📄'}</span>
+                      {(() => {
+                        const TypeIcon = typeIcon[audit.type] || FileText
+                        return <TypeIcon size={18} strokeWidth={1.5} className="dash-audit-icon" />
+                      })()}
                       <div className="dash-audit-info">
                         <div className="dash-audit-name">{audit.domain || (audit.name?.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')) || '—'}</div>
                         <div className="dash-audit-meta">
@@ -228,13 +236,13 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
                             <ScoreBadge score={audit.score} />
                           </>
                         ) : <span className="dash-audit-pending">İşleniyor</span>}
-                        <span className="dash-audit-credits">-{audit.credits_spent} ◈</span>
-                        {audit.result_json && <span style={{ color: 'var(--accent)', fontSize: '.75rem' }}>→</span>}
+                        <span className="dash-audit-credits">-{audit.credits_spent} <Gem size={11} strokeWidth={1.5} /></span>
+                        {audit.result_json && <ChevronRight size={14} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />}
                         <button
                           onClick={(e) => deleteAudit(e, audit.id)}
                           className="dash-audit-delete"
                           title="Sil"
-                        >✕</button>
+                        ><X size={13} strokeWidth={1.5} /></button>
                       </div>
                     </div>
                   ))}

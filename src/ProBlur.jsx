@@ -1,3 +1,5 @@
+import { Lock } from 'lucide-react'
+
 export default function ProBlur({ children, label = "Pro içerik", isPro = false }) {
   if (isPro) return <>{children}</>
   return (
@@ -5,7 +7,7 @@ export default function ProBlur({ children, label = "Pro içerik", isPro = false
       <div className="pro-blur__content">{children}</div>
       <div className="pro-blur__overlay">
         <div className="pro-blur__badge">
-          <span className="pro-blur__lock">🔒</span>
+          <Lock size={14} strokeWidth={1.5} className="pro-blur__lock" />
           <span className="pro-blur__label">{label}</span>
           <a href="https://geoni.ai#paketler" className="pro-blur__btn" target="_blank" rel="noopener">
             Pro'ya Geç →

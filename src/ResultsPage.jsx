@@ -1,3 +1,4 @@
+import { CircleCheck, TrendingUp } from 'lucide-react'
 import GeoniMark from './GeoniMark'
 import ProBlur from './ProBlur'
 
@@ -70,7 +71,7 @@ function TopicCard({ topic, isOpportunity }) {
   )
 }
 
-export default function ResultsPage({ result, onReset }) {
+export default function ResultsPage({ result, onReset, user, onLogin, onDashboard, isPro = false }) {
   const {
     domain, score, score_breakdown,
     total_pages, indexed_pages, platforms,
@@ -122,7 +123,7 @@ export default function ResultsPage({ result, onReset }) {
         {/* Skor + Breakdown (breakdown blur) */}
         <div className="results__top">
           <ScoreGauge score={score} />
-          <ProBlur isPro={isPro} label="Detaylı skor dökümü Pro planında">
+          <ProBlur isPro={isPro} label="6 boyutlu skor dökümünü gör">
             <Breakdown breakdown={score_breakdown} />
           </ProBlur>
         </div>
@@ -159,7 +160,7 @@ export default function ResultsPage({ result, onReset }) {
             <span className="results__stat-l">Gemini Bot İzni</span>
           </div>
           <div className="results__stat">
-            <ProBlur isPro={isPro} label="Pro">
+            <ProBlur isPro={isPro} label="llm.txt durumunu gör">
               <span className="results__stat-n">—</span>
               <span className="results__stat-l">llm.txt</span>
             </ProBlur>
@@ -169,27 +170,27 @@ export default function ResultsPage({ result, onReset }) {
         {/* Topics */}
         <div className="topics">
           <div className="topics__col">
-            <h3><span className="topics__col-icon">✓</span> Güçlü Olduğunuz Konular</h3>
+            <h3><CircleCheck size={16} strokeWidth={1.5} className="topics__col-icon" /> Güçlü Olduğunuz Konular</h3>
             {freeTopics.length > 0 ? (
               freeTopics.map((t, i) => <TopicCard topic={t} key={i} />)
             ) : (
               <div className="topics__empty">Henüz güçlü bir konu tespit edilmedi.</div>
             )}
             {paidTopics.length > 0 && (
-              <ProBlur isPro={isPro} label={`+${paidTopics.length} konu daha Pro planında`}>
+              <ProBlur isPro={isPro} label={`+${paidTopics.length} güçlü konu daha — tümünü gör`}>
                 {paidTopics.map((t, i) => <TopicCard topic={t} key={i} />)}
               </ProBlur>
             )}
           </div>
           <div className="topics__col">
-            <h3><span className="topics__col-icon">→</span> Kaçırdığınız Fırsatlar</h3>
+            <h3><TrendingUp size={16} strokeWidth={1.5} className="topics__col-icon" /> Kaçırdığınız Fırsatlar</h3>
             {freeOpps.length > 0 ? (
               freeOpps.map((t, i) => <TopicCard topic={t} isOpportunity key={i} />)
             ) : (
               <div className="topics__empty">Fırsat alanı tespit edilmedi.</div>
             )}
             {paidOpps.length > 0 && (
-              <ProBlur isPro={isPro} label={`+${paidOpps.length} fırsat daha Pro planında`}>
+              <ProBlur isPro={isPro} label={`+${paidOpps.length} fırsat konusu ve rakip verisi — tümünü gör`}>
                 {paidOpps.map((t, i) => <TopicCard topic={t} isOpportunity key={i} />)}
               </ProBlur>
             )}

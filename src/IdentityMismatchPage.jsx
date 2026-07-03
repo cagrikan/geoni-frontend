@@ -1,3 +1,4 @@
+import { TriangleAlert } from 'lucide-react'
 import GeoniMark from './GeoniMark'
 
 export default function IdentityMismatchPage({ result, onReset }) {
@@ -14,7 +15,7 @@ export default function IdentityMismatchPage({ result, onReset }) {
 
       <div className="results">
         <div className="identity-mismatch">
-          <div className="identity-mismatch__icon">⚠</div>
+          <TriangleAlert size={40} strokeWidth={1.5} className="identity-mismatch__icon" />
           <h1 className="identity-mismatch__title">Kimlik Doğrulanamadı</h1>
           <p className="identity-mismatch__desc">
             <strong>{name}</strong> için internette bulunan sonuçlar, girdiğiniz bilgilerle yeterince örtüşmüyor.

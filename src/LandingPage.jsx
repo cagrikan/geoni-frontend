@@ -129,8 +129,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
           <em>Siz yoksunuz.</em>
         </h1>
         <p className="hero-centered__subhead">
-          ChatGPT, Claude, Gemini ve Perplexity artık kaynakça değil, tek bir yanıt veriyor.
-          GEONI, bu dört motordaki görünürlüğünüzü ölçüp somut bir yol haritası çıkarır.
+          ChatGPT, Claude, Gemini ve Perplexity'nin sizi nasıl gördüğünü ölçün.
         </p>
 
         {onViewSample && (

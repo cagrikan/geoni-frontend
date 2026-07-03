@@ -30,7 +30,7 @@ function BgRadar({ active }) {
 
 const OPT = <span style={{color:'var(--text-muted)',fontWeight:400,fontSize:'.8em'}}>(isteğe bağlı)</span>
 
-export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading, statusText, error, user, onDashboard, onLogin }) {
+export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading, statusText, error, user, onDashboard, onLogin, onViewSample }) {
   const [mode, setMode] = useState('site') // 'site' | 'person' | 'brand'
 
   // site
@@ -222,7 +222,17 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
             </form>
 
             {error && <p className="landing__error">{error}</p>}
-            <p className="landing__trust">Kredi kartı gerekmez · Sonuç ~30 saniyede hazır</p>
+            <p className="landing__trust">
+              Kredi kartı gerekmez · Sonuç ~30 saniyede hazır
+              {onViewSample && (
+                <>
+                  {' · '}
+                  <button type="button" className="landing__sample-link" onClick={onViewSample}>
+                    Örnek bir rapor gör →
+                  </button>
+                </>
+              )}
+            </p>
           </div>
         </div>
 

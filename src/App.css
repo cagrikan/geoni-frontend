@@ -207,6 +207,18 @@ body {
   color: var(--text-muted);
   font-family: var(--mono);
 }
+.landing__sample-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--mono);
+  font-size: .76rem;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.landing__sample-link:hover { color: var(--text); }
 
 /* ===== BACKGROUND RADAR (contained within left column, shifted left) ===== */
 .bg-radar {
@@ -598,6 +610,36 @@ body {
 }
 .results__cta-btn:hover { opacity: .88; transform: translateY(-2px); }
 
+/* ===== SAMPLE REPORT BANNER ===== */
+.results__sample-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: rgba(34,211,238,.08);
+  border: 1px solid rgba(34,211,238,.25);
+  border-radius: 12px;
+  padding: 14px 20px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  color: var(--text-sub);
+  font-size: .88rem;
+}
+.results__sample-banner strong { color: var(--text); }
+.results__sample-banner-btn {
+  background: none;
+  border: 1px solid rgba(34,211,238,.4);
+  color: var(--text);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: .82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .2s;
+}
+.results__sample-banner-btn:hover { background: rgba(34,211,238,.12); }
+
 /* ===== RESULTS COMPACT CTA (below score section) ===== */
 .results__cta-compact {
   display: flex;
@@ -667,6 +709,7 @@ body {
 
 @media (max-width: 600px) {
   .results__cta-compact { flex-direction: column; align-items: stretch; text-align: center; }
+  .results__sample-banner { flex-direction: column; align-items: stretch; text-align: center; }
   .results__sticky-bar { flex-direction: column; gap: 8px; padding: 10px 16px; }
 }
 

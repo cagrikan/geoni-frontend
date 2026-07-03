@@ -71,7 +71,7 @@ function TopicCard({ topic, isOpportunity }) {
   )
 }
 
-export default function ResultsPage({ result, onReset, user, onLogin, onDashboard, isPro = false }) {
+export default function ResultsPage({ result, onReset, user, onLogin, onDashboard, isPro = false, isSample = false }) {
   const {
     domain, score, score_breakdown,
     total_pages, indexed_pages, platforms,
@@ -105,6 +105,14 @@ export default function ResultsPage({ result, onReset, user, onLogin, onDashboar
       </header>
 
       <div className="results">
+        {isSample && (
+          <div className="results__sample-banner">
+            <span>Bu bir <strong>örnek rapordur</strong> — gerçek veri değildir.</span>
+            <button type="button" className="results__sample-banner-btn" onClick={onReset}>
+              Kendi Sitenizi Ücretsiz Tarayın →
+            </button>
+          </div>
+        )}
         <div className="results__header">
           <div>
             <h1 className="results__title">AI Görünürlük Raporu</h1>

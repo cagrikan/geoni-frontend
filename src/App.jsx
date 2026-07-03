@@ -11,6 +11,35 @@ import './App.css'
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.geoni.ai'
 
+const SAMPLE_RESULT = {
+  domain: 'ornek-magaza.com',
+  score: 68,
+  score_breakdown: {
+    index_coverage: 74,
+    authority: 61,
+    freshness: 55,
+    schema: 82,
+    engagement: 63,
+    brand_recall: 71,
+  },
+  total_pages: 142,
+  indexed_pages: 118,
+  platforms: { chatgpt: true, anthropic: true, google: false },
+  top_topics: [
+    { topic: 'Kurumsal Sürdürülebilirlik Raporlaması', platforms: ['chatgpt', 'claude'] },
+    { topic: 'B2B E-ticaret Entegrasyonları', platforms: ['chatgpt', 'claude', 'gemini'] },
+    { topic: 'Lojistik ve Tedarik Zinciri Danışmanlığı', platforms: ['chatgpt'] },
+    { topic: 'Kurumsal Satın Alma Süreçleri', platforms: ['claude'] },
+  ],
+  opportunities: [
+    { topic: 'Yapay Zeka Destekli Envanter Yönetimi', platforms: [], competitors: ['rakip-a.com', 'rakip-b.com'] },
+    { topic: 'Sürdürülebilir Ambalaj Çözümleri', platforms: [], competitors: ['rakip-c.com'] },
+    { topic: 'Uluslararası Nakliye Optimizasyonu', platforms: [], competitors: ['rakip-a.com', 'rakip-d.com'] },
+    { topic: 'Perakende Analitik Platformları', platforms: [], competitors: ['rakip-b.com'] },
+  ],
+  created_at: new Date().toISOString(),
+}
+
 function AppInner() {
   const { user, profile, loading: authLoading, refreshProfile } = useAuth()
   const [view, setView] = useState(() => {
@@ -23,6 +52,7 @@ function AppInner() {
   const [brandResult, setBrandResult] = useState(null)
   const [error, setError] = useState(null)
   const [statusText, setStatusText] = useState('queued')
+  const [isSample, setIsSample] = useState(false)
 
   // Sync URL with view
   useEffect(() => {
@@ -70,7 +100,7 @@ function AppInner() {
   }
 
   const handleAudit = async (domain, email) => {
-    setError(null); setView('loading'); setStatusText('queued')
+    setError(null); setIsSample(false); setView('loading'); setStatusText('queued')
     try {
       const session = (await import('./lib/supabase')).supabase.auth.getSession ? await (await import('./lib/supabase')).supabase.auth.getSession() : null
       const token = session?.data?.session?.access_token || ''
@@ -104,7 +134,9 @@ function AppInner() {
     } catch (err) { setError(err.message || 'Bağlantı hatası'); setView('landing') }
   }
 
-  const handleReset = () => { setResult(null); setBrandResult(null); setError(null); navigateTo('landing') }
+  const handleReset = () => { setResult(null); setBrandResult(null); setError(null); setIsSample(false); navigateTo('landing') }
+
+  const handleViewSample = () => { setError(null); setIsSample(true); setResult(SAMPLE_RESULT); setView('results') }
 
   const handleViewAudit = (audit) => {
     const resultJson = audit.result_json
@@ -154,9 +186,10 @@ function AppInner() {
           user={user}
           onDashboard={() => navigateTo('dashboard')}
           onLogin={() => navigateTo('login')}
+          onViewSample={handleViewSample}
         />
       )}
-      {view === 'results' && result && <ResultsPage result={result} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} isPro={profile?.is_admin || (profile?.credit_balance > 0 && profile?.total_credits_purchased > 0)} />}
+      {view === 'results' && result && <ResultsPage result={result} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} isPro={!isSample && (profile?.is_admin || (profile?.credit_balance > 0 && profile?.total_credits_purchased > 0))} isSample={isSample} />}
       {view === 'brand_results' && brandResult && !brandResult.identity_mismatch && (
         <BrandCheckResultsPage result={brandResult} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} isPro={profile?.is_admin || (profile?.credit_balance > 0 && profile?.total_credits_purchased > 0)} />
       )}

@@ -1,12 +1,6 @@
 import { CircleCheck, Loader2 } from 'lucide-react'
 import GeoniMark from '../GeoniMark'
-
-const SITE_STEPS = [
-  { key: 'queued', label: 'Sıraya alındı' },
-  { key: 'crawling', label: 'Site taranıyor' },
-  { key: 'indexing', label: 'Dizin kontrol ediliyor' },
-  { key: 'scoring', label: 'Skor hesaplanıyor' },
-]
+import { useLanguage } from '../lib/LanguageContext'
 
 function Pulse() {
   return (
@@ -36,6 +30,15 @@ function StepRow({ label, state }) {
 // SSE baglanamazsa (ör. desteklenmeyen taraeyici) site taramasi icin sabit
 // 4 asamalik statusKey tabanli listeye duser.
 export default function ScanningScreen({ kind, target, statusKey, progressLog = [], onCancel }) {
+  const { t, language } = useLanguage()
+
+  const SITE_STEPS = [
+    { key: 'queued', label: t('scan_step_queued') },
+    { key: 'crawling', label: t('scan_step_crawling') },
+    { key: 'indexing', label: t('scan_step_indexing') },
+    { key: 'scoring', label: t('scan_step_scoring') },
+  ]
+
   const steps = progressLog.length > 0
     ? progressLog.map((msg, i) => ({ label: msg, state: i < progressLog.length - 1 ? 'done' : 'active' }))
     : kind === 'site'
@@ -55,19 +58,25 @@ export default function ScanningScreen({ kind, target, statusKey, progressLog = 
       <div className="scan-screen__center">
         <Pulse />
         <h1 className="scan-screen__title">
-          {kind === 'site' ? <>{target} <em>taranıyor</em></> : <><em>{target}</em> için AI motorları sorgulanıyor</>}
+          {kind === 'site' ? (
+            <>{target} <em>{t('scan_title_site_suffix')}</em></>
+          ) : language === 'en' ? (
+            <>{t('scan_title_brand_prefix')} <em>{target}</em></>
+          ) : (
+            <><em>{target}</em> {t('scan_title_brand_prefix')}</>
+          )}
         </h1>
-        <p className="scan-screen__sub">Claude, ChatGPT, Gemini{kind === 'brand' ? ' ve Perplexity' : ''} gerçek zamanlı çalışıyor</p>
+        <p className="scan-screen__sub">Claude, ChatGPT, Gemini{kind === 'brand' ? ' + Perplexity' : ''} {t('scan_sub')}</p>
 
         <div className="scan-steps">
           {steps.length > 0
             ? steps.map((s, i) => <StepRow key={i} label={s.label} state={s.state} />)
-            : <StepRow label="Başlatılıyor…" state="active" />}
+            : <StepRow label={t('scan_starting')} state="active" />}
         </div>
 
-        <p className="scan-screen__eta">Ortalama süre ~30 saniye</p>
+        <p className="scan-screen__eta">{t('scan_eta')}</p>
         {onCancel && (
-          <button type="button" className="scan-screen__cancel" onClick={onCancel}>Vazgeç</button>
+          <button type="button" className="scan-screen__cancel" onClick={onCancel}>{t('scan_cancel')}</button>
         )}
       </div>
     </div>

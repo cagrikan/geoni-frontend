@@ -1,6 +1,8 @@
 import { CircleCheck, TrendingUp } from 'lucide-react'
 import GeoniMark from './GeoniMark'
 import ProBlur from './ProBlur'
+import LanguageSwitcher from './components/LanguageSwitcher'
+import { useLanguage } from './lib/LanguageContext'
 
 function scoreColor(score) {
   if (score >= 65) return 'var(--good)'
@@ -8,7 +10,7 @@ function scoreColor(score) {
   return 'var(--bad)'
 }
 
-function ScoreGauge({ score }) {
+function ScoreGauge({ score, label }) {
   const radius = 64
   const circumference = 2 * Math.PI * radius
   const offset = circumference - (score / 100) * circumference
@@ -28,27 +30,26 @@ function ScoreGauge({ score }) {
         />
       </svg>
       <div className="score-gauge__num" style={{ color }}>{score}</div>
-      <div className="score-gauge__label">AI BİLİNİRLİK SKORU</div>
+      <div className="score-gauge__label">{label}</div>
     </div>
   )
 }
 
-const BREAKDOWN_LABELS = {
-  claude:          'Claude',
-  chatgpt:         'ChatGPT',
-  gemini:          'Gemini',
-  perplexity:      'Perplexity',
-  yanit_kalitesi:  'Yanıt Kalitesi',
-  konu_uyumu:      'Konu Uyumu',
-}
-
-function Breakdown({ breakdown }) {
+function Breakdown({ breakdown, t }) {
+  const labels = {
+    claude: 'Claude',
+    chatgpt: 'ChatGPT',
+    gemini: 'Gemini',
+    perplexity: 'Perplexity',
+    yanit_kalitesi: t('breakdown_yanit_kalitesi'),
+    konu_uyumu: t('breakdown_konu_uyumu'),
+  }
   return (
     <div className="breakdown">
       {Object.entries(breakdown || {}).map(([key, value]) => (
         <div className="breakdown__row" key={key}>
           <div className="breakdown__row-top">
-            <span className="breakdown__row-label">{BREAKDOWN_LABELS[key] || key}</span>
+            <span className="breakdown__row-label">{labels[key] || key}</span>
             <span className="breakdown__row-value">{value}</span>
           </div>
           <div className="breakdown__bar-track">
@@ -89,6 +90,7 @@ function TopicCard({ topic, isOpportunity }) {
 }
 
 export default function BrandCheckResultsPage({ result, onReset, user, onLogin, onDashboard, isPro = false }) {
+  const { t, language } = useLanguage()
   const {
     name,
     topic,
@@ -102,12 +104,13 @@ export default function BrandCheckResultsPage({ result, onReset, user, onLogin, 
     created_at,
   } = result
 
+  const locale = language === 'en' ? 'en-US' : 'tr-TR'
   const formattedDate = created_at
-    ? new Date(created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })
+    ? new Date(created_at).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })
     : null
 
   const formattedTime = created_at
-    ? new Date(created_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+    ? new Date(created_at).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })
     : null
 
   const capitalizedName = name
@@ -129,23 +132,24 @@ export default function BrandCheckResultsPage({ result, onReset, user, onLogin, 
           <span className="landing__logo">GEONI</span>
         </button>
         <div className="nav-auth">
-          {onDashboard && <button className="nav-dashboard-btn" onClick={onDashboard}>← Dashboard</button>}
-          {!user && onLogin && <button className="nav-login-btn" onClick={onLogin}>Giriş Yap</button>}
+          <LanguageSwitcher />
+          {onDashboard && <button className="nav-dashboard-btn" onClick={onDashboard}>{t('nav_dashboard_back')}</button>}
+          {!user && onLogin && <button className="nav-login-btn" onClick={onLogin}>{t('nav_login')}</button>}
         </div>
       </header>
 
       <div className="results">
         <div className="results__header">
           <div>
-            <h1 className="results__title">AI Bilinirlik Raporu</h1>
+            <h1 className="results__title">{t('results_brand_title')}</h1>
             {formattedDate && (
               <div className="results__date">
-                {formattedDate}{formattedTime && <span style={{ marginLeft: 8, opacity: .7 }}>{formattedTime}</span>} tarihinde oluşturuldu
+                {formattedDate}{formattedTime && <span style={{ marginLeft: 8, opacity: .7 }}>{formattedTime}</span>} {t('results_created_at_suffix')}
               </div>
             )}
           </div>
           <div className="results__scanned">
-            <span className="results__scanned-label">Sorgulanan</span>
+            <span className="results__scanned-label">{t('results_brand_queried_label')}</span>
             <span className="results__scanned-value">{capitalizedName}</span>
             {topic && topic !== name && (
               <span style={{ display: 'block', fontFamily: 'var(--mono)', fontSize: '.72rem', color: 'var(--text-muted)', marginTop: 2 }}>{topic}</span>
@@ -154,80 +158,80 @@ export default function BrandCheckResultsPage({ result, onReset, user, onLogin, 
         </div>
 
         <div className="results__top">
-          <ScoreGauge score={score} />
-          <ProBlur isPro={isPro} label="Model bazlı skor dökümünü gör">
-            <Breakdown breakdown={score_breakdown} />
+          <ScoreGauge score={score} label={t('results_brand_score_label')} />
+          <ProBlur isPro={isPro} label={t('results_brand_breakdown_label')}>
+            <Breakdown breakdown={score_breakdown} t={t} />
           </ProBlur>
         </div>
 
         <div className="results__cta-compact">
-          <span className="results__cta-compact-text">Bu skoru nasıl yükseltiriz?</span>
+          <span className="results__cta-compact-text">{t('results_upgrade_question')}</span>
           <a href="https://geoni.ai#paketler" className="results__cta-compact-btn" target="_blank" rel="noopener">
-            GEO Paketlerini İncele →
+            {t('results_view_packages')}
           </a>
         </div>
 
         <div className={`results__stats ${model_results?.perplexity ? 'results__stats--six' : 'results__stats--five'}`}>
           <div className="results__stat">
             <span className="results__stat-n">{recognition_count}/{total}</span>
-            <span className="results__stat-l">Tanıyan Model</span>
+            <span className="results__stat-l">{t('results_brand_recognizing_models')}</span>
           </div>
           <div className="results__stat">
             <span className="results__stat-n">{google_result_count}</span>
-            <span className="results__stat-l">Web Sonucu</span>
+            <span className="results__stat-l">{t('results_brand_web_results')}</span>
           </div>
           <div className="results__stat">
             <span className="results__stat-n" style={{ color: model_results?.claude?.recognized ? 'var(--good)' : 'var(--bad)' }}>
-              {model_results?.claude?.recognized ? 'Evet' : 'Hayır'}
+              {model_results?.claude?.recognized ? t('results_yes') : t('results_no')}
             </span>
-            <span className="results__stat-l">Claude Tanıyor</span>
+            <span className="results__stat-l">{t('results_brand_claude_recognizes')}</span>
           </div>
           <div className="results__stat">
             <span className="results__stat-n" style={{ color: model_results?.openai?.recognized ? 'var(--good)' : 'var(--bad)' }}>
-              {model_results?.openai?.recognized ? 'Evet' : 'Hayır'}
+              {model_results?.openai?.recognized ? t('results_yes') : t('results_no')}
             </span>
-            <span className="results__stat-l">ChatGPT Tanıyor</span>
+            <span className="results__stat-l">{t('results_brand_chatgpt_recognizes')}</span>
           </div>
           <div className="results__stat">
             <span className="results__stat-n" style={{ color: model_results?.gemini?.recognized ? 'var(--good)' : 'var(--bad)' }}>
-              {model_results?.gemini?.recognized ? 'Evet' : 'Hayır'}
+              {model_results?.gemini?.recognized ? t('results_yes') : t('results_no')}
             </span>
-            <span className="results__stat-l">Gemini Tanıyor</span>
+            <span className="results__stat-l">{t('results_brand_gemini_recognizes')}</span>
           </div>
           {model_results?.perplexity && (
             <div className="results__stat">
               <span className="results__stat-n" style={{ color: model_results.perplexity.recognized ? 'var(--good)' : 'var(--bad)' }}>
-                {model_results.perplexity.recognized ? 'Evet' : 'Hayır'}
+                {model_results.perplexity.recognized ? t('results_yes') : t('results_no')}
               </span>
-              <span className="results__stat-l">Perplexity Tanıyor</span>
+              <span className="results__stat-l">{t('results_brand_perplexity_recognizes')}</span>
             </div>
           )}
         </div>
 
         <div className="topics">
           <div className="topics__col">
-            <h3><CircleCheck size={16} strokeWidth={1.5} className="topics__col-icon" /> Güçlü Olduğunuz Konular</h3>
+            <h3><CircleCheck size={16} strokeWidth={1.5} className="topics__col-icon" /> {t('results_strong_topics')}</h3>
             {freePerforming.length > 0 ? (
-              freePerforming.map((t, i) => <TopicCard topic={t} key={i} />)
+              freePerforming.map((tp, i) => <TopicCard topic={tp} key={i} />)
             ) : (
-              <div className="topics__empty">Henüz güçlü bir konu tespit edilmedi.</div>
+              <div className="topics__empty">{t('results_strong_topics_empty')}</div>
             )}
             {paidPerforming.length > 0 && (
-              <ProBlur isPro={isPro} label={`+${paidPerforming.length} güçlü konu daha — tümünü gör`}>
-                {paidPerforming.map((t, i) => <TopicCard topic={t} key={i} />)}
+              <ProBlur isPro={isPro} label={`+${paidPerforming.length} ${t('results_more_topics')}`}>
+                {paidPerforming.map((tp, i) => <TopicCard topic={tp} key={i} />)}
               </ProBlur>
             )}
           </div>
           <div className="topics__col">
-            <h3><TrendingUp size={16} strokeWidth={1.5} className="topics__col-icon" /> Kaçırdığınız Fırsatlar</h3>
+            <h3><TrendingUp size={16} strokeWidth={1.5} className="topics__col-icon" /> {t('results_missed_opportunities')}</h3>
             {freeOpps.length > 0 ? (
-              freeOpps.map((t, i) => <TopicCard topic={t} isOpportunity key={i} />)
+              freeOpps.map((tp, i) => <TopicCard topic={tp} isOpportunity key={i} />)
             ) : (
-              <div className="topics__empty">Fırsat alanı tespit edilmedi.</div>
+              <div className="topics__empty">{t('results_opportunities_empty')}</div>
             )}
             {paidOpps.length > 0 && (
-              <ProBlur isPro={isPro} label={`+${paidOpps.length} fırsat konusu ve rakip verisi — tümünü gör`}>
-                {paidOpps.map((t, i) => <TopicCard topic={t} isOpportunity key={i} />)}
+              <ProBlur isPro={isPro} label={`+${paidOpps.length} ${t('results_more_opportunities')}`}>
+                {paidOpps.map((tp, i) => <TopicCard topic={tp} isOpportunity key={i} />)}
               </ProBlur>
             )}
           </div>
@@ -235,11 +239,11 @@ export default function BrandCheckResultsPage({ result, onReset, user, onLogin, 
 
         <div className="results__cta">
           <div className="results__cta-inner">
-            <p className="results__cta-eyebrow">Sonraki Adım</p>
-            <h2 className="results__cta-title">Bu skoru nasıl yükseltiriz?</h2>
-            <p className="results__cta-sub">ChatGPT, Gemini ve Claude'un sizi alanınızda kaynak olarak göstermesi için sistematik GEO çalışması gerekiyor. Rakipleriniz bu yarışa çoktan girdi.</p>
+            <p className="results__cta-eyebrow">{t('results_next_step')}</p>
+            <h2 className="results__cta-title">{t('results_upgrade_question')}</h2>
+            <p className="results__cta-sub">{t('results_cta_sub_brand')}</p>
             <a href="https://geoni.ai#paketler" className="results__cta-btn" target="_blank" rel="noopener">
-              GEO Paketlerini İncele →
+              {t('results_view_packages')}
             </a>
           </div>
         </div>
@@ -247,10 +251,10 @@ export default function BrandCheckResultsPage({ result, onReset, user, onLogin, 
 
       <div className="results__sticky-bar">
         <span className="results__sticky-text">
-          {recognition_count > 0 ? `${recognition_count}/${total} AI motoru sizi tanıyor` : 'Hiçbir AI motoru sizi tanımıyor — GEO ile değiştirin'}
+          {recognition_count > 0 ? `${recognition_count}/${total} ${t('results_brand_sticky_recognized')}` : t('results_brand_sticky_none')}
         </span>
         <a href="https://geoni.ai#paketler" className="results__sticky-btn" target="_blank" rel="noopener">
-          GEO Paketlerini İncele →
+          {t('results_view_packages')}
         </a>
       </div>
     </>

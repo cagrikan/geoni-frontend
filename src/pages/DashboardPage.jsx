@@ -1,8 +1,10 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
+import { useLanguage } from '../lib/LanguageContext'
 import GeoniMark from '../GeoniMark'
 import Sparkline from '../components/Sparkline'
+import LanguageSwitcher from '../components/LanguageSwitcher'
 import {
   Gem, History, Bookmark, Settings, Globe, User, Building2, FileText,
   TrendingUp, TrendingDown, ChevronRight, X,
@@ -57,6 +59,7 @@ function targetKey(audit) {
 
 export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
   const { user, profile, signOut } = useAuth()
+  const { t, language } = useLanguage()
   const [audits, setAudits] = useState([])
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState('audits') // 'audits' | 'assets'
@@ -114,17 +117,18 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
 
   const deleteAudit = async (e, auditId) => {
     e.stopPropagation()
-    if (!window.confirm('Bu taramayı silmek istediğinize emin misiniz?')) return
+    if (!window.confirm(t('dash_delete_confirm'))) return
     await supabase.from('audits').delete().eq('id', auditId)
     setAudits(prev => prev.filter(a => a.id !== auditId))
   }
 
-  const formatDate = (d) => new Date(d).toLocaleDateString('tr-TR', {
+  const locale = language === 'en' ? 'en-US' : 'tr-TR'
+  const formatDate = (d) => new Date(d).toLocaleDateString(locale, {
     day: 'numeric', month: 'short', year: 'numeric',
     hour: '2-digit', minute: '2-digit'
   })
 
-  const typeLabel = { web: 'Web Sitesi', person: 'Kişi', brand: 'Marka' }
+  const typeLabel = { web: t('dash_type_web'), person: t('dash_type_person'), brand: t('dash_type_brand') }
   const typeIcon = { web: Globe, person: User, brand: Building2 }
 
   return (
@@ -136,10 +140,11 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
           <span className="landing__logo">GEONI</span>
         </button>
         <div className="dash-nav-right">
+          <LanguageSwitcher />
           <div className="dash-credit-badge">
             <Gem size={14} strokeWidth={1.5} className="dash-credit-icon" />
             <span className="dash-credit-val">{profile?.credit_balance ?? '—'}</span>
-            <span className="dash-credit-label">kontör</span>
+            <span className="dash-credit-label">{t('dash_credit_unit')}</span>
           </div>
           <div className="dash-avatar" title={user?.email}>
             {profile?.avatar_url
@@ -147,7 +152,7 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
               : <span>{(profile?.full_name || user?.email || '?')[0].toUpperCase()}</span>
             }
           </div>
-          <button className="dash-signout" onClick={signOut}>Çıkış</button>
+          <button className="dash-signout" onClick={signOut}>{t('dash_signout')}</button>
         </div>
       </header>
 
@@ -162,28 +167,28 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
               }
             </div>
             <div>
-              <div className="dash-user__name">{profile?.full_name || 'Kullanıcı'}</div>
+              <div className="dash-user__name">{profile?.full_name || t('dash_default_user')}</div>
               <div className="dash-user__email">{user?.email}</div>
             </div>
           </div>
 
           <nav className="dash-nav">
             <button className={`dash-nav__item ${tab === 'audits' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('audits')}>
-              <History size={16} strokeWidth={1.5} /> Tarama Geçmişi
+              <History size={16} strokeWidth={1.5} /> {t('dash_nav_history')}
             </button>
             <button className={`dash-nav__item ${tab === 'assets' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('assets')}>
-              <Bookmark size={16} strokeWidth={1.5} /> Takip Listesi
+              <Bookmark size={16} strokeWidth={1.5} /> {t('dash_nav_watchlist')}
             </button>
             <button className={`dash-nav__item ${tab === 'credits' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('credits')}>
-              <Gem size={16} strokeWidth={1.5} /> Kontörlerim
+              <Gem size={16} strokeWidth={1.5} /> {t('dash_nav_credits')}
             </button>
             <button className={`dash-nav__item ${tab === 'settings' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('settings')}>
-              <Settings size={16} strokeWidth={1.5} /> Ayarlar
+              <Settings size={16} strokeWidth={1.5} /> {t('dash_nav_settings')}
             </button>
           </nav>
 
           <button className="dash-new-scan" onClick={onNewScan}>
-            + Yeni Tarama
+            {t('dash_new_scan')}
           </button>
         </aside>
 
@@ -191,15 +196,15 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
         <main className="dashboard__main">
           {/* Stats */}
           <div className="dash-stats">
-            <StatCard label="Toplam Tarama" value={audits.length} />
-            <StatCard label="Kontör Bakiyesi" value={profile?.credit_balance ?? '—'} sub="kontör" />
+            <StatCard label={t('dash_stat_total_scans')} value={audits.length} />
+            <StatCard label={t('dash_stat_credit_balance')} value={profile?.credit_balance ?? '—'} sub={t('dash_credit_unit')} />
             <StatCard
-              label="Ortalama Skor"
+              label={t('dash_stat_avg_score')}
               value={audits.length ? Math.round(audits.filter(a => a.score).reduce((s, a) => s + a.score, 0) / audits.filter(a => a.score).length) || '—' : '—'}
             />
             <StatCard
-              label="Son Tarama"
-              value={audits[0] ? new Date(audits[0].created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }) : '—'}
+              label={t('dash_stat_last_scan')}
+              value={audits[0] ? new Date(audits[0].created_at).toLocaleDateString(locale, { day: 'numeric', month: 'short' }) : '—'}
             />
           </div>
 
@@ -207,9 +212,9 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
           {tab === 'audits' && overallTrend.length >= 2 && (
             <div className="dash-trend-card">
               <div className="dash-trend-card__info">
-                <div className="dash-trend-card__title">Genel Skor Trendi</div>
+                <div className="dash-trend-card__title">{t('dash_trend_title')}</div>
                 <div className="dash-trend-card__meta">
-                  Son {overallTrend.length} puanlı tarama
+                  {t('dash_trend_meta_prefix')} {overallTrend.length} {t('dash_trend_meta_suffix')}
                   {overallDelta != null && <DeltaBadge delta={overallDelta} />}
                 </div>
               </div>
@@ -220,15 +225,15 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
           {/* Audits tab */}
           {tab === 'audits' && (
             <div className="dash-section">
-              <h2 className="dash-section__title">Tarama Geçmişi</h2>
+              <h2 className="dash-section__title">{t('dash_history_title')}</h2>
               {loading ? (
                 <div className="dash-audit-list">
                   {Array.from({ length: 4 }).map((_, i) => <SkeletonRow key={i} />)}
                 </div>
               ) : audits.length === 0 ? (
                 <div className="dash-empty">
-                  <p>Henüz tarama yapmadınız.</p>
-                  <button className="dash-new-scan" onClick={onNewScan}>İlk Taramayı Başlat</button>
+                  <p>{t('dash_history_empty')}</p>
+                  <button className="dash-new-scan" onClick={onNewScan}>{t('dash_history_start_first')}</button>
                 </div>
               ) : (
                 <div className="dash-audit-list">
@@ -250,13 +255,13 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
                             <DeltaBadge delta={deltaFor(audit)} />
                             <ScoreBadge score={audit.score} />
                           </>
-                        ) : <span className="dash-audit-pending">İşleniyor</span>}
+                        ) : <span className="dash-audit-pending">{t('dash_processing')}</span>}
                         <span className="dash-audit-credits">-{audit.credits_spent} <Gem size={11} strokeWidth={1.5} /></span>
                         {audit.result_json && <ChevronRight size={14} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />}
                         <button
                           onClick={(e) => deleteAudit(e, audit.id)}
                           className="dash-audit-delete"
-                          title="Sil"
+                          title={t('dash_delete_title')}
                         ><X size={13} strokeWidth={1.5} /></button>
                       </div>
                     </div>
@@ -269,10 +274,10 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
           {/* Assets tab */}
           {tab === 'assets' && (
             <div className="dash-section">
-              <h2 className="dash-section__title">Takip Listesi</h2>
+              <h2 className="dash-section__title">{t('dash_watchlist_title')}</h2>
               <div className="dash-empty">
-                <p>Takip listesi yakında aktif olacak.</p>
-                <span style={{ fontSize: '.85rem', color: 'var(--text-muted)' }}>Taramalarınızı kaydedin, skor değişimlerini takip edin.</span>
+                <p>{t('dash_watchlist_soon')}</p>
+                <span style={{ fontSize: '.85rem', color: 'var(--text-muted)' }}>{t('dash_watchlist_desc')}</span>
               </div>
             </div>
           )}
@@ -280,19 +285,19 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
           {/* Credits tab */}
           {tab === 'credits' && (
             <div className="dash-section">
-              <h2 className="dash-section__title">Kontörlerim</h2>
+              <h2 className="dash-section__title">{t('dash_credits_title')}</h2>
               <div className="dash-credit-summary">
                 <div className="dash-credit-big">
                   <span className="dash-credit-big__val">{profile?.credit_balance ?? '—'}</span>
-                  <span className="dash-credit-big__label">mevcut kontör</span>
+                  <span className="dash-credit-big__label">{t('dash_credits_current')}</span>
                 </div>
                 <div className="dash-credit-info">
-                  <div>Toplam satın alınan: <strong>{profile?.total_credits_purchased ?? 0}</strong></div>
-                  <div>Toplam harcanan: <strong>{profile?.total_credits_spent ?? 0}</strong></div>
+                  <div>{t('dash_credits_purchased')} <strong>{profile?.total_credits_purchased ?? 0}</strong></div>
+                  <div>{t('dash_credits_spent')} <strong>{profile?.total_credits_spent ?? 0}</strong></div>
                 </div>
               </div>
               <a href="https://geoni.ai#paketler" className="dash-buy-btn" target="_blank" rel="noopener">
-                Kontör Satın Al →
+                {t('dash_credits_buy')}
               </a>
             </div>
           )}
@@ -300,34 +305,34 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
           {/* Settings tab */}
           {tab === 'settings' && (
             <div className="dash-section">
-              <h2 className="dash-section__title">Ayarlar</h2>
+              <h2 className="dash-section__title">{t('dash_settings_title')}</h2>
               <div className="dash-settings">
                 <div className="dash-setting-row">
                   <div>
-                    <div className="dash-setting-label">Ad Soyad</div>
+                    <div className="dash-setting-label">{t('dash_settings_fullname')}</div>
                     <div className="dash-setting-val">{profile?.full_name || '—'}</div>
                   </div>
                 </div>
                 <div className="dash-setting-row">
                   <div>
-                    <div className="dash-setting-label">E-posta</div>
+                    <div className="dash-setting-label">{t('dash_settings_email')}</div>
                     <div className="dash-setting-val">{user?.email}</div>
                   </div>
                 </div>
                 <div className="dash-setting-row">
                   <div>
-                    <div className="dash-setting-label">Giriş Yöntemi</div>
+                    <div className="dash-setting-label">{t('dash_settings_login_method')}</div>
                     <div className="dash-setting-val" style={{ textTransform: 'capitalize' }}>{profile?.auth_provider || '—'}</div>
                   </div>
                 </div>
                 <div className="dash-setting-row">
                   <div>
-                    <div className="dash-setting-label">Üyelik</div>
-                    <div className="dash-setting-val">Ücretsiz Plan</div>
+                    <div className="dash-setting-label">{t('dash_settings_membership')}</div>
+                    <div className="dash-setting-val">{t('dash_settings_free_plan')}</div>
                   </div>
-                  <a href="https://geoni.ai#paketler" className="dash-upgrade-btn" target="_blank" rel="noopener">Pro'ya Geç</a>
+                  <a href="https://geoni.ai#paketler" className="dash-upgrade-btn" target="_blank" rel="noopener">{t('dash_settings_upgrade')}</a>
                 </div>
-                <button className="dash-signout-full" onClick={signOut}>Çıkış Yap</button>
+                <button className="dash-signout-full" onClick={signOut}>{t('dash_settings_signout')}</button>
               </div>
             </div>
           )}

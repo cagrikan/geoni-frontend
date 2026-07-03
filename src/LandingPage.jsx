@@ -1,35 +1,38 @@
 import { useState, useEffect } from 'react'
 import { Globe, User, Building2, ScanSearch, GitCompareArrows, Award } from 'lucide-react'
 import GeoniMark from './GeoniMark'
+import LanguageSwitcher from './components/LanguageSwitcher'
+import { useLanguage } from './lib/LanguageContext'
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.geoni.ai'
-
-const MODE_TABS = [
-  { key: 'site', icon: Globe, title: 'Web Sitesi' },
-  { key: 'person', icon: User, title: 'Kişi' },
-  { key: 'brand', icon: Building2, title: 'Marka / Şirket' },
-]
-
-const HOW_STEPS = [
-  { icon: ScanSearch, title: 'Sorgula', desc: 'Sitenizi tarar, adınızı veya markanızı Claude, ChatGPT, Gemini ve Perplexity\'ye gerçek zamanlı sorarız.' },
-  { icon: GitCompareArrows, title: 'Karşılaştır', desc: 'Yanıtları web\'deki gerçek verilerle karşılaştırır, doğruluğunu ve rakiplerinize kıyasla konumunuzu ölçeriz.' },
-  { icon: Award, title: 'Puanla', desc: '0-100 arası AI Görünürlük Skoru, güçlü olduğunuz konular ve kaçırdığınız fırsatları somut biçimde sunarız.' },
-]
-
-const OPT = <span style={{color:'var(--text-muted)',fontWeight:400,fontSize:'.8em'}}>(isteğe bağlı)</span>
 
 const SITE_LAST_STEP = 1
 const PERSON_LAST_STEP = 3
 const BRAND_LAST_STEP = 2
 
-const SITE_STEP_TITLES = ['', 'İletişim Bilginiz']
-const PERSON_STEP_TITLES = ['', 'Meslek Bilginiz', 'Konum ve Uzmanlık Alanınız', 'İletişim Bilginiz']
-const BRAND_STEP_TITLES = ['', 'Sektör ve Konum', 'İletişim Bilginiz']
-
 export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading = false, statusText = '', error, user, onDashboard, onLogin, onViewSample }) {
+  const { t } = useLanguage()
   const [mode, setMode] = useState('site') // 'site' | 'person' | 'brand'
   const [step, setStep] = useState(0)
   const [scanCount, setScanCount] = useState(0)
+
+  const MODE_TABS = [
+    { key: 'site', icon: Globe, title: t('mode_site') },
+    { key: 'person', icon: User, title: t('mode_person') },
+    { key: 'brand', icon: Building2, title: t('mode_brand') },
+  ]
+
+  const HOW_STEPS = [
+    { icon: ScanSearch, title: t('how_step1_title'), desc: t('how_step1_desc') },
+    { icon: GitCompareArrows, title: t('how_step2_title'), desc: t('how_step2_desc') },
+    { icon: Award, title: t('how_step3_title'), desc: t('how_step3_desc') },
+  ]
+
+  const OPT = <span style={{color:'var(--text-muted)',fontWeight:400,fontSize:'.8em'}}>{t('field_optional')}</span>
+
+  const SITE_STEP_TITLES = ['', t('step_title_contact')]
+  const PERSON_STEP_TITLES = ['', t('step_title_profession'), t('step_title_location_expertise'), t('step_title_contact')]
+  const BRAND_STEP_TITLES = ['', t('step_title_sector_location'), t('step_title_contact')]
 
   const changeMode = (key) => { setMode(key); setStep(0) }
 
@@ -100,7 +103,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
 
   const WizardProgress = ({ total }) => (
     <div className="wizard-progress">
-      <span className="wizard-progress__count">Adım {step + 1}/{total + 1}</span>
+      <span className="wizard-progress__count">{t('wizard_step_count')} {step + 1}/{total + 1}</span>
       <div className="wizard-progress__dots">
         {Array.from({ length: total + 1 }).map((_, i) => (
           <span key={i} className={`wizard-dot ${i <= step ? 'wizard-dot--active' : ''}`} />
@@ -117,12 +120,13 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
           <span className="landing__logo">GEONI</span>
         </div>
         <div className="nav-auth">
+          <LanguageSwitcher />
           {user ? (
-            <button className="nav-dashboard-btn" onClick={onDashboard}>Dashboard</button>
+            <button className="nav-dashboard-btn" onClick={onDashboard}>{t('nav_dashboard')}</button>
           ) : (
             <>
-              <button className="nav-login-btn" onClick={onLogin}>Giriş Yap</button>
-              <button className="nav-dashboard-btn" onClick={onLogin}>Ücretsiz Başla</button>
+              <button className="nav-login-btn" onClick={onLogin}>{t('nav_login')}</button>
+              <button className="nav-dashboard-btn" onClick={onLogin}>{t('nav_start_free')}</button>
             </>
           )}
         </div>
@@ -130,19 +134,19 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
 
       {/* ══ HERO: tek sütun, ortalanmış, tek odak noktası ══ */}
       <section className="hero-centered">
-        <p className="landing__eyebrow">AI Görünürlük Taraması</p>
+        <p className="landing__eyebrow">{t('hero_eyebrow')}</p>
         <h1 className="landing__headline landing__headline--center">
-          Rakibiniz her AI yanıtında var.
+          {t('hero_headline_1')}
           <br />
-          <em>Siz yoksunuz.</em>
+          <em>{t('hero_headline_2')}</em>
         </h1>
         <p className="hero-centered__subhead">
-          ChatGPT, Claude, Gemini ve Perplexity'nin sizi nasıl gördüğünü ölçün.
+          {t('hero_subhead')}
         </p>
 
         {onViewSample && (
           <button type="button" className="sample-report-btn" onClick={onViewSample}>
-            Örnek bir rapor gör →
+            {t('hero_sample_btn')}
           </button>
         )}
 
@@ -170,22 +174,22 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
 
                 {step === 0 && (
                   <div className="landing__field landing__field--hero">
-                    <label htmlFor="domain">Web sitenizin adresi nedir?</label>
-                    <input id="domain" type="text" placeholder="Örn: alanadiniz.com" value={domain} onChange={e => setDomain(e.target.value)} disabled={loading} required autoFocus />
+                    <label htmlFor="domain">{t('field_domain_label')}</label>
+                    <input id="domain" type="text" placeholder={t('field_domain_placeholder')} value={domain} onChange={e => setDomain(e.target.value)} disabled={loading} required autoFocus />
                   </div>
                 )}
                 {step === 1 && (
                   <div className="landing__field">
-                    <label htmlFor="site-email">Raporu hangi e-postaya gönderelim?</label>
-                    <input id="site-email" type="email" placeholder="Örn: ad@alanadiniz.com" value={siteEmail} onChange={e => setSiteEmail(e.target.value)} disabled={loading} required autoFocus />
+                    <label htmlFor="site-email">{t('field_site_email_label')}</label>
+                    <input id="site-email" type="email" placeholder={t('field_email_placeholder')} value={siteEmail} onChange={e => setSiteEmail(e.target.value)} disabled={loading} required autoFocus />
                   </div>
                 )}
 
                 <div className="wizard-nav">
                   <WizardProgress total={SITE_LAST_STEP} />
-                  {step > 0 && <button type="button" className="wizard-back" onClick={() => setStep(s => s - 1)}>← Geri</button>}
+                  {step > 0 && <button type="button" className="wizard-back" onClick={() => setStep(s => s - 1)}>{t('wizard_back')}</button>}
                   <button type="submit" className="landing__submit" disabled={loading}>
-                    {loading ? statusText + '…' : step < SITE_LAST_STEP ? 'İleri →' : 'Ücretsiz Taramayı Başlat'}
+                    {loading ? statusText + '…' : step < SITE_LAST_STEP ? t('wizard_next') : t('submit_site')}
                   </button>
                 </div>
               </>
@@ -198,52 +202,52 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
 
                 {step === 0 && (
                   <div className="landing__field landing__field--hero">
-                    <label htmlFor="person-name">Adınız ve soyadınız nedir?</label>
-                    <input id="person-name" type="text" placeholder="Örn: İsim Soyisim" value={personName} onChange={e => setPersonName(e.target.value)} disabled={loading} required autoFocus />
+                    <label htmlFor="person-name">{t('field_person_name_label')}</label>
+                    <input id="person-name" type="text" placeholder={t('field_person_name_placeholder')} value={personName} onChange={e => setPersonName(e.target.value)} disabled={loading} required autoFocus />
                   </div>
                 )}
                 {step === 1 && (
                   <div className="landing__field-row">
                     <div className="landing__field">
-                      <label htmlFor="person-role">Unvanınız {OPT}</label>
-                      <input id="person-role" type="text" placeholder="Örn: CTO, Avukat, Milletvekili" value={personRole} onChange={e => setPersonRole(e.target.value)} disabled={loading} autoFocus />
+                      <label htmlFor="person-role">{t('field_person_role_label')} {OPT}</label>
+                      <input id="person-role" type="text" placeholder={t('field_person_role_placeholder')} value={personRole} onChange={e => setPersonRole(e.target.value)} disabled={loading} autoFocus />
                     </div>
                     <div className="landing__field">
-                      <label htmlFor="person-company">Çalıştığınız şirket {OPT}</label>
-                      <input id="person-company" type="text" placeholder="Örn: ARD Grup" value={personCompany} onChange={e => setPersonCompany(e.target.value)} disabled={loading} />
+                      <label htmlFor="person-company">{t('field_person_company_label')} {OPT}</label>
+                      <input id="person-company" type="text" placeholder={t('field_person_company_placeholder')} value={personCompany} onChange={e => setPersonCompany(e.target.value)} disabled={loading} />
                     </div>
                   </div>
                 )}
                 {step === 2 && (
                   <div className="landing__field-row">
                     <div className="landing__field">
-                      <label htmlFor="person-city">Bulunduğunuz şehir {OPT}</label>
-                      <input id="person-city" type="text" placeholder="Örn: Ankara" value={personCity} onChange={e => setPersonCity(e.target.value)} disabled={loading} autoFocus />
+                      <label htmlFor="person-city">{t('field_person_city_label')} {OPT}</label>
+                      <input id="person-city" type="text" placeholder={t('field_city_placeholder')} value={personCity} onChange={e => setPersonCity(e.target.value)} disabled={loading} autoFocus />
                     </div>
                     <div className="landing__field">
-                      <label htmlFor="person-topic">Tanındığınız alan {OPT}</label>
-                      <input id="person-topic" type="text" placeholder="Örn: dijital dönüşüm, siyaset" value={personTopic} onChange={e => setPersonTopic(e.target.value)} disabled={loading} />
+                      <label htmlFor="person-topic">{t('field_person_topic_label')} {OPT}</label>
+                      <input id="person-topic" type="text" placeholder={t('field_person_topic_placeholder')} value={personTopic} onChange={e => setPersonTopic(e.target.value)} disabled={loading} />
                     </div>
                   </div>
                 )}
                 {step === 3 && (
                   <>
                     <div className="landing__field">
-                      <label htmlFor="person-linkedin">LinkedIn profiliniz {OPT}</label>
+                      <label htmlFor="person-linkedin">{t('field_person_linkedin_label')} {OPT}</label>
                       <input id="person-linkedin" type="url" placeholder="https://linkedin.com/in/..." value={personLinkedin} onChange={e => setPersonLinkedin(e.target.value)} disabled={loading} autoFocus />
                     </div>
                     <div className="landing__field">
-                      <label htmlFor="person-email">Raporu hangi e-postaya gönderelim? {OPT}</label>
-                      <input id="person-email" type="email" placeholder="Örn: ad@alanadiniz.com" value={personEmail} onChange={e => setPersonEmail(e.target.value)} disabled={loading} />
+                      <label htmlFor="person-email">{t('field_person_email_label')} {OPT}</label>
+                      <input id="person-email" type="email" placeholder={t('field_email_placeholder')} value={personEmail} onChange={e => setPersonEmail(e.target.value)} disabled={loading} />
                     </div>
                   </>
                 )}
 
                 <div className="wizard-nav">
                   <WizardProgress total={PERSON_LAST_STEP} />
-                  {step > 0 && <button type="button" className="wizard-back" onClick={() => setStep(s => s - 1)}>← Geri</button>}
+                  {step > 0 && <button type="button" className="wizard-back" onClick={() => setStep(s => s - 1)}>{t('wizard_back')}</button>}
                   <button type="submit" className="landing__submit" disabled={loading}>
-                    {loading ? statusText + '…' : step < PERSON_LAST_STEP ? 'İleri →' : 'AI\'da Beni Ara'}
+                    {loading ? statusText + '…' : step < PERSON_LAST_STEP ? t('wizard_next') : t('submit_person')}
                   </button>
                 </div>
               </>
@@ -256,40 +260,40 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
 
                 {step === 0 && (
                   <div className="landing__field landing__field--hero">
-                    <label htmlFor="brand-name">Marka veya şirket adınız nedir?</label>
-                    <input id="brand-name" type="text" placeholder="Örn: Geoni" value={brandName} onChange={e => setBrandName(e.target.value)} disabled={loading} required autoFocus />
+                    <label htmlFor="brand-name">{t('field_brand_name_label')}</label>
+                    <input id="brand-name" type="text" placeholder={t('field_brand_name_placeholder')} value={brandName} onChange={e => setBrandName(e.target.value)} disabled={loading} required autoFocus />
                   </div>
                 )}
                 {step === 1 && (
                   <div className="landing__field-row">
                     <div className="landing__field">
-                      <label htmlFor="brand-sector">Faaliyet sektörünüz {OPT}</label>
-                      <input id="brand-sector" type="text" placeholder="Örn: Teknoloji, Hukuk, Finans" value={brandSector} onChange={e => setBrandSector(e.target.value)} disabled={loading} autoFocus />
+                      <label htmlFor="brand-sector">{t('field_brand_sector_label')} {OPT}</label>
+                      <input id="brand-sector" type="text" placeholder={t('field_brand_sector_placeholder')} value={brandSector} onChange={e => setBrandSector(e.target.value)} disabled={loading} autoFocus />
                     </div>
                     <div className="landing__field">
-                      <label htmlFor="brand-city">Bulunduğunuz şehir {OPT}</label>
-                      <input id="brand-city" type="text" placeholder="Örn: İstanbul, Ankara" value={brandCity} onChange={e => setBrandCity(e.target.value)} disabled={loading} />
+                      <label htmlFor="brand-city">{t('field_brand_city_label')} {OPT}</label>
+                      <input id="brand-city" type="text" placeholder={t('field_brand_city_placeholder')} value={brandCity} onChange={e => setBrandCity(e.target.value)} disabled={loading} />
                     </div>
                   </div>
                 )}
                 {step === 2 && (
                   <>
                     <div className="landing__field">
-                      <label htmlFor="brand-website">Şirketinizin web sitesi {OPT}</label>
-                      <input id="brand-website" type="text" placeholder="Örn: alanadiniz.com" value={brandWebsite} onChange={e => setBrandWebsite(e.target.value)} disabled={loading} autoFocus />
+                      <label htmlFor="brand-website">{t('field_brand_website_label')} {OPT}</label>
+                      <input id="brand-website" type="text" placeholder={t('field_domain_placeholder')} value={brandWebsite} onChange={e => setBrandWebsite(e.target.value)} disabled={loading} autoFocus />
                     </div>
                     <div className="landing__field">
-                      <label htmlFor="brand-email">Raporu hangi e-postaya gönderelim? {OPT}</label>
-                      <input id="brand-email" type="email" placeholder="Örn: ad@alanadiniz.com" value={brandEmail} onChange={e => setBrandEmail(e.target.value)} disabled={loading} />
+                      <label htmlFor="brand-email">{t('field_brand_email_label')} {OPT}</label>
+                      <input id="brand-email" type="email" placeholder={t('field_email_placeholder')} value={brandEmail} onChange={e => setBrandEmail(e.target.value)} disabled={loading} />
                     </div>
                   </>
                 )}
 
                 <div className="wizard-nav">
                   <WizardProgress total={BRAND_LAST_STEP} />
-                  {step > 0 && <button type="button" className="wizard-back" onClick={() => setStep(s => s - 1)}>← Geri</button>}
+                  {step > 0 && <button type="button" className="wizard-back" onClick={() => setStep(s => s - 1)}>{t('wizard_back')}</button>}
                   <button type="submit" className="landing__submit" disabled={loading}>
-                    {loading ? statusText + '…' : step < BRAND_LAST_STEP ? 'İleri →' : 'Markamı Sorgula'}
+                    {loading ? statusText + '…' : step < BRAND_LAST_STEP ? t('wizard_next') : t('submit_brand')}
                   </button>
                 </div>
               </>
@@ -301,14 +305,14 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
         </div>
 
         <p className="landing__trust">
-          {scanCount > 0 && <>{scanCount.toLocaleString('tr-TR')}+ tarama tamamlandı ·{' '}</>}
-          Kredi kartı gerekmez · Sonuç ~30 saniyede hazır
+          {scanCount > 0 && <>{scanCount.toLocaleString('tr-TR')}{t('hero_trust_scans')}{' '}</>}
+          {t('hero_trust')}
         </p>
       </section>
 
       {/* ══ NASIL ÇALIŞIR: tam genişlik, 3 sütun ══ */}
       <section className="how-band">
-        <h2 className="landing__how-title-main">Nasıl çalışır</h2>
+        <h2 className="landing__how-title-main">{t('how_title')}</h2>
         <div className="how-grid">
           {HOW_STEPS.map(({ icon: Icon, title, desc }) => (
             <div className="how-col" key={title}>

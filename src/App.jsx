@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { AuthProvider, useAuth } from './lib/AuthContext'
+import { LanguageProvider, useLanguage } from './lib/LanguageContext'
 import LandingPage from './LandingPage'
 import ScanningScreen from './components/ScanningScreen'
 import ResultsPage from './ResultsPage'
@@ -12,37 +13,52 @@ import './App.css'
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.geoni.ai'
 
-const SAMPLE_RESULT = {
-  domain: 'ornek-magaza.com',
-  score: 68,
-  score_breakdown: {
-    index_coverage: 74,
-    authority: 61,
-    freshness: 55,
-    schema: 82,
-    engagement: 63,
-    brand_recall: 71,
+const SAMPLE_RESULT_BY_LANG = {
+  tr: {
+    domain: 'ornek-magaza.com',
+    score: 68,
+    score_breakdown: { index_coverage: 74, authority: 61, freshness: 55, schema: 82, engagement: 63, brand_recall: 71 },
+    total_pages: 142,
+    indexed_pages: 118,
+    platforms: { chatgpt: true, anthropic: true, google: false },
+    top_topics: [
+      { topic: 'Kurumsal Sürdürülebilirlik Raporlaması', platforms: ['chatgpt', 'claude'] },
+      { topic: 'B2B E-ticaret Entegrasyonları', platforms: ['chatgpt', 'claude', 'gemini'] },
+      { topic: 'Lojistik ve Tedarik Zinciri Danışmanlığı', platforms: ['chatgpt'] },
+      { topic: 'Kurumsal Satın Alma Süreçleri', platforms: ['claude'] },
+    ],
+    opportunities: [
+      { topic: 'Yapay Zeka Destekli Envanter Yönetimi', platforms: [], competitors: ['rakip-a.com', 'rakip-b.com'] },
+      { topic: 'Sürdürülebilir Ambalaj Çözümleri', platforms: [], competitors: ['rakip-c.com'] },
+      { topic: 'Uluslararası Nakliye Optimizasyonu', platforms: [], competitors: ['rakip-a.com', 'rakip-d.com'] },
+      { topic: 'Perakende Analitik Platformları', platforms: [], competitors: ['rakip-b.com'] },
+    ],
   },
-  total_pages: 142,
-  indexed_pages: 118,
-  platforms: { chatgpt: true, anthropic: true, google: false },
-  top_topics: [
-    { topic: 'Kurumsal Sürdürülebilirlik Raporlaması', platforms: ['chatgpt', 'claude'] },
-    { topic: 'B2B E-ticaret Entegrasyonları', platforms: ['chatgpt', 'claude', 'gemini'] },
-    { topic: 'Lojistik ve Tedarik Zinciri Danışmanlığı', platforms: ['chatgpt'] },
-    { topic: 'Kurumsal Satın Alma Süreçleri', platforms: ['claude'] },
-  ],
-  opportunities: [
-    { topic: 'Yapay Zeka Destekli Envanter Yönetimi', platforms: [], competitors: ['rakip-a.com', 'rakip-b.com'] },
-    { topic: 'Sürdürülebilir Ambalaj Çözümleri', platforms: [], competitors: ['rakip-c.com'] },
-    { topic: 'Uluslararası Nakliye Optimizasyonu', platforms: [], competitors: ['rakip-a.com', 'rakip-d.com'] },
-    { topic: 'Perakende Analitik Platformları', platforms: [], competitors: ['rakip-b.com'] },
-  ],
-  created_at: new Date().toISOString(),
+  en: {
+    domain: 'example-store.com',
+    score: 68,
+    score_breakdown: { index_coverage: 74, authority: 61, freshness: 55, schema: 82, engagement: 63, brand_recall: 71 },
+    total_pages: 142,
+    indexed_pages: 118,
+    platforms: { chatgpt: true, anthropic: true, google: false },
+    top_topics: [
+      { topic: 'Corporate Sustainability Reporting', platforms: ['chatgpt', 'claude'] },
+      { topic: 'B2B E-commerce Integrations', platforms: ['chatgpt', 'claude', 'gemini'] },
+      { topic: 'Logistics and Supply Chain Consulting', platforms: ['chatgpt'] },
+      { topic: 'Corporate Procurement Processes', platforms: ['claude'] },
+    ],
+    opportunities: [
+      { topic: 'AI-Powered Inventory Management', platforms: [], competitors: ['competitor-a.com', 'competitor-b.com'] },
+      { topic: 'Sustainable Packaging Solutions', platforms: [], competitors: ['competitor-c.com'] },
+      { topic: 'International Shipping Optimization', platforms: [], competitors: ['competitor-a.com', 'competitor-d.com'] },
+      { topic: 'Retail Analytics Platforms', platforms: [], competitors: ['competitor-b.com'] },
+    ],
+  },
 }
 
 function AppInner() {
   const { user, profile, loading: authLoading, refreshProfile } = useAuth()
+  const { t, language } = useLanguage()
   const [view, setView] = useState(() => {
     if (window.location.pathname === '/auth/callback') return 'auth_callback'
     if (window.location.pathname === '/dashboard') return 'dashboard'
@@ -96,14 +112,14 @@ function AppInner() {
       await new Promise(r => setTimeout(r, 3000))
       try {
         const res = await fetch(`${API_URL}/api/audit/${jobId}`)
-        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'Tarama başarısız')
+        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || t('error_audit_failed'))
         const data = await res.json()
         if (data.status === 'complete') { setResult(data.result); pushView('results'); if (refreshProfile) refreshProfile(); return }
-        if (data.status === 'failed') throw new Error('Tarama başarısız')
+        if (data.status === 'failed') throw new Error(t('error_audit_failed'))
         setStatusKey(data.status)
       } catch (err) { setError(err.message); pushView('landing'); return }
     }
-    setError('Tarama zaman aşımına uğradı.'); pushView('landing')
+    setError(t('error_audit_timeout')); pushView('landing')
   }
 
   const pollBrandJob = async (jobId) => {
@@ -111,13 +127,13 @@ function AppInner() {
       await new Promise(r => setTimeout(r, 2000))
       try {
         const res = await fetch(`${API_URL}/api/brand-check/${jobId}`)
-        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'Sorgu başarısız')
+        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || t('error_query_failed'))
         const data = await res.json()
         if (data.status === 'complete') { setBrandResult(data.result); pushView('brand_results'); if (refreshProfile) refreshProfile(); return }
-        if (data.status === 'failed') throw new Error('Sorgu başarısız')
+        if (data.status === 'failed') throw new Error(t('error_query_failed'))
       } catch (err) { setError(err.message); pushView('landing'); return }
     }
-    setError('Sorgu zaman aşımına uğradı.'); pushView('landing')
+    setError(t('error_query_timeout')); pushView('landing')
   }
 
   const handleAudit = async (domain, email) => {
@@ -131,7 +147,7 @@ function AppInner() {
         headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
         body: JSON.stringify({ domain, email: email || user?.email || 'anonymous@geoni.ai', competitors: [] }),
       })
-      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'İstek başarısız')
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || t('error_request_failed'))
       const jobId = (await res.json()).job_id
       let es
       try {
@@ -147,7 +163,7 @@ function AppInner() {
       } catch { /* EventSource desteklenmiyorsa polling zaten yeterli */ }
       await pollAuditJob(jobId)
       es?.close()
-    } catch (err) { setError(err.message || 'Bağlantı hatası'); pushView('landing') }
+    } catch (err) { setError(err.message || t('error_connection')); pushView('landing') }
   }
 
   const handleBrandCheck = async (payload) => {
@@ -161,7 +177,7 @@ function AppInner() {
         headers: { 'Content-Type': 'application/json', ...(token2 ? { 'Authorization': `Bearer ${token2}` } : {}) },
         body: JSON.stringify({ ...payload, email: payload.email || user?.email || 'anonymous@geoni.ai' }),
       })
-      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'İstek başarısız')
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || t('error_request_failed'))
       const data = await res.json()
       if (data.identity_mismatch) {
         setBrandResult({ identity_mismatch: true, match_score: data.match_score, name: payload.name })
@@ -185,12 +201,16 @@ function AppInner() {
       } catch { /* EventSource desteklenmiyorsa polling zaten yeterli */ }
       await pollBrandJob(data.job_id)
       es?.close()
-    } catch (err) { setError(err.message || 'Bağlantı hatası'); pushView('landing') }
+    } catch (err) { setError(err.message || t('error_connection')); pushView('landing') }
   }
 
   const handleReset = () => { setResult(null); setBrandResult(null); setError(null); setIsSample(false); navigateTo('landing') }
 
-  const handleViewSample = () => { setError(null); setIsSample(true); setResult(SAMPLE_RESULT); pushView('results') }
+  const handleViewSample = () => {
+    setError(null); setIsSample(true)
+    setResult({ ...SAMPLE_RESULT_BY_LANG[language] || SAMPLE_RESULT_BY_LANG.tr, created_at: new Date().toISOString() })
+    pushView('results')
+  }
 
   const handleViewAudit = (audit) => {
     const resultJson = audit.result_json
@@ -262,8 +282,10 @@ function AppInner() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AppInner />
-    </AuthProvider>
+    <LanguageProvider>
+      <AuthProvider>
+        <AppInner />
+      </AuthProvider>
+    </LanguageProvider>
   )
 }

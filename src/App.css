@@ -1221,12 +1221,18 @@ body {
 
 /* ===== LOGIN PAGE ===== */
 .login-page {
+  position: relative;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--bg);
   padding: 24px;
+}
+.login-page__lang {
+  position: absolute;
+  top: 20px;
+  right: 20px;
 }
 .login-card {
   background: var(--surface);
@@ -1595,6 +1601,31 @@ body {
   align-items: center;
   gap: 10px;
   margin-left: auto;
+}
+.lang-switcher {
+  display: flex;
+  gap: 2px;
+  background: var(--surface);
+  border: 1px solid var(--border-mid);
+  border-radius: 8px;
+  padding: 3px;
+}
+.lang-switcher__btn {
+  background: none;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 9px;
+  font-family: var(--mono);
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background .2s, color .2s;
+}
+.lang-switcher__btn:hover { color: var(--text-sub); }
+.lang-switcher__btn--active {
+  background: var(--accent);
+  color: #0D0D1A;
 }
 .nav-login-btn {
   background: none;

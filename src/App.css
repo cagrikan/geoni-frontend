@@ -160,11 +160,11 @@ body {
 }
 .mode-tab--active:hover { color: #0D0D1A; }
 
-/* ===== FORM (hafif, kutusuz — Premium Oneri Dok. 3.1 wizard) ===== */
+/* ===== FORM (net, kutulu alanlar — "ne yazacagimi anlamiyorum" duzeltmesi) ===== */
 .landing__form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   width: 100%;
   text-align: left;
   padding: 0;
@@ -172,34 +172,35 @@ body {
 .landing__field { display: flex; flex-direction: column; gap: 6px; }
 .landing__field label {
   font-family: var(--body);
-  font-size: .78rem;
+  font-size: .82rem;
   font-weight: 600;
-  letter-spacing: .02em;
-  color: var(--text-muted);
+  letter-spacing: .01em;
+  color: var(--text-sub);
 }
 .landing__field input {
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid var(--border-mid);
-  border-radius: 0;
-  padding: 10px 2px;
+  background: var(--surface);
+  border: 1.5px solid var(--border-mid);
+  border-radius: 10px;
+  padding: 13px 14px;
   color: var(--text);
   font-family: var(--body);
   font-size: 1rem;
+  font-weight: 500;
   outline: none;
-  transition: border-color .2s;
+  transition: border-color .2s, background .2s;
 }
-.landing__field input:focus { border-bottom-color: var(--accent); }
-.landing__field input::placeholder { color: #3A4258; font-family: inherit; font-weight: inherit; }
+.landing__field input:focus { border-color: var(--accent); background: var(--surface-2); }
+.landing__field input::placeholder { color: #57607A; font-family: inherit; font-weight: 400; font-style: italic; }
 
-/* Adım 1 (tek gerekli alan) — sayfanın odak noktası */
+/* Adım 1 (tek gerekli alan) — sayfanın odak noktası, ama hala acikca "kutu" */
 .landing__field--hero input {
   font-family: var(--body);
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 600;
-  padding: 9px 2px 11px;
+  padding: 15px 16px;
+  border-width: 2px;
 }
-.landing__field--hero label { font-size: .76rem; }
+.landing__field--hero label { font-size: .84rem; }
 
 /* Wizard ilerleme noktaları */
 .wizard-progress {

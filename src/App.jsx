@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { AuthProvider, useAuth } from './lib/AuthContext'
 import LandingPage from './LandingPage'
+import ScanningScreen from './components/ScanningScreen'
 import ResultsPage from './ResultsPage'
 import BrandCheckResultsPage from './BrandCheckResultsPage'
 import IdentityMismatchPage from './IdentityMismatchPage'
@@ -51,8 +52,11 @@ function AppInner() {
   const [result, setResult] = useState(null)
   const [brandResult, setBrandResult] = useState(null)
   const [error, setError] = useState(null)
-  const [statusText, setStatusText] = useState('queued')
   const [isSample, setIsSample] = useState(false)
+  const [scanKind, setScanKind] = useState('site')
+  const [scanTarget, setScanTarget] = useState('')
+  const [statusKey, setStatusKey] = useState('queued')
+  const [progressLog, setProgressLog] = useState([])
 
   // Sync URL with view
   useEffect(() => {
@@ -62,26 +66,44 @@ function AppInner() {
     else if (path === '/login') setView('login')
   }, [user])
 
+  // Tarayici geri/ileri tuslari: sonuc/ornek/yukleme ekranlarindan her zaman
+  // guvenle landing'e donebilmek icin (bkz. "ornek rapordan geri gelemiyorum").
+  useEffect(() => {
+    const onPopState = () => {
+      const path = window.location.pathname
+      if (path === '/auth/callback') { setView('auth_callback'); return }
+      if (path === '/dashboard') { setView(user ? 'dashboard' : 'login'); return }
+      if (path === '/login') { setView('login'); return }
+      setResult(null); setBrandResult(null); setError(null); setIsSample(false)
+      setView('landing')
+    }
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, [user])
+
   const navigateTo = (v) => {
     setView(v)
     const paths = { dashboard: '/dashboard', login: '/login', landing: '/', results: '/', brand_results: '/' }
     window.history.pushState({}, '', paths[v] || '/')
   }
 
+  // loading/results/sample gibi view degisikliklerinde de bir history kaydi
+  // birakir, boylece tarayci geri tusu her zaman bir onceki adima doner.
+  const pushView = (v) => { setView(v); window.history.pushState({}, '', '/') }
+
   const pollAuditJob = async (jobId) => {
-    const labels = { queued: 'Sıraya alındı', crawling: 'Site taranıyor', indexing: 'Dizin kontrol ediliyor', scoring: 'Skor hesaplanıyor' }
     for (let i = 0; i < 60; i++) {
       await new Promise(r => setTimeout(r, 3000))
       try {
         const res = await fetch(`${API_URL}/api/audit/${jobId}`)
         if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'Tarama başarısız')
         const data = await res.json()
-        if (data.status === 'complete') { setResult(data.result); setView('results'); if (refreshProfile) refreshProfile(); return }
+        if (data.status === 'complete') { setResult(data.result); pushView('results'); if (refreshProfile) refreshProfile(); return }
         if (data.status === 'failed') throw new Error('Tarama başarısız')
-        setStatusText(labels[data.status] || data.status)
-      } catch (err) { setError(err.message); setView('landing'); return }
+        setStatusKey(data.status)
+      } catch (err) { setError(err.message); pushView('landing'); return }
     }
-    setError('Tarama zaman aşımına uğradı.'); setView('landing')
+    setError('Tarama zaman aşımına uğradı.'); pushView('landing')
   }
 
   const pollBrandJob = async (jobId) => {
@@ -91,16 +113,16 @@ function AppInner() {
         const res = await fetch(`${API_URL}/api/brand-check/${jobId}`)
         if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'Sorgu başarısız')
         const data = await res.json()
-        if (data.status === 'complete') { setBrandResult(data.result); setView('brand_results'); if (refreshProfile) refreshProfile(); return }
+        if (data.status === 'complete') { setBrandResult(data.result); pushView('brand_results'); if (refreshProfile) refreshProfile(); return }
         if (data.status === 'failed') throw new Error('Sorgu başarısız')
-        // statusText artik SSE stream'inden geliyor (bkz. handleBrandCheck); burada ezilmiyor.
-      } catch (err) { setError(err.message); setView('landing'); return }
+      } catch (err) { setError(err.message); pushView('landing'); return }
     }
-    setError('Sorgu zaman aşımına uğradı.'); setView('landing')
+    setError('Sorgu zaman aşımına uğradı.'); pushView('landing')
   }
 
   const handleAudit = async (domain, email) => {
-    setError(null); setIsSample(false); setView('loading'); setStatusText('queued')
+    setError(null); setIsSample(false); setScanKind('site'); setScanTarget(domain); setStatusKey('queued'); setProgressLog([])
+    pushView('loading')
     try {
       const session = (await import('./lib/supabase')).supabase.auth.getSession ? await (await import('./lib/supabase')).supabase.auth.getSession() : null
       const token = session?.data?.session?.access_token || ''
@@ -110,12 +132,27 @@ function AppInner() {
         body: JSON.stringify({ domain, email: email || user?.email || 'anonymous@geoni.ai', competitors: [] }),
       })
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'İstek başarısız')
-      await pollAuditJob((await res.json()).job_id)
-    } catch (err) { setError(err.message || 'Bağlantı hatası'); setView('landing') }
+      const jobId = (await res.json()).job_id
+      let es
+      try {
+        es = new EventSource(`${API_URL}/api/audit/${jobId}/stream`)
+        es.onmessage = (evt) => {
+          try {
+            const parsed = JSON.parse(evt.data)
+            if (parsed.message) setProgressLog(prev => [...prev, parsed.message])
+            if (parsed.done) es.close()
+          } catch { /* ignore malformed event */ }
+        }
+        es.onerror = () => es.close()
+      } catch { /* EventSource desteklenmiyorsa polling zaten yeterli */ }
+      await pollAuditJob(jobId)
+      es?.close()
+    } catch (err) { setError(err.message || 'Bağlantı hatası'); pushView('landing') }
   }
 
   const handleBrandCheck = async (payload) => {
-    setError(null); setView('loading'); setStatusText('AI sorgulanıyor')
+    setError(null); setScanKind('brand'); setScanTarget(payload.name); setProgressLog([])
+    pushView('loading')
     try {
       const session2 = (await import('./lib/supabase')).supabase.auth.getSession ? await (await import('./lib/supabase')).supabase.auth.getSession() : null
       const token2 = session2?.data?.session?.access_token || ''
@@ -128,9 +165,9 @@ function AppInner() {
       const data = await res.json()
       if (data.identity_mismatch) {
         setBrandResult({ identity_mismatch: true, match_score: data.match_score, name: payload.name })
-        setView('brand_results'); return
+        pushView('brand_results'); return
       }
-      // Canlı model-bazli ilerleme (SSE) — sadece statusText'i besler,
+      // Canlı model-bazli ilerleme (SSE) — sadece progressLog'u besler,
       // is tamamlanma karari hala pollBrandJob'daki polling'de.
       let es
       try {
@@ -138,7 +175,9 @@ function AppInner() {
         es.onmessage = (evt) => {
           try {
             const parsed = JSON.parse(evt.data)
-            if (parsed.message) setStatusText(parsed.message)
+            if (parsed.message) {
+              setProgressLog(prev => [...prev, parsed.message])
+            }
             if (parsed.done) es.close()
           } catch { /* ignore malformed event */ }
         }
@@ -146,12 +185,12 @@ function AppInner() {
       } catch { /* EventSource desteklenmiyorsa polling zaten yeterli */ }
       await pollBrandJob(data.job_id)
       es?.close()
-    } catch (err) { setError(err.message || 'Bağlantı hatası'); setView('landing') }
+    } catch (err) { setError(err.message || 'Bağlantı hatası'); pushView('landing') }
   }
 
   const handleReset = () => { setResult(null); setBrandResult(null); setError(null); setIsSample(false); navigateTo('landing') }
 
-  const handleViewSample = () => { setError(null); setIsSample(true); setResult(SAMPLE_RESULT); setView('results') }
+  const handleViewSample = () => { setError(null); setIsSample(true); setResult(SAMPLE_RESULT); pushView('results') }
 
   const handleViewAudit = (audit) => {
     const resultJson = audit.result_json
@@ -159,7 +198,7 @@ function AppInner() {
     if (audit.type === 'web') {
       // Ensure domain audit result has required fields
       setResult({ ...resultJson, domain: audit.domain || resultJson.domain })
-      setView('results')
+      pushView('results')
     } else {
       // Ensure brand check result has required fields
       setBrandResult({
@@ -173,9 +212,8 @@ function AppInner() {
         opportunity_topics: resultJson.opportunity_topics ?? [],
         google_result_count: resultJson.google_result_count ?? 0,
       })
-      setView('brand_results')
+      pushView('brand_results')
     }
-    window.history.pushState({}, '', '/')
   }
 
   const handleDashboard = () => navigateTo('dashboard')
@@ -191,17 +229,24 @@ function AppInner() {
       {view === 'auth_callback' && <AuthCallback onDone={navigateTo} />}
       {view === 'login' && <LoginPage onSuccess={() => navigateTo('dashboard')} />}
       {view === 'dashboard' && <DashboardPage onReset={handleReset} onNewScan={() => navigateTo('landing')} onViewAudit={handleViewAudit} />}
-      {(view === 'landing' || view === 'loading') && (
+      {view === 'landing' && (
         <LandingPage
           onSubmitAudit={handleAudit}
           onSubmitBrandCheck={handleBrandCheck}
-          loading={view === 'loading'}
-          statusText={statusText}
           error={error}
           user={user}
           onDashboard={() => navigateTo('dashboard')}
           onLogin={() => navigateTo('login')}
           onViewSample={handleViewSample}
+        />
+      )}
+      {view === 'loading' && (
+        <ScanningScreen
+          kind={scanKind}
+          target={scanTarget}
+          statusKey={statusKey}
+          progressLog={progressLog}
+          onCancel={handleReset}
         />
       )}
       {view === 'results' && result && <ResultsPage result={result} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} isPro={!isSample && (profile?.is_admin || (profile?.credit_balance > 0 && profile?.total_credits_purchased > 0))} isSample={isSample} />}

@@ -317,14 +317,6 @@ body {
   margin: 0 auto;
   text-align: center;
 }
-.landing__how-eyebrow {
-  font-family: var(--mono);
-  font-size: .75rem;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 10px;
-}
 .landing__how-title-main {
   font-family: var(--display);
   font-size: 1.3rem;

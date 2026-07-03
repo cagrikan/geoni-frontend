@@ -22,9 +22,9 @@ const SITE_LAST_STEP = 1
 const PERSON_LAST_STEP = 3
 const BRAND_LAST_STEP = 2
 
-const SITE_STEP_TITLES = ['Web Siteniz', 'İletişim Bilginiz']
-const PERSON_STEP_TITLES = ['Kimliğiniz', 'Meslek Bilginiz', 'Konum ve Uzmanlık Alanınız', 'İletişim Bilginiz']
-const BRAND_STEP_TITLES = ['Marka Bilginiz', 'Sektör ve Konum', 'İletişim Bilginiz']
+const SITE_STEP_TITLES = ['', 'İletişim Bilginiz']
+const PERSON_STEP_TITLES = ['', 'Meslek Bilginiz', 'Konum ve Uzmanlık Alanınız', 'İletişim Bilginiz']
+const BRAND_STEP_TITLES = ['', 'Sektör ve Konum', 'İletişim Bilginiz']
 
 export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading = false, statusText = '', error, user, onDashboard, onLogin, onViewSample }) {
   const [mode, setMode] = useState('site') // 'site' | 'person' | 'brand'
@@ -104,7 +104,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
           ))}
         </div>
       </div>
-      <h2 className="wizard-step-title">{titles[step]}</h2>
+      {titles[step] && <h2 className="wizard-step-title">{titles[step]}</h2>}
     </div>
   )
 
@@ -170,7 +170,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
                 {step === 0 && (
                   <div className="landing__field landing__field--hero">
                     <label htmlFor="domain">Web sitenizin adresi nedir?</label>
-                    <input id="domain" type="text" placeholder="Örn: firmaniz.com" value={domain} onChange={e => setDomain(e.target.value)} disabled={loading} required autoFocus />
+                    <input id="domain" type="text" placeholder="Örn: alanadiniz.com" value={domain} onChange={e => setDomain(e.target.value)} disabled={loading} required autoFocus />
                   </div>
                 )}
                 {step === 1 && (
@@ -197,7 +197,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
                 {step === 0 && (
                   <div className="landing__field landing__field--hero">
                     <label htmlFor="person-name">Adınız ve soyadınız nedir?</label>
-                    <input id="person-name" type="text" placeholder="Örn: Ahmet Yılmaz" value={personName} onChange={e => setPersonName(e.target.value)} disabled={loading} required autoFocus />
+                    <input id="person-name" type="text" placeholder="Örn: İsim Soyisim" value={personName} onChange={e => setPersonName(e.target.value)} disabled={loading} required autoFocus />
                   </div>
                 )}
                 {step === 1 && (
@@ -254,7 +254,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
                 {step === 0 && (
                   <div className="landing__field landing__field--hero">
                     <label htmlFor="brand-name">Marka veya şirket adınız nedir?</label>
-                    <input id="brand-name" type="text" placeholder="Örn: Geoni.ai, ARD Grup" value={brandName} onChange={e => setBrandName(e.target.value)} disabled={loading} required autoFocus />
+                    <input id="brand-name" type="text" placeholder="Örn: Geoni" value={brandName} onChange={e => setBrandName(e.target.value)} disabled={loading} required autoFocus />
                   </div>
                 )}
                 {step === 1 && (
@@ -273,7 +273,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
                   <>
                     <div className="landing__field">
                       <label htmlFor="brand-website">Şirketinizin web sitesi {OPT}</label>
-                      <input id="brand-website" type="text" placeholder="Örn: firmaniz.com" value={brandWebsite} onChange={e => setBrandWebsite(e.target.value)} disabled={loading} autoFocus />
+                      <input id="brand-website" type="text" placeholder="Örn: alanadiniz.com" value={brandWebsite} onChange={e => setBrandWebsite(e.target.value)} disabled={loading} autoFocus />
                     </div>
                     <div className="landing__field">
                       <label htmlFor="brand-email">Raporu hangi e-postaya gönderelim? {OPT}</label>
@@ -304,7 +304,6 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
 
       {/* ══ NASIL ÇALIŞIR: tam genişlik, 3 sütun ══ */}
       <section className="how-band">
-        <p className="landing__how-eyebrow">Süreç</p>
         <h2 className="landing__how-title-main">Nasıl çalışır</h2>
         <div className="how-grid">
           {HOW_STEPS.map(({ icon: Icon, title, desc }) => (

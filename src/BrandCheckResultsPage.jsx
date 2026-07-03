@@ -37,6 +37,7 @@ const BREAKDOWN_LABELS = {
   claude:          'Claude',
   chatgpt:         'ChatGPT',
   gemini:          'Gemini',
+  perplexity:      'Perplexity',
   yanit_kalitesi:  'Yanıt Kalitesi',
   konu_uyumu:      'Konu Uyumu',
 }
@@ -166,7 +167,7 @@ export default function BrandCheckResultsPage({ result, onReset, user, onLogin, 
           </a>
         </div>
 
-        <div className="results__stats results__stats--five">
+        <div className={`results__stats ${model_results?.perplexity ? 'results__stats--six' : 'results__stats--five'}`}>
           <div className="results__stat">
             <span className="results__stat-n">{recognition_count}/{total}</span>
             <span className="results__stat-l">Tanıyan Model</span>
@@ -193,6 +194,14 @@ export default function BrandCheckResultsPage({ result, onReset, user, onLogin, 
             </span>
             <span className="results__stat-l">Gemini Tanıyor</span>
           </div>
+          {model_results?.perplexity && (
+            <div className="results__stat">
+              <span className="results__stat-n" style={{ color: model_results.perplexity.recognized ? 'var(--good)' : 'var(--bad)' }}>
+                {model_results.perplexity.recognized ? 'Evet' : 'Hayır'}
+              </span>
+              <span className="results__stat-l">Perplexity Tanıyor</span>
+            </div>
+          )}
         </div>
 
         <div className="topics">

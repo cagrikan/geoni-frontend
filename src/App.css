@@ -1083,6 +1083,11 @@ body {
   grid-template-columns: repeat(5, 1fr);
 }
 
+/* 6-column stats grid for brand check with Perplexity */
+.results__stats--six {
+  grid-template-columns: repeat(6, 1fr);
+}
+
 /* ===== FORM ROW (2 columns) ===== */
 .landing__field-row {
   display: grid;

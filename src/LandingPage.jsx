@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Globe, User, Building2, ScanSearch, GitCompareArrows, Award } from 'lucide-react'
+import { Globe, User, Building2, ScanSearch, GitCompareArrows, Award, EyeOff } from 'lucide-react'
 import GeoniMark from './GeoniMark'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import ThemeSwitcher from './components/ThemeSwitcher'
@@ -16,6 +16,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
   const [mode, setMode] = useState('site') // 'site' | 'person' | 'brand'
   const [step, setStep] = useState(0)
   const [scanCount, setScanCount] = useState(0)
+  const [isPrivate, setIsPrivate] = useState(false)
 
   const MODE_TABS = [
     { key: 'site', icon: Globe, title: t('mode_site') },
@@ -70,7 +71,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
       if (step === 0 && !domain) return
       if (step < SITE_LAST_STEP) { setStep(s => s + 1); return }
       if (!domain || !siteEmail) return
-      onSubmitAudit(domain, siteEmail)
+      onSubmitAudit(domain, siteEmail, isPrivate)
     } else if (mode === 'person') {
       if (step === 0 && !personName) return
       if (step < PERSON_LAST_STEP) { setStep(s => s + 1); return }
@@ -83,6 +84,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
         topic: personTopic,
         linkedin_url: personLinkedin,
         email: personEmail || 'anonymous@geoni.ai',
+        private: isPrivate,
       })
     } else {
       if (step === 0 && !brandName) return
@@ -94,6 +96,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
         location: brandCity,
         website: brandWebsite,
         email: brandEmail || 'anonymous@geoni.ai',
+        private: isPrivate,
       })
     }
   }
@@ -166,6 +169,12 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
               </button>
             ))}
           </div>
+
+          <label className="private-toggle">
+            <input type="checkbox" checked={isPrivate} onChange={e => setIsPrivate(e.target.checked)} />
+            <span className="private-toggle__box"><EyeOff size={12} strokeWidth={2} /></span>
+            <span className="private-toggle__label">{t('private_scan_label')}</span>
+          </label>
 
           <form className="landing__form" onSubmit={handleSubmit}>
 

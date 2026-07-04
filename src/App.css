@@ -189,6 +189,39 @@ body {
 }
 .mode-tab--active:hover { color: #0D0D1A; }
 
+.private-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 10px 0 2px;
+  cursor: pointer;
+  user-select: none;
+}
+.private-toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
+.private-toggle__box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 1.5px solid var(--border-mid);
+  color: transparent;
+  transition: border-color .2s, background .2s, color .2s;
+  flex-shrink: 0;
+}
+.private-toggle input:checked + .private-toggle__box {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #0D0D1A;
+}
+.private-toggle__label {
+  font-family: var(--body);
+  font-size: .8rem;
+  color: var(--text-muted);
+}
+.private-toggle input:checked ~ .private-toggle__label { color: var(--text-sub); }
+
 /* ===== FORM (net, kutulu alanlar — "ne yazacagimi anlamiyorum" duzeltmesi) ===== */
 .landing__form {
   display: flex;
@@ -710,6 +743,19 @@ body {
   transition: background .2s;
 }
 .results__sample-banner-btn:hover { background: rgba(34,211,238,.12); }
+
+.results__private-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--tint-weak);
+  border: 1px solid var(--border-mid);
+  border-radius: 12px;
+  padding: 12px 20px;
+  margin-bottom: 24px;
+  color: var(--text-muted);
+  font-size: .85rem;
+}
 
 /* ===== RESULTS COMPACT CTA (below score section) ===== */
 .results__cta-compact {

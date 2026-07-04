@@ -78,6 +78,7 @@ function AppInner() {
   const [brandResult, setBrandResult] = useState(null)
   const [error, setError] = useState(null)
   const [isSample, setIsSample] = useState(false)
+  const [isPrivateResult, setIsPrivateResult] = useState(false)
   const [scanKind, setScanKind] = useState('site')
   const [scanTarget, setScanTarget] = useState('')
   const [statusKey, setStatusKey] = useState('queued')
@@ -145,8 +146,8 @@ function AppInner() {
     setError(t('error_query_timeout')); pushView('landing')
   }
 
-  const handleAudit = async (domain, email) => {
-    setError(null); setIsSample(false); setScanKind('site'); setScanTarget(domain); setStatusKey('queued'); setProgressLog([])
+  const handleAudit = async (domain, email, isPrivate = false) => {
+    setError(null); setIsSample(false); setIsPrivateResult(isPrivate); setScanKind('site'); setScanTarget(domain); setStatusKey('queued'); setProgressLog([])
     pushView('loading')
     try {
       const session = (await import('./lib/supabase')).supabase.auth.getSession ? await (await import('./lib/supabase')).supabase.auth.getSession() : null
@@ -154,7 +155,7 @@ function AppInner() {
       const res = await fetch(`${API_URL}/api/audit/quick`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ domain, email: email || user?.email || 'anonymous@geoni.ai', competitors: [], lang: language }),
+        body: JSON.stringify({ domain, email: email || user?.email || 'anonymous@geoni.ai', competitors: [], lang: language, private: isPrivate }),
       })
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || t('error_request_failed'))
       const jobId = (await res.json()).job_id
@@ -176,7 +177,7 @@ function AppInner() {
   }
 
   const handleBrandCheck = async (payload) => {
-    setError(null); setScanKind('brand'); setScanTarget(payload.name); setProgressLog([])
+    setError(null); setIsPrivateResult(!!payload.private); setScanKind('brand'); setScanTarget(payload.name); setProgressLog([])
     pushView('loading')
     try {
       const session2 = (await import('./lib/supabase')).supabase.auth.getSession ? await (await import('./lib/supabase')).supabase.auth.getSession() : null
@@ -213,10 +214,10 @@ function AppInner() {
     } catch (err) { setError(err.message || t('error_connection')); pushView('landing') }
   }
 
-  const handleReset = () => { setResult(null); setBrandResult(null); setError(null); setIsSample(false); navigateTo('landing') }
+  const handleReset = () => { setResult(null); setBrandResult(null); setError(null); setIsSample(false); setIsPrivateResult(false); navigateTo('landing') }
 
   const handleViewSample = () => {
-    setError(null); setIsSample(true)
+    setError(null); setIsSample(true); setIsPrivateResult(false)
     setResult({ ...SAMPLE_RESULT_BY_LANG[language] || SAMPLE_RESULT_BY_LANG.tr, created_at: new Date().toISOString() })
     pushView('results')
   }
@@ -224,6 +225,7 @@ function AppInner() {
   const handleViewAudit = (audit) => {
     const resultJson = audit.result_json
     if (!resultJson) return
+    setIsPrivateResult(false)
     if (audit.type === 'web') {
       // Ensure domain audit result has required fields
       setResult({ ...resultJson, domain: audit.domain || resultJson.domain })
@@ -279,9 +281,9 @@ function AppInner() {
           onCancel={handleReset}
         />
       )}
-      {view === 'results' && result && <ResultsPage result={result} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} isPro={!isSample && (profile?.is_admin || (profile?.credit_balance > 0 && profile?.total_credits_purchased > 0))} isSample={isSample} />}
+      {view === 'results' && result && <ResultsPage result={result} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} isPro={!isSample && (profile?.is_admin || (profile?.credit_balance > 0 && profile?.total_credits_purchased > 0))} isSample={isSample} isPrivate={isPrivateResult} />}
       {view === 'brand_results' && brandResult && !brandResult.identity_mismatch && (
-        <BrandCheckResultsPage result={brandResult} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} isPro={profile?.is_admin || (profile?.credit_balance > 0 && profile?.total_credits_purchased > 0)} />
+        <BrandCheckResultsPage result={brandResult} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} isPro={profile?.is_admin || (profile?.credit_balance > 0 && profile?.total_credits_purchased > 0)} isPrivate={isPrivateResult} />
       )}
       {view === 'brand_results' && brandResult?.identity_mismatch && (
         <IdentityMismatchPage result={brandResult} onReset={handleReset} />

@@ -1,4 +1,4 @@
-import { CircleCheck, TrendingUp } from 'lucide-react'
+import { CircleCheck, TrendingUp, EyeOff } from 'lucide-react'
 import GeoniMark from './GeoniMark'
 import ProBlur from './ProBlur'
 import LanguageSwitcher from './components/LanguageSwitcher'
@@ -84,7 +84,7 @@ function TopicCard({ topic, isOpportunity }) {
   )
 }
 
-export default function ResultsPage({ result, onReset, user, onLogin, onDashboard, isPro = false, isSample = false }) {
+export default function ResultsPage({ result, onReset, user, onLogin, onDashboard, isPro = false, isSample = false, isPrivate = false }) {
   const { t, language } = useLanguage()
   const {
     domain, score, score_breakdown,
@@ -129,6 +129,11 @@ export default function ResultsPage({ result, onReset, user, onLogin, onDashboar
             </button>
           </div>
         )}
+        {isPrivate && (
+          <div className="results__private-banner">
+            <EyeOff size={14} strokeWidth={1.5} /> {t('private_scan_banner')}
+          </div>
+        )}
         <div className="results__header">
           <div>
             <h1 className="results__title">{t('results_site_title')}</h1>
@@ -141,7 +146,7 @@ export default function ResultsPage({ result, onReset, user, onLogin, onDashboar
           <div className="results__scanned">
             <span className="results__scanned-label">{t('results_site_scanned_label')}</span>
             <span className="results__scanned-value">{domain}</span>
-            {!isSample && <WatchlistButton user={user} type="web" label={domain} target={{ domain }} />}
+            {!isSample && !isPrivate && <WatchlistButton user={user} type="web" label={domain} target={{ domain }} />}
           </div>
         </div>
 

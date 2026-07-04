@@ -18,6 +18,8 @@ export const translations = {
     hero_sample_btn: 'Örnek bir rapor gör →',
     hero_trust: 'Kredi kartı gerekmez · Sonuç ~30 saniyede hazır',
     hero_trust_scans: '+ tarama tamamlandı ·',
+    private_scan_label: 'Özel tarama (geçmişe kaydedilmez)',
+    private_scan_banner: 'Bu özel bir taramaydı — sonuç hiçbir yerde kaydedilmedi.',
 
     // ── Mod sekmeleri ──
     mode_site: 'Web Sitesi',
@@ -245,6 +247,8 @@ export const translations = {
     hero_sample_btn: 'See a sample report →',
     hero_trust: 'No credit card required · Results in ~30 seconds',
     hero_trust_scans: '+ scans completed ·',
+    private_scan_label: "Private scan (won't be saved to history)",
+    private_scan_banner: 'This was a private scan — the result was not saved anywhere.',
 
     // ── Mode tabs ──
     mode_site: 'Website',

@@ -1,4 +1,4 @@
-import { CircleCheck, TrendingUp } from 'lucide-react'
+import { CircleCheck, TrendingUp, EyeOff } from 'lucide-react'
 import GeoniMark from './GeoniMark'
 import ProBlur from './ProBlur'
 import LanguageSwitcher from './components/LanguageSwitcher'
@@ -90,7 +90,7 @@ function TopicCard({ topic, isOpportunity }) {
   )
 }
 
-export default function BrandCheckResultsPage({ result, onReset, user, onLogin, onDashboard, isPro = false }) {
+export default function BrandCheckResultsPage({ result, onReset, user, onLogin, onDashboard, isPro = false, isPrivate = false }) {
   const { t, language } = useLanguage()
   const {
     name,
@@ -141,6 +141,11 @@ export default function BrandCheckResultsPage({ result, onReset, user, onLogin, 
       </header>
 
       <div className="results">
+        {isPrivate && (
+          <div className="results__private-banner">
+            <EyeOff size={14} strokeWidth={1.5} /> {t('private_scan_banner')}
+          </div>
+        )}
         <div className="results__header">
           <div>
             <h1 className="results__title">{t('results_brand_title')}</h1>
@@ -156,7 +161,7 @@ export default function BrandCheckResultsPage({ result, onReset, user, onLogin, 
             {topic && topic !== name && (
               <span style={{ display: 'block', fontFamily: 'var(--mono)', fontSize: '.72rem', color: 'var(--text-muted)', marginTop: 2 }}>{topic}</span>
             )}
-            <WatchlistButton user={user} type={type} label={capitalizedName} target={{ name, topic }} />
+            {!isPrivate && <WatchlistButton user={user} type={type} label={capitalizedName} target={{ name, topic }} />}
           </div>
         </div>
 

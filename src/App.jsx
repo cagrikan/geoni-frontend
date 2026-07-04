@@ -59,6 +59,14 @@ const SAMPLE_RESULT_BY_LANG = {
 function AppInner() {
   const { user, profile, loading: authLoading, refreshProfile } = useAuth()
   const { t, language } = useLanguage()
+
+  useEffect(() => {
+    document.title = t('page_title')
+    document.documentElement.lang = language
+    const desc = document.querySelector('meta[name="description"]')
+    if (desc) desc.setAttribute('content', t('page_description'))
+  }, [language])
+
   const [view, setView] = useState(() => {
     if (window.location.pathname === '/auth/callback') return 'auth_callback'
     if (window.location.pathname === '/dashboard') return 'dashboard'

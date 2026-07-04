@@ -1,5 +1,9 @@
 export const translations = {
   tr: {
+    // ── Sayfa basligi ──
+    page_title: 'GEONI | AI Görünürlük Taraması',
+    page_description: "ChatGPT, Claude, Gemini ve Perplexity'nin sizi nasıl gördüğünü ölçün. Ücretsiz AI görünürlük taraması.",
+
     // ── Nav (paylaşılan) ──
     nav_login: 'Giriş Yap',
     nav_start_free: 'Ücretsiz Başla',
@@ -215,6 +219,10 @@ export const translations = {
   },
 
   en: {
+    // ── Page title ──
+    page_title: 'GEONI | AI Visibility Scan',
+    page_description: 'Measure how ChatGPT, Claude, Gemini and Perplexity see you. Free AI visibility scan.',
+
     // ── Nav (shared) ──
     nav_login: 'Log In',
     nav_start_free: 'Start Free',

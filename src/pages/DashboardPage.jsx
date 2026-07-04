@@ -110,6 +110,18 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
     }
   }
 
+  // Hedef bazlı (domain/isim) en son tam audit kaydi (result_json dahil) -
+  // Takip Listesi'nde bir satira tiklandiginda raporu acabilmek icin.
+  const latestAuditByTarget = useMemo(() => {
+    const map = {}
+    audits.filter(a => a.result_json).forEach(a => {
+      const key = targetKey(a)
+      if (!key) return
+      if (!map[key] || new Date(a.created_at) > new Date(map[key].created_at)) map[key] = a
+    })
+    return map
+  }, [audits])
+
   // Hedef bazlı (domain/isim) kronolojik skor geçmişi — aynı siteyi/kişiyi
   // birden çok kez tarayan kullanıcılar için sparkline + delta hesaplanır.
   const trendsByTarget = useMemo(() => {
@@ -322,9 +334,15 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                     const series = key ? trendsByTarget[key] : null
                     const latest = series && series.length ? series[series.length - 1] : null
                     const delta = series && series.length >= 2 ? series[series.length - 1].score - series[series.length - 2].score : null
+                    const matchedAudit = key ? latestAuditByTarget[key] : null
                     const TypeIcon = typeIcon[item.type] || FileText
                     return (
-                      <div key={item.id} className="dash-audit-row">
+                      <div
+                        key={item.id}
+                        className={`dash-audit-row ${matchedAudit ? 'dash-audit-row--clickable' : ''}`}
+                        onClick={() => matchedAudit && onViewAudit && onViewAudit(matchedAudit)}
+                        style={{ cursor: matchedAudit ? 'pointer' : 'default' }}
+                      >
                         <TypeIcon size={18} strokeWidth={1.5} className="dash-audit-icon" />
                         <div className="dash-audit-info">
                           <div className="dash-audit-name">{item.label}</div>
@@ -337,8 +355,9 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                               <ScoreBadge score={latest.score} />
                             </>
                           ) : <span className="dash-audit-pending">{t('watchlist_not_scanned_yet')}</span>}
+                          {matchedAudit && <ChevronRight size={14} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />}
                           <button
-                            onClick={() => rescanItem(item)}
+                            onClick={(e) => { e.stopPropagation(); rescanItem(item) }}
                             className="dash-audit-delete"
                             title={t('watchlist_rescan')}
                           ><RefreshCw size={13} strokeWidth={1.5} /></button>

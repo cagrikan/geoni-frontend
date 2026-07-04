@@ -231,6 +231,7 @@ function AppInner() {
       // Ensure brand check result has required fields
       setBrandResult({
         ...resultJson,
+        type: audit.type || resultJson.type || 'person',
         name: audit.name || resultJson.name,
         topic: audit.topic || resultJson.topic || '',
         recognition_count: resultJson.recognition_count ?? 0,

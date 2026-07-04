@@ -18,7 +18,10 @@ export default function WatchlistButton({ user, type, label, target }) {
       .eq('type', type)
       .eq('label', label)
       .maybeSingle()
-      .then(({ data }) => { if (!cancelled) { setAdded(!!data); setChecking(false) } })
+      .then(({ data, error }) => {
+        if (error) console.error('Watchlist check failed:', error)
+        if (!cancelled) { setAdded(!!data); setChecking(false) }
+      })
     return () => { cancelled = true }
   }, [user, type, label])
 
@@ -28,7 +31,9 @@ export default function WatchlistButton({ user, type, label, target }) {
     if (added || checking) return
     setAdded(true)
     const { error } = await supabase.from('watchlist').insert({ user_id: user.id, type, label, target })
-    if (error && error.code !== '23505') setAdded(false)
+    if (error) {
+      if (error.code !== '23505') { setAdded(false); console.error('Watchlist insert failed:', error) }
+    }
   }
 
   return (

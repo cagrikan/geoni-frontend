@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Globe, User, Building2, ScanSearch, GitCompareArrows, Award } from 'lucide-react'
 import GeoniMark from './GeoniMark'
 import LanguageSwitcher from './components/LanguageSwitcher'
+import ThemeSwitcher from './components/ThemeSwitcher'
 import { useLanguage } from './lib/LanguageContext'
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.geoni.ai'
@@ -120,6 +121,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
           <span className="landing__logo">GEONI</span>
         </div>
         <div className="nav-auth">
+          <ThemeSwitcher />
           <LanguageSwitcher />
           {user ? (
             <button className="nav-dashboard-btn" onClick={onDashboard}>{t('nav_dashboard')}</button>

@@ -193,7 +193,10 @@ body {
   flex: 0 0 auto;
   width: 40px;
   padding: 10px;
+  margin-left: 8px;
+  border: 1.5px dashed var(--border-mid);
 }
+.mode-tab--private.mode-tab--active { border-color: #0D0D1A; }
 
 /* ===== FORM (net, kutulu alanlar — "ne yazacagimi anlamiyorum" duzeltmesi) ===== */
 .landing__form {

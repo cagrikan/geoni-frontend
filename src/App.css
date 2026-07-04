@@ -168,11 +168,11 @@ body {
   align-items: center;
   justify-content: center;
   flex: 1;
-  gap: 6px;
+  gap: 5px;
   background: none;
   border: none;
   border-radius: 7px;
-  padding: 10px 18px;
+  padding: 10px 10px;
   font-family: var(--body);
   font-size: .88rem;
   font-weight: 500;
@@ -191,9 +191,9 @@ body {
 
 .mode-tab--private {
   flex: 0 0 auto;
-  width: 40px;
-  padding: 10px;
-  margin-left: 8px;
+  width: 34px;
+  padding: 8px;
+  margin-left: 6px;
   border: 1.5px dashed var(--border-mid);
 }
 .mode-tab--private.mode-tab--active { border-color: #0D0D1A; }

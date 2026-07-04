@@ -7,7 +7,7 @@ import Sparkline from '../components/Sparkline'
 import LanguageSwitcher from '../components/LanguageSwitcher'
 import {
   Gem, History, Bookmark, Settings, Globe, User, Building2, FileText,
-  TrendingUp, TrendingDown, ChevronRight, X,
+  TrendingUp, TrendingDown, ChevronRight, X, RefreshCw,
 } from 'lucide-react'
 
 function SkeletonRow() {
@@ -57,15 +57,17 @@ function targetKey(audit) {
   return raw ? raw.toLowerCase().trim() : null
 }
 
-export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
+export default function DashboardPage({ onReset, onNewScan, onViewAudit, onRescanWeb, onRescanBrand }) {
   const { user, profile, signOut } = useAuth()
   const { t, language } = useLanguage()
   const [audits, setAudits] = useState([])
   const [loading, setLoading] = useState(true)
+  const [watchlist, setWatchlist] = useState([])
+  const [watchlistLoading, setWatchlistLoading] = useState(true)
   const [tab, setTab] = useState('audits') // 'audits' | 'assets'
 
   useEffect(() => {
-    if (user) fetchAudits()
+    if (user) { fetchAudits(); fetchWatchlist() }
   }, [user])
 
   const fetchAudits = async () => {
@@ -77,6 +79,35 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
       .limit(20)
     setAudits(data || [])
     setLoading(false)
+  }
+
+  const fetchWatchlist = async () => {
+    const { data } = await supabase
+      .from('watchlist')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+    setWatchlist(data || [])
+    setWatchlistLoading(false)
+  }
+
+  const removeWatchlistItem = async (e, id) => {
+    e.stopPropagation()
+    await supabase.from('watchlist').delete().eq('id', id)
+    setWatchlist(prev => prev.filter(w => w.id !== id))
+  }
+
+  const rescanItem = (item) => {
+    if (item.type === 'web') {
+      onRescanWeb(item.target?.domain || item.label, user?.email)
+    } else {
+      onRescanBrand({
+        type: item.type,
+        name: item.target?.name || item.label,
+        topic: item.target?.topic || '',
+        email: user?.email,
+      })
+    }
   }
 
   // Hedef bazlı (domain/isim) kronolojik skor geçmişi — aynı siteyi/kişiyi
@@ -275,10 +306,53 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit }) {
           {tab === 'assets' && (
             <div className="dash-section">
               <h2 className="dash-section__title">{t('dash_watchlist_title')}</h2>
-              <div className="dash-empty">
-                <p>{t('dash_watchlist_soon')}</p>
-                <span style={{ fontSize: '.85rem', color: 'var(--text-muted)' }}>{t('dash_watchlist_desc')}</span>
-              </div>
+              {watchlistLoading ? (
+                <div className="dash-audit-list">
+                  {Array.from({ length: 3 }).map((_, i) => <SkeletonRow key={i} />)}
+                </div>
+              ) : watchlist.length === 0 ? (
+                <div className="dash-empty">
+                  <p>{t('dash_watchlist_empty')}</p>
+                  <span style={{ fontSize: '.85rem', color: 'var(--text-muted)' }}>{t('dash_watchlist_empty_hint')}</span>
+                </div>
+              ) : (
+                <div className="dash-audit-list">
+                  {watchlist.map(item => {
+                    const key = item.label?.toLowerCase().trim()
+                    const series = key ? trendsByTarget[key] : null
+                    const latest = series && series.length ? series[series.length - 1] : null
+                    const delta = series && series.length >= 2 ? series[series.length - 1].score - series[series.length - 2].score : null
+                    const TypeIcon = typeIcon[item.type] || FileText
+                    return (
+                      <div key={item.id} className="dash-audit-row">
+                        <TypeIcon size={18} strokeWidth={1.5} className="dash-audit-icon" />
+                        <div className="dash-audit-info">
+                          <div className="dash-audit-name">{item.label}</div>
+                          <div className="dash-audit-meta">{typeLabel[item.type]}</div>
+                        </div>
+                        <div className="dash-audit-right">
+                          {latest ? (
+                            <>
+                              <DeltaBadge delta={delta} />
+                              <ScoreBadge score={latest.score} />
+                            </>
+                          ) : <span className="dash-audit-pending">{t('watchlist_not_scanned_yet')}</span>}
+                          <button
+                            onClick={() => rescanItem(item)}
+                            className="dash-audit-delete"
+                            title={t('watchlist_rescan')}
+                          ><RefreshCw size={13} strokeWidth={1.5} /></button>
+                          <button
+                            onClick={(e) => removeWatchlistItem(e, item.id)}
+                            className="dash-audit-delete"
+                            title={t('dash_delete_title')}
+                          ><X size={13} strokeWidth={1.5} /></button>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
             </div>
           )}
 

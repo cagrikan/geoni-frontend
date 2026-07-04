@@ -2,6 +2,7 @@ import { CircleCheck, TrendingUp } from 'lucide-react'
 import GeoniMark from './GeoniMark'
 import ProBlur from './ProBlur'
 import LanguageSwitcher from './components/LanguageSwitcher'
+import WatchlistButton from './components/WatchlistButton'
 import { useLanguage } from './lib/LanguageContext'
 
 function scoreColor(score) {
@@ -140,6 +141,7 @@ export default function ResultsPage({ result, onReset, user, onLogin, onDashboar
           <div className="results__scanned">
             <span className="results__scanned-label">{t('results_site_scanned_label')}</span>
             <span className="results__scanned-value">{domain}</span>
+            {!isSample && <WatchlistButton user={user} type="web" label={domain} target={{ domain }} />}
           </div>
         </div>
 

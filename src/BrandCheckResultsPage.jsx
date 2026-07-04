@@ -2,6 +2,7 @@ import { CircleCheck, TrendingUp } from 'lucide-react'
 import GeoniMark from './GeoniMark'
 import ProBlur from './ProBlur'
 import LanguageSwitcher from './components/LanguageSwitcher'
+import WatchlistButton from './components/WatchlistButton'
 import { useLanguage } from './lib/LanguageContext'
 
 function scoreColor(score) {
@@ -94,6 +95,7 @@ export default function BrandCheckResultsPage({ result, onReset, user, onLogin, 
   const {
     name,
     topic,
+    type = 'person',
     score = 0,
     score_breakdown = {},
     recognition_count = 0,
@@ -154,6 +156,7 @@ export default function BrandCheckResultsPage({ result, onReset, user, onLogin, 
             {topic && topic !== name && (
               <span style={{ display: 'block', fontFamily: 'var(--mono)', fontSize: '.72rem', color: 'var(--text-muted)', marginTop: 2 }}>{topic}</span>
             )}
+            <WatchlistButton user={user} type={type} label={capitalizedName} target={{ name, topic }} />
           </div>
         </div>
 

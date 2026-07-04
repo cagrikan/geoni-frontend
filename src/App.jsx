@@ -130,14 +130,14 @@ function AppInner() {
     setError(t('error_audit_timeout')); pushView('landing')
   }
 
-  const pollBrandJob = async (jobId) => {
+  const pollBrandJob = async (jobId, entityType) => {
     for (let i = 0; i < 25; i++) {
       await new Promise(r => setTimeout(r, 2000))
       try {
         const res = await fetch(`${API_URL}/api/brand-check/${jobId}`)
         if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || t('error_query_failed'))
         const data = await res.json()
-        if (data.status === 'complete') { setBrandResult(data.result); pushView('brand_results'); if (refreshProfile) refreshProfile(); return }
+        if (data.status === 'complete') { setBrandResult({ ...data.result, type: entityType }); pushView('brand_results'); if (refreshProfile) refreshProfile(); return }
         if (data.status === 'failed') throw new Error(t('error_query_failed'))
       } catch (err) { setError(err.message); pushView('landing'); return }
     }
@@ -207,7 +207,7 @@ function AppInner() {
         }
         es.onerror = () => es.close()
       } catch { /* EventSource desteklenmiyorsa polling zaten yeterli */ }
-      await pollBrandJob(data.job_id)
+      await pollBrandJob(data.job_id, payload.type)
       es?.close()
     } catch (err) { setError(err.message || t('error_connection')); pushView('landing') }
   }
@@ -256,7 +256,7 @@ function AppInner() {
     <div className="app-shell">
       {view === 'auth_callback' && <AuthCallback onDone={navigateTo} />}
       {view === 'login' && <LoginPage onSuccess={() => navigateTo('dashboard')} />}
-      {view === 'dashboard' && <DashboardPage onReset={handleReset} onNewScan={() => navigateTo('landing')} onViewAudit={handleViewAudit} />}
+      {view === 'dashboard' && <DashboardPage onReset={handleReset} onNewScan={() => navigateTo('landing')} onViewAudit={handleViewAudit} onRescanWeb={handleAudit} onRescanBrand={handleBrandCheck} />}
       {view === 'landing' && (
         <LandingPage
           onSubmitAudit={handleAudit}

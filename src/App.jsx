@@ -145,7 +145,7 @@ function AppInner() {
       const res = await fetch(`${API_URL}/api/audit/quick`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ domain, email: email || user?.email || 'anonymous@geoni.ai', competitors: [] }),
+        body: JSON.stringify({ domain, email: email || user?.email || 'anonymous@geoni.ai', competitors: [], lang: language }),
       })
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || t('error_request_failed'))
       const jobId = (await res.json()).job_id
@@ -175,7 +175,7 @@ function AppInner() {
       const res = await fetch(`${API_URL}/api/brand-check`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token2 ? { 'Authorization': `Bearer ${token2}` } : {}) },
-        body: JSON.stringify({ ...payload, email: payload.email || user?.email || 'anonymous@geoni.ai' }),
+        body: JSON.stringify({ ...payload, email: payload.email || user?.email || 'anonymous@geoni.ai', lang: language }),
       })
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || t('error_request_failed'))
       const data = await res.json()

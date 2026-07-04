@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { AuthProvider, useAuth } from './lib/AuthContext'
 import { LanguageProvider, useLanguage } from './lib/LanguageContext'
+import { ThemeProvider } from './lib/ThemeContext'
 import LandingPage from './LandingPage'
 import ScanningScreen from './components/ScanningScreen'
 import ResultsPage from './ResultsPage'
@@ -291,10 +292,12 @@ function AppInner() {
 
 export default function App() {
   return (
-    <LanguageProvider>
-      <AuthProvider>
-        <AppInner />
-      </AuthProvider>
-    </LanguageProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <AppInner />
+        </AuthProvider>
+      </LanguageProvider>
+    </ThemeProvider>
   )
 }

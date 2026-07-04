@@ -2,9 +2,11 @@ import { useState, useEffect, useMemo } from 'react'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
 import { useLanguage } from '../lib/LanguageContext'
+import { useTheme } from '../lib/ThemeContext'
 import GeoniMark from '../GeoniMark'
 import Sparkline from '../components/Sparkline'
 import LanguageSwitcher from '../components/LanguageSwitcher'
+import ThemeSwitcher from '../components/ThemeSwitcher'
 import {
   Gem, History, Bookmark, Settings, Globe, User, Building2, FileText,
   TrendingUp, TrendingDown, ChevronRight, X, RefreshCw,
@@ -60,6 +62,7 @@ function targetKey(audit) {
 export default function DashboardPage({ onReset, onNewScan, onViewAudit, onRescanWeb, onRescanBrand }) {
   const { user, profile, signOut } = useAuth()
   const { t, language } = useLanguage()
+  const { theme } = useTheme()
   const [audits, setAudits] = useState([])
   const [loading, setLoading] = useState(true)
   const [watchlist, setWatchlist] = useState([])
@@ -417,6 +420,13 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                     <div className="dash-setting-label">{t('dash_settings_login_method')}</div>
                     <div className="dash-setting-val" style={{ textTransform: 'capitalize' }}>{profile?.auth_provider || '—'}</div>
                   </div>
+                </div>
+                <div className="dash-setting-row">
+                  <div>
+                    <div className="dash-setting-label">{t('dash_settings_theme')}</div>
+                    <div className="dash-setting-val">{theme === 'dark' ? t('dash_settings_theme_dark') : t('dash_settings_theme_light')}</div>
+                  </div>
+                  <ThemeSwitcher />
                 </div>
                 <div className="dash-setting-row">
                   <div>

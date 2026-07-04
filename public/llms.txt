@@ -1,0 +1,32 @@
+# GEONI Scanner (app.geoni.ai)
+
+> GEONI Scanner, bir markanın, kişinin ya da web sitesinin ChatGPT, Claude, Gemini ve Perplexity gibi büyük dil modelleri tarafından ne ölçüde tanındığını ve nasıl temsil edildiğini ölçen, ücretsiz bir AI Görünürlük Tarama aracıdır. GEONI ajansının (geoni.ai) ürün tarafıdır.
+
+## Core Capabilities
+
+- **Website AI Visibility Audit:** Crawls a domain, checks AI bot access (ChatGPT, Claude, Gemini, Perplexity crawlers), verifies `llms.txt` presence, and produces a 0-100 AI Visibility Score across six dimensions (index coverage, authority, freshness, schema integrity, engagement, brand recall).
+- **Brand / Person Recall Check:** Queries Claude, ChatGPT, Gemini and Perplexity in real time to determine whether a named person or brand is recognized, how accurately, and in what context — with judge-based accuracy scoring against real web data.
+- **Topic Gap Analysis:** Surfaces topics where the target already performs well in AI answers, and opportunity topics where competitors are cited instead.
+- **Automated Email Reporting:** Delivers a formatted visibility report to the requester's email, available in Turkish and English.
+
+## How It Works
+
+1. **Query:** The target site is crawled and/or the name or brand is asked to Claude, ChatGPT, Gemini and Perplexity in real time.
+2. **Compare:** Answers are checked against real web data to measure accuracy and competitive standing.
+3. **Score:** An AI Visibility Score (0-100) is produced along with strong topics and missed opportunities.
+
+## Key Technical Specifications
+
+- **Scan modes:** Website domain, Person, Brand/Company.
+- **Models queried:** Claude, ChatGPT (OpenAI), Gemini (Google), Perplexity.
+- **Languages:** Turkish, English (UI, live scan progress, and email reports).
+- **Typical scan time:** ~30 seconds.
+- **Pricing:** Free scan; paid GEO improvement packages available via geoni.ai.
+
+## Contact & Navigation
+
+- **App:** https://app.geoni.ai
+- **Agency / Services:** https://geoni.ai
+- **Primary Action:** Free AI Visibility Scan (https://app.geoni.ai)
+- **Location & Market:** Ankara, Turkey (serving globally)
+- **Contact:** info@geoni.ai

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Globe, User, Building2, ScanSearch, GitCompareArrows, Award, EyeOff } from 'lucide-react'
+import { Globe, User, Building2, ScanSearch, GitCompareArrows, Award, Eye, EyeOff } from 'lucide-react'
 import GeoniMark from './GeoniMark'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import ThemeSwitcher from './components/ThemeSwitcher'
@@ -168,13 +168,16 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
                 {title}
               </button>
             ))}
+            <button
+              type="button"
+              className={`mode-tab mode-tab--private ${isPrivate ? 'mode-tab--active' : ''}`}
+              onClick={() => setIsPrivate(p => !p)}
+              title={t('private_scan_label')}
+              aria-label={t('private_scan_label')}
+            >
+              {isPrivate ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
+            </button>
           </div>
-
-          <label className="private-toggle">
-            <input type="checkbox" checked={isPrivate} onChange={e => setIsPrivate(e.target.checked)} />
-            <span className="private-toggle__box"><EyeOff size={12} strokeWidth={2} /></span>
-            <span className="private-toggle__label">{t('private_scan_label')}</span>
-          </label>
 
           <form className="landing__form" onSubmit={handleSubmit}>
 

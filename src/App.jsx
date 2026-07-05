@@ -10,6 +10,7 @@ import IdentityMismatchPage from './IdentityMismatchPage'
 import LoginPage from './pages/LoginPage'
 import AuthCallback from './pages/AuthCallback'
 import DashboardPage from './pages/DashboardPage'
+import AdminPage from './pages/AdminPage'
 import './App.css'
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.geoni.ai'
@@ -71,6 +72,7 @@ function AppInner() {
   const [view, setView] = useState(() => {
     if (window.location.pathname === '/auth/callback') return 'auth_callback'
     if (window.location.pathname === '/dashboard') return 'dashboard'
+    if (window.location.pathname === '/admin') return 'admin'
     if (window.location.pathname === '/login') return 'login'
     return 'landing'
   })
@@ -89,6 +91,7 @@ function AppInner() {
     const path = window.location.pathname
     if (path === '/auth/callback') setView('auth_callback')
     else if (path === '/dashboard') setView(user ? 'dashboard' : 'login')
+    else if (path === '/admin') setView(user ? 'admin' : 'login')
     else if (path === '/login') setView('login')
   }, [user])
 
@@ -99,6 +102,7 @@ function AppInner() {
       const path = window.location.pathname
       if (path === '/auth/callback') { setView('auth_callback'); return }
       if (path === '/dashboard') { setView(user ? 'dashboard' : 'login'); return }
+      if (path === '/admin') { setView(user ? 'admin' : 'login'); return }
       if (path === '/login') { setView('login'); return }
       setResult(null); setBrandResult(null); setError(null); setIsSample(false)
       setView('landing')
@@ -109,7 +113,7 @@ function AppInner() {
 
   const navigateTo = (v) => {
     setView(v)
-    const paths = { dashboard: '/dashboard', login: '/login', landing: '/', results: '/', brand_results: '/' }
+    const paths = { dashboard: '/dashboard', admin: '/admin', login: '/login', landing: '/', results: '/', brand_results: '/' }
     window.history.pushState({}, '', paths[v] || '/')
   }
 
@@ -260,7 +264,8 @@ function AppInner() {
     <div className="app-shell">
       {view === 'auth_callback' && <AuthCallback onDone={navigateTo} />}
       {view === 'login' && <LoginPage onSuccess={() => navigateTo('dashboard')} />}
-      {view === 'dashboard' && <DashboardPage onReset={handleReset} onNewScan={() => navigateTo('landing')} onViewAudit={handleViewAudit} onRescanWeb={handleAudit} onRescanBrand={handleBrandCheck} />}
+      {view === 'dashboard' && <DashboardPage onReset={handleReset} onNewScan={() => navigateTo('landing')} onViewAudit={handleViewAudit} onRescanWeb={handleAudit} onRescanBrand={handleBrandCheck} onAdmin={profile?.is_admin ? () => navigateTo('admin') : null} />}
+      {view === 'admin' && <AdminPage onBack={() => navigateTo('dashboard')} />}
       {view === 'landing' && (
         <LandingPage
           onSubmitAudit={handleAudit}

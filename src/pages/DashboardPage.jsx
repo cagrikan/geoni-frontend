@@ -9,7 +9,7 @@ import LanguageSwitcher from '../components/LanguageSwitcher'
 import ThemeSwitcher from '../components/ThemeSwitcher'
 import {
   Gem, History, Bookmark, Settings, Globe, User, Building2, FileText,
-  TrendingUp, TrendingDown, ChevronRight, X, RefreshCw,
+  TrendingUp, TrendingDown, ChevronRight, X, RefreshCw, ShieldCheck,
 } from 'lucide-react'
 
 function SkeletonRow() {
@@ -59,7 +59,7 @@ function targetKey(audit) {
   return raw ? raw.toLowerCase().trim() : null
 }
 
-export default function DashboardPage({ onReset, onNewScan, onViewAudit, onRescanWeb, onRescanBrand }) {
+export default function DashboardPage({ onReset, onNewScan, onViewAudit, onRescanWeb, onRescanBrand, onAdmin }) {
   const { user, profile, signOut } = useAuth()
   const { t, language } = useLanguage()
   const { theme } = useTheme()
@@ -231,6 +231,11 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
             <button className={`dash-nav__item ${tab === 'settings' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('settings')}>
               <Settings size={16} strokeWidth={1.5} /> {t('dash_nav_settings')}
             </button>
+            {onAdmin && (
+              <button className="dash-nav__item" onClick={onAdmin}>
+                <ShieldCheck size={16} strokeWidth={1.5} /> Admin Paneli
+              </button>
+            )}
           </nav>
 
           <button className="dash-new-scan" onClick={onNewScan}>

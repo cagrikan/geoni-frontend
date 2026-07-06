@@ -75,6 +75,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
     } else if (mode === 'person') {
       if (step === 0 && !personName) return
       if (step < PERSON_LAST_STEP) { setStep(s => s + 1); return }
+      if (!user) { onLogin(); return }
       onSubmitBrandCheck({
         type: 'person',
         name: personName,
@@ -89,6 +90,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
     } else {
       if (step === 0 && !brandName) return
       if (step < BRAND_LAST_STEP) { setStep(s => s + 1); return }
+      if (!user) { onLogin(); return }
       onSubmitBrandCheck({
         type: 'brand',
         name: brandName,
@@ -260,7 +262,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
                   <WizardProgress total={PERSON_LAST_STEP} />
                   {step > 0 && <button type="button" className="wizard-back" onClick={() => setStep(s => s - 1)}>{t('wizard_back')}</button>}
                   <button type="submit" className="landing__submit" disabled={loading}>
-                    {loading ? statusText + '…' : step < PERSON_LAST_STEP ? t('wizard_next') : t('submit_person')}
+                    {loading ? statusText + '…' : step < PERSON_LAST_STEP ? t('wizard_next') : !user ? `${t('nav_login')} →` : t('submit_person')}
                   </button>
                 </div>
               </>
@@ -306,7 +308,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
                   <WizardProgress total={BRAND_LAST_STEP} />
                   {step > 0 && <button type="button" className="wizard-back" onClick={() => setStep(s => s - 1)}>{t('wizard_back')}</button>}
                   <button type="submit" className="landing__submit" disabled={loading}>
-                    {loading ? statusText + '…' : step < BRAND_LAST_STEP ? t('wizard_next') : t('submit_brand')}
+                    {loading ? statusText + '…' : step < BRAND_LAST_STEP ? t('wizard_next') : !user ? `${t('nav_login')} →` : t('submit_brand')}
                   </button>
                 </div>
               </>

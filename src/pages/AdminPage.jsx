@@ -104,7 +104,7 @@ const PROVIDER_META = {
 
 // Herhangi bir "gercek maliyet" karti icin ortak yukleme-gecmisi bolumu:
 // toplam yuklenen kredi - API'den gelen tum-zamanlar harcama = tahmini kalan.
-function TopupSection({ provider, spentAllTime }) {
+function TopupSection({ provider, spentAllTime, currency = '$' }) {
   const { data: topups, error } = useAdminFetch(`/api/admin/stats/topups?provider=${provider}`)
   const [local, setLocal] = useState(null)
   const [amount, setAmount] = useState('')
@@ -141,12 +141,12 @@ function TopupSection({ provider, spentAllTime }) {
   return (
     <>
       <div className="admin-stats-grid admin-stats-grid--compact">
-        <StatTile label="Toplam yüklenen kredi" value={`$${local.total.toFixed(2)}`} />
-        <StatTile label="Tahmini kalan bakiye" value={`$${remaining.toFixed(2)}`} />
+        <StatTile label="Toplam yüklenen kredi" value={`${currency}${local.total.toFixed(2)}`} />
+        <StatTile label="Tahmini kalan bakiye" value={`${currency}${remaining.toFixed(2)}`} />
       </div>
       {saveError && <div className="admin-error">{saveError}</div>}
       <div className="topup-form">
-        <input type="number" step="0.01" placeholder="Yüklenen tutar ($)" value={amount} onChange={(e) => setAmount(e.target.value)} />
+        <input type="number" step="0.01" placeholder={`Yüklenen tutar (${currency})`} value={amount} onChange={(e) => setAmount(e.target.value)} />
         <input type="text" placeholder="Not (opsiyonel)" value={note} onChange={(e) => setNote(e.target.value)} />
         <button disabled={saving || !amount} onClick={addTopup}>Yükleme ekle</button>
       </div>
@@ -156,7 +156,7 @@ function TopupSection({ provider, spentAllTime }) {
             <div key={t.id} className="topup-history__row">
               <span>{new Date(t.created_at).toLocaleDateString('tr-TR')}</span>
               <span>{t.note || '—'}</span>
-              <span className="topup-history__amount">+${Number(t.amount).toFixed(2)}</span>
+              <span className="topup-history__amount">+{currency}{Number(t.amount).toFixed(2)}</span>
             </div>
           ))}
         </div>
@@ -355,26 +355,27 @@ function OverviewTab() {
         )
       }} />
 
-      <Widget title="Gemini gerçek maliyet" hint="GCP Billing export → BigQuery üzerinden gelen gerçek maliyet. Google Cloud faturalı (postpaid) çalıştığı için kalan bakiye kavramı yok - AWS gibi. Not: export verisi ~24 saat gecikmeli akabilir." path="/api/admin/stats/gemini-cost" render={(data) => {
+      <Widget title="Gemini gerçek maliyet" hint="GCP Billing export → BigQuery üzerinden gelen gerçek maliyet, faturalandırma hesabınızın para biriminde (₺). AI Studio ön ödemeli (prepay) çalıştığı için kredi yüklemenizi aşağıya kaydedin, kalanı buradan hesaplarız. Not: export verisi ~24 saat gecikmeli akabilir." path="/api/admin/stats/gemini-cost" render={(data) => {
         if (!data || data.usd_today == null) {
           return <div className="admin-empty">Gemini maliyet verisi yok - service account key tanımlı değil ya da export verisi henüz oluşmadı.</div>
         }
         return (
           <>
             <div className="admin-stats-grid admin-stats-grid--compact">
-              <StatTile label="Bugün (USD)" value={`$${data.usd_today.toFixed(2)}`} />
-              <StatTile label="Son 7 gün (USD)" value={`$${data.usd_week.toFixed(2)}`} />
-              <StatTile label="Bu ay - Toplam (USD)" value={`$${data.usd_month.toFixed(2)}`} />
-              <StatTile label="Tüm zamanlar harcama (USD)" value={`$${data.usd_all_time.toFixed(2)}`} />
+              <StatTile label="Bugün (₺)" value={`₺${data.usd_today.toFixed(2)}`} />
+              <StatTile label="Son 7 gün (₺)" value={`₺${data.usd_week.toFixed(2)}`} />
+              <StatTile label="Bu ay - Toplam (₺)" value={`₺${data.usd_month.toFixed(2)}`} />
+              <StatTile label="Tüm zamanlar harcama (₺)" value={`₺${data.usd_all_time.toFixed(2)}`} />
             </div>
             {data.daily?.length > 0 && (
               <BarChart
                 data={data.daily}
-                series={[{ key: 'usd', label: 'Maliyet (USD)', color: 'var(--chart-2)' }]}
+                series={[{ key: 'usd', label: 'Maliyet (₺)', color: 'var(--chart-2)' }]}
                 dateFormatter={shortDate}
-                valueFormatter={(v) => `$${v.toFixed(2)}`}
+                valueFormatter={(v) => `₺${v.toFixed(2)}`}
               />
             )}
+            <TopupSection provider="gemini" spentAllTime={data.usd_all_time} currency="₺" />
           </>
         )
       }} />

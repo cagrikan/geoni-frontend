@@ -93,6 +93,8 @@ const PROVIDER_META = {
   openai: { label: 'OpenAI', color: 'var(--chart-1)' },
   google: { label: 'Google', color: 'var(--chart-2)' },
   perplexity: { label: 'Perplexity', color: 'var(--chart-4)' },
+  'tavily-1': { label: 'Tavily (Hesap 1)', color: 'var(--chart-5)' },
+  'tavily-2': { label: 'Tavily (Hesap 2)', color: 'var(--chart-6)' },
 }
 
 function OverviewTab() {

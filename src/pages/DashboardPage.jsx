@@ -137,7 +137,13 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
   const [loading, setLoading] = useState(true)
   const [watchlist, setWatchlist] = useState([])
   const [watchlistLoading, setWatchlistLoading] = useState(true)
-  const [tab, setTab] = useState('audits') // 'audits' | 'assets'
+  const [tab, setTab] = useState(() => {
+    try {
+      const pending = localStorage.getItem('geoni_pending_tab')
+      if (pending) { localStorage.removeItem('geoni_pending_tab'); return pending }
+    } catch { /* ignore */ }
+    return 'audits'
+  }) // 'audits' | 'assets' | 'credits' | 'settings'
 
   useEffect(() => {
     if (user) { fetchAudits(); fetchWatchlist() }

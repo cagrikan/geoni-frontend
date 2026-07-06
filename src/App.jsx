@@ -35,6 +35,18 @@ function captureAcquisition() {
   } catch { /* localStorage erisimi engellenmis olabilir - sessizce gec */ }
 }
 
+// geoni.ai'daki "Satın Alın" gibi linkler /dashboard?tab=credits ile gelir.
+// Giris yapmamis kullanici once /login'e yonlendigi icin bu query string
+// navigateTo('dashboard') ile silinir - localStorage'a alip DashboardPage'de
+// tuketiyoruz ki giris sonrasi da dogru sekmede acilsin.
+function capturePendingTab() {
+  try {
+    if (window.location.pathname !== '/dashboard') return
+    const tab = new URLSearchParams(window.location.search).get('tab')
+    if (tab) localStorage.setItem('geoni_pending_tab', tab)
+  } catch { /* ignore */ }
+}
+
 const SAMPLE_RESULT_BY_LANG = {
   tr: {
     domain: 'ornek-magaza.com',
@@ -89,7 +101,7 @@ function AppInner() {
     if (desc) desc.setAttribute('content', t('page_description'))
   }, [language])
 
-  useEffect(() => { captureAcquisition() }, [])
+  useEffect(() => { captureAcquisition(); capturePendingTab() }, [])
 
   const [view, setView] = useState(() => {
     if (window.location.pathname === '/auth/callback') return 'auth_callback'

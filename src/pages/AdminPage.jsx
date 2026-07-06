@@ -422,7 +422,7 @@ function OverviewTab() {
 
       <Widget
         title="Dış AI motoru kullanımı"
-        hint="OpenAI, Google ve Perplexity kendi hesap bakiyelerini API üzerinden sunmuyor — burada gösterilen GEONI'nin bu motorlara yaptığı çağrı sayısıdır. Anthropic için gerçek USD maliyeti yukarıdaki ayrı kartta."
+        hint="Burada gösterilen GEONI'nin bu motorlara yaptığı çağrı sayısıdır - gerçek/tahmini USD maliyetleri her motorun kendi kartında (Google hariç, onun hiçbir API'si yok)."
         path="/api/admin/stats/provider-usage"
         render={(data) => {
           const providers = Array.from(new Set([...Object.keys(data.today || {}), ...Object.keys(data.week || {})]))

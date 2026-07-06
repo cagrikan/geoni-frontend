@@ -77,6 +77,28 @@ function AsOfNote({ asOf }) {
   return <p className="admin-asof">Veri {label} alındı - önbelleklenmiş olabilir, yeni yükleme eklediğinizde kalan bakiye birkaç dakika gecikmeli güncellenebilir.</p>
 }
 
+const RANGE_OPTIONS = [
+  { days: 1, label: 'Bugün' },
+  { days: 7, label: 'Son 7 gün' },
+  { days: 14, label: '14 gün' },
+  { days: 30, label: '30 gün' },
+  { days: 90, label: '90 gün' },
+]
+
+function RangeToggle({ days, onChange }) {
+  return (
+    <div className="admin-range-toggle">
+      {RANGE_OPTIONS.map((opt) => (
+        <button
+          key={opt.days}
+          className={opt.days === days ? 'admin-range-toggle__btn admin-range-toggle__btn--active' : 'admin-range-toggle__btn'}
+          onClick={() => onChange(opt.days)}
+        >{opt.label}</button>
+      ))}
+    </div>
+  )
+}
+
 const SCAN_SERIES = [
   { key: 'web', label: 'Web Sitesi', color: 'var(--chart-1)' },
   { key: 'person', label: 'Kişi', color: 'var(--chart-2)' },
@@ -296,11 +318,7 @@ function UsersAndScansWidget() {
         </div>
       )}
 
-      <div className="admin-range-toggle">
-        {[14, 30, 90].map((d) => (
-          <button key={d} className={d === days ? 'admin-range-toggle__btn admin-range-toggle__btn--active' : 'admin-range-toggle__btn'} onClick={() => setDays(d)}>{d} gün</button>
-        ))}
-      </div>
+      <RangeToggle days={days} onChange={setDays} />
       {scansError && <div className="admin-error">{scansError}</div>}
       {!scans ? <div className="admin-loading admin-loading--widget">Yükleniyor…</div> : (
         <>
@@ -335,11 +353,7 @@ function CreditsWidget() {
               <StatTile label="Hediye edilen kredi (toplam)" value={data.gifted} />
               <StatTile label="Admin kullanıcı harcaması (ayrı)" value={data.admin_spent} />
             </div>
-            <div className="admin-range-toggle">
-              {[14, 30, 90].map((d) => (
-                <button key={d} className={d === days ? 'admin-range-toggle__btn admin-range-toggle__btn--active' : 'admin-range-toggle__btn'} onClick={() => setDays(d)}>{d} gün</button>
-              ))}
-            </div>
+            <RangeToggle days={days} onChange={setDays} />
             <BarChart data={data.daily} series={CREDIT_SERIES} dateFormatter={shortDate} />
             {reasonItems.length > 0 && (
               <>

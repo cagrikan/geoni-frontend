@@ -1944,6 +1944,7 @@ body {
 .admin-section { display: flex; flex-direction: column; gap: 16px; }
 .admin-section__title { font-size: 1rem; font-weight: 600; color: var(--text); margin: 8px 0 0; }
 .admin-hint { font-size: .82rem; color: var(--text-muted); margin: -8px 0 4px; line-height: 1.5; }
+.admin-asof { font-size: .72rem; color: var(--text-muted); font-style: italic; margin: 2px 0; }
 .admin-loading, .admin-empty, .admin-error { padding: 20px; text-align: center; color: var(--text-muted); font-size: .88rem; }
 .admin-error { color: var(--bad); }
 

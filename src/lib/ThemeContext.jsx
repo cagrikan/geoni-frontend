@@ -5,9 +5,9 @@ const ThemeContext = createContext(null)
 export function ThemeProvider({ children }) {
   const [theme, setThemeState] = useState(() => {
     try {
-      return localStorage.getItem('geoni_theme') || 'dark'
+      return localStorage.getItem('geoni_theme') || 'light'
     } catch {
-      return 'dark'
+      return 'light'
     }
   })
 

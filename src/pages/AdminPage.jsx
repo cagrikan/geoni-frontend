@@ -322,13 +322,16 @@ function UsersAndScansWidget() {
       {scansError && <div className="admin-error">{scansError}</div>}
       {!scans ? <div className="admin-loading admin-loading--widget">Yükleniyor…</div> : (() => {
         const rangeLabel = RANGE_OPTIONS.find((o) => o.days === days)?.label || `${days} gün`
-        const rangeTotal = scans.days.reduce((sum, d) => sum + (d.web || 0) + (d.person || 0) + (d.brand || 0), 0)
+        const webTotal = scans.days.reduce((sum, d) => sum + (d.web || 0), 0)
+        const personTotal = scans.days.reduce((sum, d) => sum + (d.person || 0), 0)
+        const brandTotal = scans.days.reduce((sum, d) => sum + (d.brand || 0), 0)
         return (
           <>
             <div className="admin-stats-grid admin-stats-grid--compact">
-              <StatTile label={`Toplam tarama (${rangeLabel})`} value={rangeTotal} />
-              <StatTile label="Bugünkü tarama (sabit)" value={scans.today} />
-              <StatTile label="Son 7 gün tarama (sabit)" value={scans.week} />
+              <StatTile label={`Toplam tarama (${rangeLabel})`} value={webTotal + personTotal + brandTotal} />
+              <StatTile label={`Web Sitesi (${rangeLabel})`} value={webTotal} />
+              <StatTile label={`Kişi (${rangeLabel})`} value={personTotal} />
+              <StatTile label={`Marka (${rangeLabel})`} value={brandTotal} />
             </div>
             <BarChart data={scans.days} series={SCAN_SERIES} stacked dateFormatter={shortDate} />
           </>

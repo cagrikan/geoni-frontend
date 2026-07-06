@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
 import GeoniMark from '../GeoniMark'
+import ThemeSwitcher from '../components/ThemeSwitcher'
 import BarChart from '../components/BarChart'
 import HBarList from '../components/HBarList'
 import {
@@ -398,7 +399,10 @@ export default function AdminPage({ onBack }) {
           <GeoniMark />
           <span className="landing__logo">GEONI</span>
         </button>
-        <button className="admin-back" onClick={onBack}><ArrowLeft size={14} strokeWidth={1.5} /> Dashboard'a dön</button>
+        <div className="admin-nav-right">
+          <ThemeSwitcher />
+          <button className="admin-back" onClick={onBack}><ArrowLeft size={14} strokeWidth={1.5} /> Dashboard'a dön</button>
+        </div>
       </header>
 
       <div className="dashboard__body">

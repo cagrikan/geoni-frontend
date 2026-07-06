@@ -187,6 +187,7 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
         </button>
         <div className="dash-nav-right">
           <LanguageSwitcher />
+          <ThemeSwitcher />
           <div className="dash-credit-badge">
             <Gem size={14} strokeWidth={1.5} className="dash-credit-icon" />
             <span className="dash-credit-val">{profile?.credit_balance ?? '—'}</span>

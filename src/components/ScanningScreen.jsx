@@ -50,10 +50,10 @@ export default function ScanningScreen({ kind, target, statusKey, progressLog = 
 
   return (
     <div className="scan-screen">
-      <div className="scan-screen__brand">
+      <button className="scan-screen__brand scan-screen__brand--clickable" onClick={onCancel} type="button">
         <GeoniMark />
         <span className="landing__logo">GEONI</span>
-      </div>
+      </button>
 
       <div className="scan-screen__center">
         <Pulse />

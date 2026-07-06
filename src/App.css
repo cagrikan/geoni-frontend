@@ -1816,6 +1816,11 @@ body {
   padding: 24px 28px;
   align-self: flex-start;
 }
+.scan-screen__brand--clickable {
+  background: none; border: none; cursor: pointer; font: inherit;
+  transition: opacity .2s;
+}
+.scan-screen__brand--clickable:hover { opacity: .8; }
 .scan-screen__center {
   flex: 1;
   display: flex;
@@ -1913,13 +1918,16 @@ body {
 }
 
 /* Admin panel */
+.admin-nav-right {
+  display: flex; align-items: center; gap: 10px;
+  margin-left: auto;
+}
 .admin-back {
   display: flex; align-items: center; gap: 6px;
   background: none; border: 1px solid var(--border);
   color: var(--text-sub); border-radius: 8px;
   padding: 8px 14px; font-size: .82rem; cursor: pointer;
   transition: border-color .2s, color .2s;
-  margin-left: auto;
   flex-shrink: 0;
 }
 .admin-back:hover { border-color: var(--accent); color: var(--text); }

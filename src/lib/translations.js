@@ -46,7 +46,7 @@ export const translations = {
     field_person_role_label: 'Unvanınız',
     field_person_role_placeholder: 'Örn: CTO, Avukat, Milletvekili',
     field_person_company_label: 'Çalıştığınız şirket',
-    field_person_company_placeholder: 'Örn: ARD Grup',
+    field_person_company_placeholder: 'Örn: Şirket A.Ş.',
     field_person_city_label: 'Bulunduğunuz şehir',
     field_city_placeholder: 'Örn: Ankara',
     field_person_topic_label: 'Tanındığınız alan',

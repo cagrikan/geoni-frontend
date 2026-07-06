@@ -98,7 +98,7 @@ const PROVIDER_META = {
 function OverviewTab() {
   return (
     <div className="admin-section admin-overview-grid">
-      <Widget path="/api/admin/stats/summary" render={(data) => (
+      <Widget title="Kullanıcı istatistikleri" path="/api/admin/stats/summary" render={(data) => (
         <div className="admin-stats-grid">
           <StatTile label="Toplam kullanıcı" value={data.total_users} />
           <StatTile label="Toplam tarama" value={data.total_audits} />

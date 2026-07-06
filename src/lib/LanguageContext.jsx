@@ -19,9 +19,15 @@ export function LanguageProvider({ children }) {
   const setLanguage = (lang) => setLanguageState(lang)
   const toggleLanguage = () => setLanguageState(l => (l === 'tr' ? 'en' : 'tr'))
 
-  const t = (key) => {
+  const t = (key, params) => {
     const dict = translations[language] || translations.tr
-    return dict[key] ?? translations.tr[key] ?? key
+    let str = dict[key] ?? translations.tr[key] ?? key
+    if (params) {
+      for (const [k, v] of Object.entries(params)) {
+        str = str.replaceAll(`{${k}}`, v)
+      }
+    }
+    return str
   }
 
   return (

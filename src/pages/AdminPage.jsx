@@ -359,7 +359,6 @@ function OverviewTab() {
                 <HBarList items={serviceItems} valueFormatter={(v) => `$${v.toFixed(2)}`} />
               </>
             )}
-            <TopupSection provider="aws" spentAllTime={data.usd_all_time} />
           </>
         )
       }} />

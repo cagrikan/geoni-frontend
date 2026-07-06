@@ -99,7 +99,9 @@ const PROVIDER_META = {
 
 // Anthropic ve AWS'nin gercek API'den maliyeti var - geri kalani icin
 // (bakiye API'si olmadigindan) admin panelden elle girilip guncelleniyor.
-const MANUAL_BALANCE_PROVIDERS = ['openai', 'google', 'perplexity', 'tavily-1', 'tavily-2']
+// OpenAI'nin kendi "OpenAI gercek maliyet" widget'i var (Costs API + yukleme
+// gecmisi) - burada sadece gercek maliyet API'si olmayanlar kalir.
+const MANUAL_BALANCE_PROVIDERS = ['google', 'perplexity', 'tavily-1', 'tavily-2']
 
 function ManualBalancesWidget() {
   const { data, error } = useAdminFetch('/api/admin/stats/manual-balances')
@@ -158,6 +160,97 @@ function ManualBalancesWidget() {
             )
           })}
         </div>
+      )}
+    </div>
+  )
+}
+
+function OpenAiCostWidget() {
+  const { data: cost, error: costError } = useAdminFetch('/api/admin/stats/openai-cost')
+  const { data: topups, error: topupError } = useAdminFetch('/api/admin/stats/topups?provider=openai')
+  const [amount, setAmount] = useState('')
+  const [note, setNote] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [localTopups, setLocalTopups] = useState(null)
+  const [saveError, setSaveError] = useState(null)
+
+  useEffect(() => { if (topups) setLocalTopups(topups) }, [topups])
+
+  const addTopup = async () => {
+    const value = parseFloat(amount)
+    if (Number.isNaN(value) || value <= 0) return
+    setSaving(true)
+    setSaveError(null)
+    try {
+      await authedFetch('/api/admin/stats/topups', {
+        method: 'POST',
+        body: JSON.stringify({ provider: 'openai', amount: value, note }),
+      })
+      setLocalTopups((prev) => ({
+        total: (prev?.total || 0) + value,
+        history: [{ id: `tmp-${Date.now()}`, amount: value, note, created_at: new Date().toISOString() }, ...(prev?.history || [])],
+      }))
+      setAmount(''); setNote('')
+    } catch (e) { setSaveError(e.message) }
+    setSaving(false)
+  }
+
+  if (!cost || cost.usd_today == null) {
+    return (
+      <div className="admin-widget">
+        <h3 className="admin-section__title">OpenAI gerçek maliyet</h3>
+        {costError && <div className="admin-error">{costError}</div>}
+        {!costError && <div className="admin-empty">Admin API key tanımlı değil, gerçek maliyet verisi yok.</div>}
+      </div>
+    )
+  }
+
+  const remaining = localTopups ? localTopups.total - cost.usd_all_time : null
+
+  return (
+    <div className="admin-widget">
+      <h3 className="admin-section__title">OpenAI gerçek maliyet</h3>
+      <p className="admin-hint">OpenAI kalan bakiyeyi API üzerinden vermiyor — her kredi yüklemenizi aşağıya kaydedin, gerçek harcamayı Costs API'den çekip kalanı buradan hesaplarız.</p>
+      <div className="admin-stats-grid admin-stats-grid--compact">
+        <StatTile label="Bugün (USD)" value={`$${cost.usd_today.toFixed(2)}`} />
+        <StatTile label="Son 7 gün (USD)" value={`$${cost.usd_week.toFixed(2)}`} />
+        <StatTile label="Bu ay - Toplam (USD)" value={`$${cost.usd_month.toFixed(2)}`} />
+        <StatTile label="Tüm zamanlar harcama (USD)" value={`$${cost.usd_all_time.toFixed(2)}`} />
+      </div>
+      {cost.daily?.length > 0 && (
+        <BarChart
+          data={cost.daily}
+          series={[{ key: 'usd', label: 'Maliyet (USD)', color: 'var(--chart-1)' }]}
+          dateFormatter={shortDate}
+          valueFormatter={(v) => `$${v.toFixed(2)}`}
+        />
+      )}
+
+      {topupError && <div className="admin-error">{topupError}</div>}
+      {saveError && <div className="admin-error">{saveError}</div>}
+      {localTopups && (
+        <>
+          <div className="admin-stats-grid admin-stats-grid--compact">
+            <StatTile label="Toplam yüklenen kredi" value={`$${localTopups.total.toFixed(2)}`} />
+            <StatTile label="Tahmini kalan bakiye" value={remaining != null ? `$${remaining.toFixed(2)}` : '—'} />
+          </div>
+          <div className="topup-form">
+            <input type="number" step="0.01" placeholder="Yüklenen tutar ($)" value={amount} onChange={(e) => setAmount(e.target.value)} />
+            <input type="text" placeholder="Not (opsiyonel)" value={note} onChange={(e) => setNote(e.target.value)} />
+            <button disabled={saving || !amount} onClick={addTopup}>Yükleme ekle</button>
+          </div>
+          {localTopups.history?.length > 0 && (
+            <div className="topup-history">
+              {localTopups.history.slice(0, 5).map((t) => (
+                <div key={t.id} className="topup-history__row">
+                  <span>{new Date(t.created_at).toLocaleDateString('tr-TR')}</span>
+                  <span>{t.note || '—'}</span>
+                  <span className="topup-history__amount">+${Number(t.amount).toFixed(2)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   )
@@ -228,6 +321,8 @@ function OverviewTab() {
           </>
         )
       }} />
+
+      <OpenAiCostWidget />
 
       <Widget title="AWS gerçek maliyet" hint="Amazon Cost Explorer'dan gelen gerçek altyapı maliyeti (ECS, ALB, ECR vb.)." path="/api/admin/stats/aws-cost" render={(data) => {
         if (!data || data.usd_today == null) {

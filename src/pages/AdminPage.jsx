@@ -725,6 +725,163 @@ function AuditsTab() {
   )
 }
 
+function PricingTiersWidget() {
+  const { t } = useLanguage()
+  const { data: tiers, error } = useAdminFetch('/api/admin/pricing-tiers')
+  const [local, setLocal] = useState(null)
+  const [form, setForm] = useState({ platform: 'web', min_credits: '', max_credits: '', price_per_credit: '', currency: 'TRY' })
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => { if (tiers) setLocal(tiers) }, [tiers])
+
+  const addTier = async () => {
+    if (!form.min_credits || !form.price_per_credit) return
+    setSaving(true)
+    try {
+      await authedFetch('/api/admin/pricing-tiers', {
+        method: 'POST',
+        body: JSON.stringify({
+          platform: form.platform,
+          min_credits: Number(form.min_credits),
+          max_credits: form.max_credits ? Number(form.max_credits) : null,
+          price_per_credit: Number(form.price_per_credit),
+          currency: form.currency,
+        }),
+      })
+      setLocal((prev) => [...(prev || []), { id: `tmp-${Date.now()}`, ...form, max_credits: form.max_credits || null }])
+      setForm((f) => ({ ...f, min_credits: '', max_credits: '', price_per_credit: '' }))
+    } catch { /* ignore - kullanici tekrar deneyebilir */ }
+    setSaving(false)
+  }
+
+  const deleteTier = async (id) => {
+    try {
+      await authedFetch(`/api/admin/pricing-tiers/${id}`, { method: 'DELETE' })
+      setLocal((prev) => prev.filter((x) => x.id !== id))
+    } catch { /* ignore */ }
+  }
+
+  if (error) return <div className="admin-error">{error}</div>
+  if (!local) return <div className="admin-loading admin-loading--widget">{t('admin_loading')}</div>
+
+  return (
+    <div className="admin-widget">
+      <h3 className="admin-section__title">{t('admin_sales_pricing_tiers')}</h3>
+      <p className="admin-hint">{t('admin_sales_pricing_hint')}</p>
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>{t('admin_pricing_platform')}</th><th>{t('admin_pricing_min')}</th><th>{t('admin_pricing_max')}</th><th>{t('admin_pricing_price')}</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {local.map((tier) => (
+              <tr key={tier.id}>
+                <td>{tier.platform}</td>
+                <td>{tier.min_credits}</td>
+                <td>{tier.max_credits ?? t('admin_pricing_none')}</td>
+                <td>{tier.price_per_credit} {tier.currency}</td>
+                <td><button onClick={() => deleteTier(tier.id)}>{t('admin_pricing_delete')}</button></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="topup-form">
+        <select value={form.platform} onChange={(e) => setForm((f) => ({ ...f, platform: e.target.value }))}>
+          <option value="web">Web</option>
+          <option value="ios">iOS</option>
+          <option value="android">Android</option>
+        </select>
+        <input type="number" placeholder={t('admin_pricing_min')} value={form.min_credits} onChange={(e) => setForm((f) => ({ ...f, min_credits: e.target.value }))} />
+        <input type="number" placeholder={t('admin_pricing_max')} value={form.max_credits} onChange={(e) => setForm((f) => ({ ...f, max_credits: e.target.value }))} />
+        <input type="number" step="0.01" placeholder={t('admin_pricing_price')} value={form.price_per_credit} onChange={(e) => setForm((f) => ({ ...f, price_per_credit: e.target.value }))} />
+        <button disabled={saving || !form.min_credits || !form.price_per_credit} onClick={addTier}>{t('admin_pricing_add')}</button>
+      </div>
+    </div>
+  )
+}
+
+function SalesTab() {
+  const { t, language } = useLanguage()
+  const [days, setDays] = useState(14)
+  const { data, error } = useAdminFetch(`/api/admin/stats/sales?days=${days}`)
+
+  return (
+    <div className="admin-section admin-overview-grid">
+      <div className="admin-widget">
+        <h3 className="admin-section__title">{t('admin_title_sales')}</h3>
+        <p className="admin-hint">{t('admin_sales_hint')}</p>
+        {error && <div className="admin-error">{error}</div>}
+        {!data ? <div className="admin-loading admin-loading--widget">{t('admin_loading')}</div> : (() => {
+          const rangeLabel = getRangeOptions(t).find((o) => o.days === days)?.label || t('admin_range_days_suffix', { n: days })
+          const channels = ['web', 'ios', 'android']
+          const channelLabels = { web: t('admin_sales_channel_web'), ios: t('admin_sales_channel_ios'), android: t('admin_sales_channel_android') }
+          return (
+            <>
+              <RangeToggle days={days} onChange={setDays} />
+              <div className="admin-stats-grid admin-stats-grid--compact">
+                {channels.map((c) => (
+                  <StatTile
+                    key={c}
+                    icon={TrendingUp}
+                    label={channelLabels[c]}
+                    range={data.revenue_by_channel[c] != null ? data.currency : t('admin_sales_not_integrated')}
+                    value={(data.revenue_by_channel[c] || 0).toFixed(2)}
+                  />
+                ))}
+              </div>
+              {data.daily?.length > 0 && (
+                <BarChart
+                  data={data.daily}
+                  series={[{ key: 'revenue', label: t('admin_sales_revenue_chart', { range: rangeLabel }), color: 'var(--chart-1)' }]}
+                  dateFormatter={getShortDate(language)}
+                  valueFormatter={(v) => `${v.toFixed(2)} ${data.currency}`}
+                />
+              )}
+            </>
+          )
+        })()}
+      </div>
+
+      <div className="admin-widget">
+        <h3 className="admin-section__title">{t('admin_sales_traffic_source')}</h3>
+        {!data ? <div className="admin-loading admin-loading--widget">{t('admin_loading')}</div> : (() => {
+          const items = Object.entries(data.by_source || {})
+            .sort((a, b) => b[1] - a[1])
+            .map(([key, value]) => ({ label: key === 'direct' ? t('admin_sales_source_direct') : key, value, color: 'var(--chart-2)' }))
+          return items.length > 0 ? <HBarList items={items} /> : <div className="admin-empty">{t('admin_empty_no_data')}</div>
+        })()}
+      </div>
+
+      <div className="admin-widget">
+        <h3 className="admin-section__title">{t('admin_sales_recent_purchases')}</h3>
+        {!data ? <div className="admin-loading admin-loading--widget">{t('admin_loading')}</div> : data.recent.length === 0 ? (
+          <div className="admin-empty">{t('admin_no_sales')}</div>
+        ) : (
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead><tr><th>{t('admin_table_date')}</th><th>{t('admin_table_channel')}</th><th>{t('admin_table_amount')}</th></tr></thead>
+              <tbody>
+                {data.recent.map((p, i) => (
+                  <tr key={i}>
+                    <td>{new Date(p.created_at).toLocaleDateString(language === 'en' ? 'en-US' : 'tr-TR')}</td>
+                    <td>{p.channel}</td>
+                    <td>{p.amount_paid} {p.currency_paid}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      <PricingTiersWidget />
+    </div>
+  )
+}
+
 export default function AdminPage({ onBack }) {
   const { t } = useLanguage()
   const { profile } = useAuth()
@@ -765,6 +922,9 @@ export default function AdminPage({ onBack }) {
             <button className={`dash-nav__item ${tab === 'audits' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('audits')}>
               <ScrollText size={16} strokeWidth={1.5} /> {t('admin_nav_scans')}
             </button>
+            <button className={`dash-nav__item ${tab === 'sales' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('sales')}>
+              <TrendingUp size={16} strokeWidth={1.5} /> {t('admin_nav_sales')}
+            </button>
           </nav>
         </aside>
 
@@ -772,6 +932,7 @@ export default function AdminPage({ onBack }) {
           {tab === 'overview' && <OverviewTab />}
           {tab === 'users' && <UsersTab />}
           {tab === 'audits' && <AuditsTab />}
+          {tab === 'sales' && <SalesTab />}
         </main>
       </div>
     </div>

@@ -317,6 +317,7 @@ function OverviewTab() {
               <StatTile label="Bugün (USD)" value={`$${data.usd_today.toFixed(2)}`} />
               <StatTile label="Son 7 gün (USD)" value={`$${data.usd_week.toFixed(2)}`} />
               <StatTile label="Bu ay - Toplam (USD)" value={`$${data.usd_month.toFixed(2)}`} />
+              <StatTile label="Tüm zamanlar harcama (USD)" value={`$${data.usd_all_time.toFixed(2)}`} />
             </div>
             {data.daily?.length > 0 && (
               <BarChart

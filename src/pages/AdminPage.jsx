@@ -100,9 +100,10 @@ const PROVIDER_META = {
 // Anthropic ve AWS'nin gercek API'den maliyeti var - geri kalani icin
 // (bakiye API'si olmadigindan) admin panelden elle girilip guncelleniyor.
 // OpenAI'nin kendi "OpenAI gercek maliyet" widget'i var (Costs API + yukleme
-// gecmisi), Tavily'nin de gercek /usage endpoint'i var (ayri widget) -
-// burada sadece hicbir gercek veri kaynagi olmayanlar kalir.
-const MANUAL_BALANCE_PROVIDERS = ['google', 'perplexity']
+// gecmisi), Tavily'nin gercek /usage endpoint'i, Perplexity'nin de kendi
+// hesapladigimiz (tahmini) maliyet widget'i var - burada sadece hicbir
+// veri kaynagi olmayan Google kalir.
+const MANUAL_BALANCE_PROVIDERS = ['google']
 
 function ManualBalancesWidget() {
   const { data, error } = useAdminFetch('/api/admin/stats/manual-balances')
@@ -265,6 +266,42 @@ function OpenAiCostWidget() {
   )
 }
 
+function PerplexityCostWidget() {
+  const { data: cost, error: costError } = useAdminFetch('/api/admin/stats/perplexity-cost')
+
+  if (!cost || cost.usd_today == null) {
+    return (
+      <div className="admin-widget">
+        <h3 className="admin-section__title">Perplexity gerçek maliyet (tahmini)</h3>
+        {costError && <div className="admin-error">{costError}</div>}
+        {!costError && <div className="admin-empty">Henüz veri yok.</div>}
+      </div>
+    )
+  }
+
+  return (
+    <div className="admin-widget">
+      <h3 className="admin-section__title">Perplexity gerçek maliyet (tahmini)</h3>
+      <p className="admin-hint">Perplexity'nin ne kalan bakiye ne de maliyet API'si var — her isteğin token sayısından ve yayınlanan fiyatlandırmadan GEONI kendisi hesaplıyor. Kredi yüklemenizi aşağıya kaydedin, kalanı buradan tahmin ederiz.</p>
+      <div className="admin-stats-grid admin-stats-grid--compact">
+        <StatTile label="Bugün (USD)" value={`$${cost.usd_today.toFixed(2)}`} />
+        <StatTile label="Son 7 gün (USD)" value={`$${cost.usd_week.toFixed(2)}`} />
+        <StatTile label="Bu ay - Toplam (USD)" value={`$${cost.usd_month.toFixed(2)}`} />
+        <StatTile label="Tüm zamanlar harcama (USD)" value={`$${cost.usd_all_time.toFixed(2)}`} />
+      </div>
+      {cost.daily?.length > 0 && (
+        <BarChart
+          data={cost.daily}
+          series={[{ key: 'usd', label: 'Maliyet (USD, tahmini)', color: 'var(--chart-4)' }]}
+          dateFormatter={shortDate}
+          valueFormatter={(v) => `$${v.toFixed(2)}`}
+        />
+      )}
+      <TopupSection provider="perplexity" spentAllTime={cost.usd_all_time} />
+    </div>
+  )
+}
+
 function UsageBar({ label, used, limit, color }) {
   if (limit == null) return null
   const pct = Math.min(100, (used / limit) * 100)
@@ -350,6 +387,8 @@ function OverviewTab() {
       }} />
 
       <OpenAiCostWidget />
+
+      <PerplexityCostWidget />
 
       <Widget title="AWS gerçek maliyet" hint="Amazon Cost Explorer'dan gelen gerçek altyapı maliyeti (ECS, ALB, ECR vb.)." path="/api/admin/stats/aws-cost" render={(data) => {
         if (!data || data.usd_today == null) {

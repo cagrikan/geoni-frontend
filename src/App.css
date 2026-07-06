@@ -2107,6 +2107,24 @@ body {
 }
 .manual-balance-row button:disabled { opacity: .4; cursor: default; }
 
+.tavily-accounts { display: flex; flex-direction: column; gap: 18px; }
+.tavily-account { display: flex; flex-direction: column; gap: 10px; }
+.tavily-account__title {
+  display: flex; align-items: center; gap: 8px;
+  font-size: .88rem; font-weight: 600; color: var(--text);
+}
+.tavily-account__plan {
+  font-size: .7rem; font-weight: 500; color: var(--text-muted);
+  background: var(--tint); border-radius: 999px; padding: 2px 9px;
+}
+.usage-bar { display: flex; flex-direction: column; gap: 5px; }
+.usage-bar__label {
+  display: flex; justify-content: space-between;
+  font-size: .78rem; color: var(--text-muted); font-family: var(--mono);
+}
+.usage-bar__track { background: var(--tint); border-radius: 5px; height: 9px; overflow: hidden; }
+.usage-bar__fill { height: 100%; border-radius: 5px; }
+
 .topup-form { display: flex; gap: 8px; flex-wrap: wrap; }
 .topup-form input {
   background: var(--tint); border: 1px solid var(--border);

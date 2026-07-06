@@ -100,8 +100,9 @@ const PROVIDER_META = {
 // Anthropic ve AWS'nin gercek API'den maliyeti var - geri kalani icin
 // (bakiye API'si olmadigindan) admin panelden elle girilip guncelleniyor.
 // OpenAI'nin kendi "OpenAI gercek maliyet" widget'i var (Costs API + yukleme
-// gecmisi) - burada sadece gercek maliyet API'si olmayanlar kalir.
-const MANUAL_BALANCE_PROVIDERS = ['google', 'perplexity', 'tavily-1', 'tavily-2']
+// gecmisi), Tavily'nin de gercek /usage endpoint'i var (ayri widget) -
+// burada sadece hicbir gercek veri kaynagi olmayanlar kalir.
+const MANUAL_BALANCE_PROVIDERS = ['google', 'perplexity']
 
 function ManualBalancesWidget() {
   const { data, error } = useAdminFetch('/api/admin/stats/manual-balances')
@@ -264,6 +265,22 @@ function OpenAiCostWidget() {
   )
 }
 
+function UsageBar({ label, used, limit, color }) {
+  if (limit == null) return null
+  const pct = Math.min(100, (used / limit) * 100)
+  return (
+    <div className="usage-bar">
+      <div className="usage-bar__label">
+        <span>{label}</span>
+        <span>{used} / {limit}</span>
+      </div>
+      <div className="usage-bar__track">
+        <div className="usage-bar__fill" style={{ width: `${pct}%`, background: color }} />
+      </div>
+    </div>
+  )
+}
+
 function OverviewTab() {
   return (
     <div className="admin-section admin-overview-grid">
@@ -392,6 +409,32 @@ function OverviewTab() {
                 </tbody>
               </table>
             </>
+          )
+        }}
+      />
+
+      <Widget
+        title="Tavily gerçek kullanım"
+        hint="Tavily diğerlerinden farklı olarak gerçek kalan kotayı normal API key ile veriyor - tahmin ya da manuel giriş gerekmiyor."
+        path="/api/admin/stats/tavily-usage"
+        render={(data) => {
+          const accounts = Object.entries(data || {})
+          if (accounts.length === 0) return <div className="admin-empty">Veri alınamadı.</div>
+          return (
+            <div className="tavily-accounts">
+              {accounts.map(([key, acc]) => (
+                <div key={key} className="tavily-account">
+                  <div className="tavily-account__title">
+                    {PROVIDER_META[key]?.label || key}
+                    {acc.plan && <span className="tavily-account__plan">{acc.plan}</span>}
+                  </div>
+                  <UsageBar label="Plan kotası" used={acc.plan_usage} limit={acc.plan_limit} color={PROVIDER_META[key]?.color || 'var(--chart-5)'} />
+                  {acc.paygo_limit > 0 && (
+                    <UsageBar label="Pay-as-you-go" used={acc.paygo_usage} limit={acc.paygo_limit} color="var(--chart-4)" />
+                  )}
+                </div>
+              ))}
+            </div>
           )
         }}
       />

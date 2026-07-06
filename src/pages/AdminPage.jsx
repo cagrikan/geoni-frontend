@@ -101,6 +101,8 @@ function OverviewTab() {
         <div className="admin-stats-grid">
           <StatTile label="Toplam kullanıcı" value={data.total_users} />
           <StatTile label="Toplam tarama" value={data.total_audits} />
+          <StatTile label="Bugünkü yeni kullanıcı" value={data.new_users_today} />
+          <StatTile label="Bugün geri dönen kullanıcı" value={data.returning_users_today} />
         </div>
       )} />
 

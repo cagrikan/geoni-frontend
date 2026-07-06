@@ -2024,9 +2024,15 @@ body {
 .admin-page .dashboard__body { max-width: 1680px; }
 .admin-overview-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
   align-items: stretch;
+}
+@media (max-width: 900px) {
+  .admin-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .admin-overview-grid { grid-template-columns: 1fr; }
 }
 .admin-widget {
   background: var(--surface); border: 1px solid var(--border);

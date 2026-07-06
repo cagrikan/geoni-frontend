@@ -1955,12 +1955,12 @@ body {
 }
 .admin-stat {
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: 12px; padding: 16px;
+  border-radius: 12px; padding: 16px; text-align: center;
 }
 .admin-stat__value { font-size: 1.6rem; font-weight: 700; color: var(--text); font-family: var(--display); }
-.admin-stat__label { font-size: .78rem; color: var(--text-muted); margin-top: 4px; display: flex; align-items: center; gap: 5px; }
+.admin-stat__label { font-size: .78rem; color: var(--text-muted); margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 5px; }
 .admin-stat__icon { flex-shrink: 0; opacity: .7; }
-.admin-stat__range { font-size: .68rem; color: var(--text-muted); opacity: .75; margin-top: 3px; padding-left: 17px; }
+.admin-stat__range { font-size: .68rem; color: var(--text-muted); opacity: .75; margin-top: 3px; }
 
 .admin-search {
   display: flex; align-items: center; gap: 8px;

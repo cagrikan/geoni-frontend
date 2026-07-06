@@ -165,16 +165,17 @@ function ManualBalancesWidget() {
   )
 }
 
-function OpenAiCostWidget() {
-  const { data: cost, error: costError } = useAdminFetch('/api/admin/stats/openai-cost')
-  const { data: topups, error: topupError } = useAdminFetch('/api/admin/stats/topups?provider=openai')
+// Herhangi bir "gercek maliyet" karti icin ortak yukleme-gecmisi bolumu:
+// toplam yuklenen kredi - API'den gelen tum-zamanlar harcama = tahmini kalan.
+function TopupSection({ provider, spentAllTime }) {
+  const { data: topups, error } = useAdminFetch(`/api/admin/stats/topups?provider=${provider}`)
+  const [local, setLocal] = useState(null)
   const [amount, setAmount] = useState('')
   const [note, setNote] = useState('')
   const [saving, setSaving] = useState(false)
-  const [localTopups, setLocalTopups] = useState(null)
   const [saveError, setSaveError] = useState(null)
 
-  useEffect(() => { if (topups) setLocalTopups(topups) }, [topups])
+  useEffect(() => { if (topups) setLocal(topups) }, [topups])
 
   const addTopup = async () => {
     const value = parseFloat(amount)
@@ -184,9 +185,9 @@ function OpenAiCostWidget() {
     try {
       await authedFetch('/api/admin/stats/topups', {
         method: 'POST',
-        body: JSON.stringify({ provider: 'openai', amount: value, note }),
+        body: JSON.stringify({ provider, amount: value, note }),
       })
-      setLocalTopups((prev) => ({
+      setLocal((prev) => ({
         total: (prev?.total || 0) + value,
         history: [{ id: `tmp-${Date.now()}`, amount: value, note, created_at: new Date().toISOString() }, ...(prev?.history || [])],
       }))
@@ -194,6 +195,41 @@ function OpenAiCostWidget() {
     } catch (e) { setSaveError(e.message) }
     setSaving(false)
   }
+
+  if (error) return <div className="admin-error">{error}</div>
+  if (!local) return <div className="admin-loading admin-loading--widget">Yükleniyor…</div>
+
+  const remaining = local.total - spentAllTime
+
+  return (
+    <>
+      <div className="admin-stats-grid admin-stats-grid--compact">
+        <StatTile label="Toplam yüklenen kredi" value={`$${local.total.toFixed(2)}`} />
+        <StatTile label="Tahmini kalan bakiye" value={`$${remaining.toFixed(2)}`} />
+      </div>
+      {saveError && <div className="admin-error">{saveError}</div>}
+      <div className="topup-form">
+        <input type="number" step="0.01" placeholder="Yüklenen tutar ($)" value={amount} onChange={(e) => setAmount(e.target.value)} />
+        <input type="text" placeholder="Not (opsiyonel)" value={note} onChange={(e) => setNote(e.target.value)} />
+        <button disabled={saving || !amount} onClick={addTopup}>Yükleme ekle</button>
+      </div>
+      {local.history?.length > 0 && (
+        <div className="topup-history">
+          {local.history.slice(0, 5).map((t) => (
+            <div key={t.id} className="topup-history__row">
+              <span>{new Date(t.created_at).toLocaleDateString('tr-TR')}</span>
+              <span>{t.note || '—'}</span>
+              <span className="topup-history__amount">+${Number(t.amount).toFixed(2)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </>
+  )
+}
+
+function OpenAiCostWidget() {
+  const { data: cost, error: costError } = useAdminFetch('/api/admin/stats/openai-cost')
 
   if (!cost || cost.usd_today == null) {
     return (
@@ -204,8 +240,6 @@ function OpenAiCostWidget() {
       </div>
     )
   }
-
-  const remaining = localTopups ? localTopups.total - cost.usd_all_time : null
 
   return (
     <div className="admin-widget">
@@ -225,33 +259,7 @@ function OpenAiCostWidget() {
           valueFormatter={(v) => `$${v.toFixed(2)}`}
         />
       )}
-
-      {topupError && <div className="admin-error">{topupError}</div>}
-      {saveError && <div className="admin-error">{saveError}</div>}
-      {localTopups && (
-        <>
-          <div className="admin-stats-grid admin-stats-grid--compact">
-            <StatTile label="Toplam yüklenen kredi" value={`$${localTopups.total.toFixed(2)}`} />
-            <StatTile label="Tahmini kalan bakiye" value={remaining != null ? `$${remaining.toFixed(2)}` : '—'} />
-          </div>
-          <div className="topup-form">
-            <input type="number" step="0.01" placeholder="Yüklenen tutar ($)" value={amount} onChange={(e) => setAmount(e.target.value)} />
-            <input type="text" placeholder="Not (opsiyonel)" value={note} onChange={(e) => setNote(e.target.value)} />
-            <button disabled={saving || !amount} onClick={addTopup}>Yükleme ekle</button>
-          </div>
-          {localTopups.history?.length > 0 && (
-            <div className="topup-history">
-              {localTopups.history.slice(0, 5).map((t) => (
-                <div key={t.id} className="topup-history__row">
-                  <span>{new Date(t.created_at).toLocaleDateString('tr-TR')}</span>
-                  <span>{t.note || '—'}</span>
-                  <span className="topup-history__amount">+${Number(t.amount).toFixed(2)}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </>
-      )}
+      <TopupSection provider="openai" spentAllTime={cost.usd_all_time} />
     </div>
   )
 }
@@ -318,6 +326,7 @@ function OverviewTab() {
                 valueFormatter={(v) => `$${v.toFixed(2)}`}
               />
             )}
+            <TopupSection provider="anthropic" spentAllTime={data.usd_all_time} />
           </>
         )
       }} />
@@ -350,6 +359,7 @@ function OverviewTab() {
                 <HBarList items={serviceItems} valueFormatter={(v) => `$${v.toFixed(2)}`} />
               </>
             )}
+            <TopupSection provider="aws" spentAllTime={data.usd_all_time} />
           </>
         )
       }} />

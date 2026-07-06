@@ -11,12 +11,24 @@ const SITE_LAST_STEP = 1
 const PERSON_LAST_STEP = 3
 const BRAND_LAST_STEP = 2
 
-export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading = false, statusText = '', error, user, onDashboard, onLogin, onViewSample }) {
+export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading = false, statusText = '', error, user, onDashboard, onLogin }) {
   const { t } = useLanguage()
   const [mode, setMode] = useState('site') // 'site' | 'person' | 'brand'
   const [step, setStep] = useState(0)
   const [scanCount, setScanCount] = useState(0)
   const [isPrivate, setIsPrivate] = useState(false)
+  const [showPrivateToast, setShowPrivateToast] = useState(false)
+
+  const togglePrivate = () => {
+    setIsPrivate((prev) => {
+      const next = !prev
+      if (next) {
+        setShowPrivateToast(true)
+        setTimeout(() => setShowPrivateToast(false), 4500)
+      }
+      return next
+    })
+  }
 
   const MODE_TABS = [
     { key: 'site', icon: Globe, title: t('mode_site') },
@@ -126,11 +138,6 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
           <span className="landing__logo">GEONI</span>
         </button>
         <div className="nav-auth">
-          {onViewSample && (
-            <button type="button" className="sample-report-btn sample-report-btn--nav" onClick={onViewSample}>
-              {t('hero_sample_btn')}
-            </button>
-          )}
           <ThemeSwitcher />
           <LanguageSwitcher />
           {user ? (
@@ -172,13 +179,20 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
             <button
               type="button"
               className={`mode-tab mode-tab--private ${isPrivate ? 'mode-tab--active' : ''}`}
-              onClick={() => setIsPrivate(p => !p)}
+              onClick={togglePrivate}
               title={t('private_scan_label')}
               aria-label={t('private_scan_label')}
             >
               {isPrivate ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
             </button>
           </div>
+
+          {showPrivateToast && (
+            <div className="private-toast" role="status">
+              <EyeOff size={14} strokeWidth={1.5} />
+              {t('private_scan_toast')}
+            </div>
+          )}
 
           <form className="landing__form" onSubmit={handleSubmit}>
 

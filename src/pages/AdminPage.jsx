@@ -253,27 +253,47 @@ function UsageBar({ label, used, limit, color }) {
   )
 }
 
+function UsersAndScansWidget() {
+  const [days, setDays] = useState(14)
+  const { data: summary, error: summaryError } = useAdminFetch('/api/admin/stats/summary')
+  const { data: scans, error: scansError } = useAdminFetch(`/api/admin/stats/scans-daily?days=${days}`)
+
+  return (
+    <div className="admin-widget">
+      <h3 className="admin-section__title">Kullanıcılar & Taramalar</h3>
+      {summaryError && <div className="admin-error">{summaryError}</div>}
+      {!summary ? <div className="admin-loading admin-loading--widget">Yükleniyor…</div> : (
+        <div className="admin-stats-grid">
+          <StatTile label="Toplam kullanıcı" value={summary.total_users} />
+          <StatTile label="Toplam tarama" value={summary.total_audits} />
+          <StatTile label="Bugünkü yeni kullanıcı" value={summary.new_users_today} />
+          <StatTile label="Bugün geri dönen kullanıcı" value={summary.returning_users_today} />
+        </div>
+      )}
+
+      <div className="admin-range-toggle">
+        {[14, 30, 90].map((d) => (
+          <button key={d} className={d === days ? 'admin-range-toggle__btn admin-range-toggle__btn--active' : 'admin-range-toggle__btn'} onClick={() => setDays(d)}>{d} gün</button>
+        ))}
+      </div>
+      {scansError && <div className="admin-error">{scansError}</div>}
+      {!scans ? <div className="admin-loading admin-loading--widget">Yükleniyor…</div> : (
+        <>
+          <div className="admin-stats-grid admin-stats-grid--compact">
+            <StatTile label="Bugünkü tarama" value={scans.today} />
+            <StatTile label="Son 7 gün tarama" value={scans.week} />
+          </div>
+          <BarChart data={scans.days} series={SCAN_SERIES} stacked dateFormatter={shortDate} />
+        </>
+      )}
+    </div>
+  )
+}
+
 function OverviewTab() {
   return (
     <div className="admin-section admin-overview-grid">
-      <Widget title="Kullanıcı istatistikleri" path="/api/admin/stats/summary" render={(data) => (
-        <div className="admin-stats-grid">
-          <StatTile label="Toplam kullanıcı" value={data.total_users} />
-          <StatTile label="Toplam tarama" value={data.total_audits} />
-          <StatTile label="Bugünkü yeni kullanıcı" value={data.new_users_today} />
-          <StatTile label="Bugün geri dönen kullanıcı" value={data.returning_users_today} />
-        </div>
-      )} />
-
-      <Widget title="Taramalar (son 14 gün)" path="/api/admin/stats/scans-daily" render={(data) => (
-        <>
-          <div className="admin-stats-grid admin-stats-grid--compact">
-            <StatTile label="Bugünkü tarama" value={data.today} />
-            <StatTile label="Son 7 gün tarama" value={data.week} />
-          </div>
-          <BarChart data={data.days} series={SCAN_SERIES} stacked dateFormatter={shortDate} />
-        </>
-      )} />
+      <UsersAndScansWidget />
 
       <Widget title="Krediler" path="/api/admin/stats/credits" render={(data) => {
         const reasonItems = Object.entries(data.by_reason || {})
@@ -379,38 +399,6 @@ function OverviewTab() {
           </>
         )
       }} />
-
-      <Widget
-        title="Dış AI motoru kullanımı"
-        hint="Burada gösterilen GEONI'nin bu motorlara yaptığı çağrı sayısıdır - gerçek/tahmini USD maliyetleri her motorun kendi kartında."
-        path="/api/admin/stats/provider-usage"
-        render={(data) => {
-          const providers = Array.from(new Set([...Object.keys(data.today || {}), ...Object.keys(data.week || {})]))
-          if (providers.length === 0) return <div className="admin-empty">Henüz kayıtlı motor çağrısı yok.</div>
-          const weekItems = providers.map((p) => ({
-            label: PROVIDER_META[p]?.label || p,
-            value: data.week?.[p] ?? 0,
-            color: PROVIDER_META[p]?.color || 'var(--chart-1)',
-          })).sort((a, b) => b.value - a.value)
-          return (
-            <>
-              <HBarList items={weekItems} />
-              <table className="admin-table">
-                <thead><tr><th>Motor</th><th>Bugün</th><th>Son 7 gün</th></tr></thead>
-                <tbody>
-                  {providers.map((p) => (
-                    <tr key={p}>
-                      <td>{PROVIDER_META[p]?.label || p}</td>
-                      <td>{data.today?.[p] ?? 0}</td>
-                      <td>{data.week?.[p] ?? 0}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </>
-          )
-        }}
-      />
 
       <Widget
         title="Tavily gerçek kullanım"

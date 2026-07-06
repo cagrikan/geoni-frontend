@@ -263,7 +263,7 @@ function AppInner() {
   return (
     <div className="app-shell">
       {view === 'auth_callback' && <AuthCallback onDone={navigateTo} />}
-      {view === 'login' && <LoginPage onSuccess={() => navigateTo('dashboard')} />}
+      {view === 'login' && <LoginPage onSuccess={() => navigateTo('dashboard')} onHome={() => navigateTo('landing')} />}
       {view === 'dashboard' && <DashboardPage onReset={handleReset} onNewScan={() => navigateTo('landing')} onViewAudit={handleViewAudit} onRescanWeb={handleAudit} onRescanBrand={handleBrandCheck} onAdmin={profile?.is_admin ? () => navigateTo('admin') : null} />}
       {view === 'admin' && <AdminPage onBack={() => navigateTo('dashboard')} />}
       {view === 'landing' && (

@@ -3,6 +3,7 @@ import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
 import GeoniMark from '../GeoniMark'
 import ThemeSwitcher from '../components/ThemeSwitcher'
+import LanguageSwitcher from '../components/LanguageSwitcher'
 import BarChart from '../components/BarChart'
 import HBarList from '../components/HBarList'
 import {
@@ -720,6 +721,7 @@ export default function AdminPage({ onBack }) {
           <span className="landing__logo">GEONI</span>
         </button>
         <div className="admin-nav-right">
+          <LanguageSwitcher />
           <ThemeSwitcher />
           <button className="admin-back" onClick={onBack}><ArrowLeft size={14} strokeWidth={1.5} /> Dashboard'a dön</button>
         </div>

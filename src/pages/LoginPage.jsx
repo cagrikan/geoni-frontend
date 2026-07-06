@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useAuth } from '../lib/AuthContext'
 import GeoniMark from '../GeoniMark'
 import LanguageSwitcher from '../components/LanguageSwitcher'
+import ThemeSwitcher from '../components/ThemeSwitcher'
 import { useLanguage } from '../lib/LanguageContext'
 
 export default function LoginPage({ onSuccess, onHome }) {
@@ -14,7 +15,10 @@ export default function LoginPage({ onSuccess, onHome }) {
 
   return (
     <div className="login-page">
-      <div className="login-page__lang"><LanguageSwitcher /></div>
+      <div className="login-page__lang">
+        <LanguageSwitcher />
+        <ThemeSwitcher />
+      </div>
       <div className="login-card">
         <button className="login-logo login-logo--clickable" onClick={onHome} type="button">
           <GeoniMark />

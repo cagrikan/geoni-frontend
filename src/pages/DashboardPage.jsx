@@ -12,6 +12,76 @@ import {
   TrendingUp, TrendingDown, ChevronRight, X, RefreshCw, ShieldCheck,
 } from 'lucide-react'
 
+const API_URL = import.meta.env.VITE_API_URL || 'https://api.geoni.ai'
+
+async function authedFetch(path, options = {}) {
+  const { data: { session } } = await supabase.auth.getSession()
+  const token = session?.access_token || ''
+  const res = await fetch(`${API_URL}${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options.headers || {}),
+    },
+  })
+  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || `İstek başarısız (${res.status})`)
+  return res.json()
+}
+
+function BuyCreditsSection({ t }) {
+  const [packages, setPackages] = useState(null)
+  const [error, setError] = useState(null)
+  const [buyingId, setBuyingId] = useState(null)
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/credit-packages`)
+      .then((r) => r.json())
+      .then(setPackages)
+      .catch(() => setPackages([]))
+  }, [])
+
+  const buy = async (packageId) => {
+    setBuyingId(packageId)
+    setError(null)
+    try {
+      const { checkout_url } = await authedFetch('/api/checkout/create', {
+        method: 'POST',
+        body: JSON.stringify({ package_id: packageId }),
+      })
+      window.location.href = checkout_url
+    } catch (e) {
+      setError(e.message)
+      setBuyingId(null)
+    }
+  }
+
+  if (packages === null) return <div className="dash-loading">{t('dash_loading')}</div>
+  if (packages.length === 0) return null
+
+  return (
+    <div className="dash-buy-credits">
+      {error && <div className="dash-buy-error">{error}</div>}
+      <div className="dash-buy-credits__grid">
+        {packages.map((pkg) => (
+          <div key={pkg.id} className="dash-buy-credits__card">
+            <div className="dash-buy-credits__credits">{pkg.credits}</div>
+            <div className="dash-buy-credits__name">{pkg.name}</div>
+            {pkg.display_price != null && (
+              <div className="dash-buy-credits__price">{pkg.display_price} {pkg.currency}</div>
+            )}
+            <button
+              className="dash-buy-btn"
+              disabled={buyingId === pkg.id}
+              onClick={() => buy(pkg.id)}
+            >{t('dash_credits_buy')}</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function SkeletonRow() {
   return (
     <div className="dash-skeleton-row">
@@ -398,9 +468,7 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                   <div>{t('dash_credits_spent')} <strong>{profile?.total_credits_spent ?? 0}</strong></div>
                 </div>
               </div>
-              <a href="https://geoni.ai#paketler" className="dash-buy-btn" target="_blank" rel="noopener">
-                {t('dash_credits_buy')}
-              </a>
+              <BuyCreditsSection t={t} />
             </div>
           )}
 

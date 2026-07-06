@@ -1638,6 +1638,21 @@ body {
   transition: opacity .2s;
 }
 .dash-buy-btn:hover { opacity: .85; }
+.dash-buy-btn { border: none; cursor: pointer; font-size: .95rem; width: 100%; }
+.dash-buy-btn:disabled { opacity: .5; cursor: default; }
+
+.dash-buy-credits { margin-top: 8px; }
+.dash-buy-error { color: #e5484d; font-size: .85rem; margin-bottom: 10px; }
+.dash-buy-credits__grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;
+}
+.dash-buy-credits__card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 18px; text-align: center; display: flex; flex-direction: column; gap: 6px;
+}
+.dash-buy-credits__credits { font-size: 1.5rem; font-weight: 700; font-family: var(--display); color: var(--text); }
+.dash-buy-credits__name { font-size: .85rem; color: var(--text-muted); }
+.dash-buy-credits__price { font-size: .95rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
 .dash-settings { display: flex; flex-direction: column; gap: 4px; }
 .dash-setting-row {
   display: flex;

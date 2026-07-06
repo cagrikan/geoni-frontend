@@ -70,6 +70,13 @@ function Widget({ title, hint, path, render }) {
 
 const shortDate = (d) => new Date(d).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })
 
+function AsOfNote({ asOf }) {
+  if (!asOf) return null
+  const mins = Math.max(0, Math.round((Date.now() - new Date(asOf).getTime()) / 60000))
+  const label = mins < 1 ? 'az önce' : mins < 60 ? `${mins} dakika önce` : `${Math.round(mins / 60)} saat önce`
+  return <p className="admin-asof">Veri {label} alındı - önbelleklenmiş olabilir, yeni yükleme eklediğinizde kalan bakiye birkaç dakika gecikmeli güncellenebilir.</p>
+}
+
 const SCAN_SERIES = [
   { key: 'web', label: 'Web Sitesi', color: 'var(--chart-1)' },
   { key: 'person', label: 'Kişi', color: 'var(--chart-2)' },
@@ -168,12 +175,19 @@ function TopupSection({ provider, spentAllTime, currency = '$' }) {
 function OpenAiCostWidget() {
   const { data: cost, error: costError } = useAdminFetch('/api/admin/stats/openai-cost')
 
-  if (!cost || cost.usd_today == null) {
+  if (costError || !cost) {
     return (
       <div className="admin-widget">
         <h3 className="admin-section__title">OpenAI gerçek maliyet</h3>
-        {costError && <div className="admin-error">{costError}</div>}
-        {!costError && <div className="admin-empty">Admin API key tanımlı değil, gerçek maliyet verisi yok.</div>}
+        {costError ? <div className="admin-error">{costError}</div> : <div className="admin-loading admin-loading--widget">Yükleniyor…</div>}
+      </div>
+    )
+  }
+  if (cost.usd_today == null) {
+    return (
+      <div className="admin-widget">
+        <h3 className="admin-section__title">OpenAI gerçek maliyet</h3>
+        <div className="admin-empty">Admin API key tanımlı değil, gerçek maliyet verisi yok.</div>
       </div>
     )
   }
@@ -196,6 +210,7 @@ function OpenAiCostWidget() {
           valueFormatter={(v) => `$${v.toFixed(2)}`}
         />
       )}
+      <AsOfNote asOf={cost.as_of} />
       <TopupSection provider="openai" spentAllTime={cost.usd_all_time} />
     </div>
   )
@@ -204,12 +219,19 @@ function OpenAiCostWidget() {
 function PerplexityCostWidget() {
   const { data: cost, error: costError } = useAdminFetch('/api/admin/stats/perplexity-cost')
 
-  if (!cost || cost.usd_today == null) {
+  if (costError || !cost) {
     return (
       <div className="admin-widget">
         <h3 className="admin-section__title">Perplexity gerçek maliyet (tahmini)</h3>
-        {costError && <div className="admin-error">{costError}</div>}
-        {!costError && <div className="admin-empty">Henüz veri yok.</div>}
+        {costError ? <div className="admin-error">{costError}</div> : <div className="admin-loading admin-loading--widget">Yükleniyor…</div>}
+      </div>
+    )
+  }
+  if (cost.usd_today == null) {
+    return (
+      <div className="admin-widget">
+        <h3 className="admin-section__title">Perplexity gerçek maliyet (tahmini)</h3>
+        <div className="admin-empty">Henüz veri yok.</div>
       </div>
     )
   }
@@ -232,6 +254,7 @@ function PerplexityCostWidget() {
           valueFormatter={(v) => `$${v.toFixed(2)}`}
         />
       )}
+      <AsOfNote asOf={cost.as_of} />
       <TopupSection provider="perplexity" spentAllTime={cost.usd_all_time} />
     </div>
   )
@@ -268,6 +291,8 @@ function UsersAndScansWidget() {
           <StatTile label="Toplam tarama" value={summary.total_audits} />
           <StatTile label="Bugünkü yeni kullanıcı" value={summary.new_users_today} />
           <StatTile label="Bugün geri dönen kullanıcı" value={summary.returning_users_today} />
+          <StatTile label="Son 7 gün yeni kullanıcı" value={summary.new_users_week} />
+          <StatTile label="Son 7 gün geri dönen kullanıcı" value={summary.returning_users_week} />
         </div>
       )}
 
@@ -290,12 +315,15 @@ function UsersAndScansWidget() {
   )
 }
 
-function OverviewTab() {
-  return (
-    <div className="admin-section admin-overview-grid">
-      <UsersAndScansWidget />
+function CreditsWidget() {
+  const [days, setDays] = useState(14)
+  const { data, error } = useAdminFetch(`/api/admin/stats/credits?days=${days}`)
 
-      <Widget title="Krediler" path="/api/admin/stats/credits" render={(data) => {
+  return (
+    <div className="admin-widget">
+      <h3 className="admin-section__title">Krediler</h3>
+      {error && <div className="admin-error">{error}</div>}
+      {!data ? <div className="admin-loading admin-loading--widget">Yükleniyor…</div> : (() => {
         const reasonItems = Object.entries(data.by_reason || {})
           .sort((a, b) => b[1] - a[1])
           .map(([key, value]) => ({ label: REASON_LABELS[key] || key, value, color: 'var(--chart-4)' }))
@@ -304,17 +332,34 @@ function OverviewTab() {
             <div className="admin-stats-grid admin-stats-grid--compact">
               <StatTile label="Satılan kredi (toplam)" value={data.purchased} />
               <StatTile label="Harcanan kredi (toplam)" value={data.spent} />
+              <StatTile label="Hediye edilen kredi (toplam)" value={data.gifted} />
+              <StatTile label="Admin kullanıcı harcaması (ayrı)" value={data.admin_spent} />
+            </div>
+            <div className="admin-range-toggle">
+              {[14, 30, 90].map((d) => (
+                <button key={d} className={d === days ? 'admin-range-toggle__btn admin-range-toggle__btn--active' : 'admin-range-toggle__btn'} onClick={() => setDays(d)}>{d} gün</button>
+              ))}
             </div>
             <BarChart data={data.daily} series={CREDIT_SERIES} dateFormatter={shortDate} />
             {reasonItems.length > 0 && (
               <>
-                <div className="admin-subtitle">Harcama nedeni (son 14 gün)</div>
+                <div className="admin-subtitle">Harcama nedeni ({days} gün)</div>
                 <HBarList items={reasonItems} />
               </>
             )}
           </>
         )
-      }} />
+      })()}
+    </div>
+  )
+}
+
+function OverviewTab() {
+  return (
+    <div className="admin-section admin-overview-grid">
+      <UsersAndScansWidget />
+
+      <CreditsWidget />
 
       <Widget title="Anthropic gerçek maliyet" path="/api/admin/stats/anthropic-cost" render={(data) => {
         if (!data || data.usd_today == null) {
@@ -336,6 +381,7 @@ function OverviewTab() {
                 valueFormatter={(v) => `$${v.toFixed(2)}`}
               />
             )}
+            <AsOfNote asOf={data.as_of} />
             <TopupSection provider="anthropic" spentAllTime={data.usd_all_time} />
           </>
         )
@@ -395,6 +441,7 @@ function OverviewTab() {
                 valueFormatter={(v) => `₺${v.toFixed(2)}`}
               />
             )}
+            <AsOfNote asOf={data.as_of} />
             <TopupSection provider="gemini" spentAllTime={data.usd_all_time} currency="₺" />
           </>
         )
@@ -494,14 +541,14 @@ function UsersTab() {
         <table className="admin-table">
           <thead>
             <tr>
-              <th>Kullanıcı</th><th>Kredi</th><th>Alınan</th><th>Harcanan</th><th>Admin</th><th>Kredi düzelt</th>
+              <th>Kullanıcı</th><th>Kredi</th><th>Alınan</th><th>Harcanan</th><th>Hediye</th><th>Admin</th><th>Kredi düzelt</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={6} className="admin-loading">Yükleniyor…</td></tr>
+              <tr><td colSpan={7} className="admin-loading">Yükleniyor…</td></tr>
             ) : users.length === 0 ? (
-              <tr><td colSpan={6} className="admin-empty">Kullanıcı bulunamadı.</td></tr>
+              <tr><td colSpan={7} className="admin-empty">Kullanıcı bulunamadı.</td></tr>
             ) : users.map(u => (
               <tr key={u.id}>
                 <td>
@@ -513,6 +560,7 @@ function UsersTab() {
                 <td>{u.credit_balance ?? 0}</td>
                 <td>{u.total_credits_purchased ?? 0}</td>
                 <td>{u.total_credits_spent ?? 0}</td>
+                <td>{u.total_credits_gifted ?? 0}</td>
                 <td>
                   <button
                     className={`admin-admin-toggle ${u.is_admin ? 'admin-admin-toggle--on' : ''}`}

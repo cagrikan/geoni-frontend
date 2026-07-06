@@ -124,6 +124,11 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
           <span className="landing__logo">GEONI</span>
         </button>
         <div className="nav-auth">
+          {onViewSample && (
+            <button type="button" className="sample-report-btn sample-report-btn--nav" onClick={onViewSample}>
+              {t('hero_sample_btn')}
+            </button>
+          )}
           <ThemeSwitcher />
           <LanguageSwitcher />
           {user ? (
@@ -148,12 +153,6 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
         <p className="hero-centered__subhead">
           {t('hero_subhead')}
         </p>
-
-        {onViewSample && (
-          <button type="button" className="sample-report-btn" onClick={onViewSample}>
-            {t('hero_sample_btn')}
-          </button>
-        )}
 
         <div className="scan-panel">
           <div className="mode-tabs">

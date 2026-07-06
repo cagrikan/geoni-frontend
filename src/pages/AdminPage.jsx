@@ -97,6 +97,72 @@ const PROVIDER_META = {
   'tavily-2': { label: 'Tavily (Hesap 2)', color: 'var(--chart-6)' },
 }
 
+// Anthropic ve AWS'nin gercek API'den maliyeti var - geri kalani icin
+// (bakiye API'si olmadigindan) admin panelden elle girilip guncelleniyor.
+const MANUAL_BALANCE_PROVIDERS = ['openai', 'google', 'perplexity', 'tavily-1', 'tavily-2']
+
+function ManualBalancesWidget() {
+  const { data, error } = useAdminFetch('/api/admin/stats/manual-balances')
+  const [balances, setBalances] = useState(null)
+  const [inputs, setInputs] = useState({})
+  const [savingKey, setSavingKey] = useState(null)
+  const [saveError, setSaveError] = useState(null)
+
+  useEffect(() => { if (data) setBalances(data) }, [data])
+
+  const save = async (providerKey) => {
+    const raw = inputs[providerKey]
+    const value = parseFloat(raw)
+    if (Number.isNaN(value)) return
+    setSavingKey(providerKey)
+    setSaveError(null)
+    try {
+      await authedFetch('/api/admin/stats/manual-balances', {
+        method: 'POST',
+        body: JSON.stringify({ provider: providerKey, balance: value }),
+      })
+      setBalances((prev) => ({ ...prev, [providerKey]: { provider: providerKey, balance: value, updated_at: new Date().toISOString() } }))
+      setInputs((prev) => ({ ...prev, [providerKey]: '' }))
+    } catch (e) { setSaveError(e.message) }
+    setSavingKey(null)
+  }
+
+  return (
+    <div className="admin-widget">
+      <h3 className="admin-section__title">Manuel bakiyeler</h3>
+      <p className="admin-hint">OpenAI, Google, Perplexity ve Tavily kendi hesap bakiyelerini API üzerinden sunmuyor — gerçek bakiyeyi sağlayıcı panelinden bakıp buraya elle girip düzenli güncelleyebilirsiniz.</p>
+      {error && <div className="admin-error">{error}</div>}
+      {saveError && <div className="admin-error">{saveError}</div>}
+      {!balances ? <div className="admin-loading admin-loading--widget">Yükleniyor…</div> : (
+        <div className="manual-balance-list">
+          {MANUAL_BALANCE_PROVIDERS.map((key) => {
+            const row = balances[key]
+            return (
+              <div key={key} className="manual-balance-row">
+                <div className="manual-balance-info">
+                  <span className="manual-balance-label">{PROVIDER_META[key]?.label || key}</span>
+                  <span className="manual-balance-meta">
+                    {row ? `$${Number(row.balance).toFixed(2)} — ${new Date(row.updated_at).toLocaleDateString('tr-TR')}` : 'henüz girilmedi'}
+                  </span>
+                </div>
+                <input
+                  type="number" step="0.01" placeholder="Yeni bakiye ($)"
+                  value={inputs[key] ?? ''}
+                  onChange={(e) => setInputs((prev) => ({ ...prev, [key]: e.target.value }))}
+                />
+                <button
+                  disabled={savingKey === key || !inputs[key]}
+                  onClick={() => save(key)}
+                >Kaydet</button>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function OverviewTab() {
   return (
     <div className="admin-section admin-overview-grid">
@@ -224,6 +290,8 @@ function OverviewTab() {
           )
         }}
       />
+
+      <ManualBalancesWidget />
     </div>
   )
 }

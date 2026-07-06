@@ -350,6 +350,9 @@ function CreditsWidget() {
         const reasonItems = Object.entries(data.by_reason || {})
           .sort((a, b) => b[1] - a[1])
           .map(([key, value]) => ({ label: REASON_LABELS[key] || key, value, color: 'var(--chart-4)' }))
+        const rangeLabel = RANGE_OPTIONS.find((o) => o.days === days)?.label || `${days} gün`
+        const rangeSpent = data.daily.reduce((sum, d) => sum + (d.spent || 0), 0)
+        const rangeGranted = data.daily.reduce((sum, d) => sum + (d.granted || 0), 0)
         return (
           <>
             <div className="admin-stats-grid admin-stats-grid--compact">
@@ -359,10 +362,14 @@ function CreditsWidget() {
               <StatTile label="Admin kullanıcı harcaması (ayrı)" value={data.admin_spent} />
             </div>
             <RangeToggle days={days} onChange={setDays} />
+            <div className="admin-stats-grid admin-stats-grid--compact">
+              <StatTile label={`Harcanan (${rangeLabel})`} value={rangeSpent} />
+              <StatTile label={`Verilen (${rangeLabel})`} value={rangeGranted} />
+            </div>
             <BarChart data={data.daily} series={CREDIT_SERIES} dateFormatter={shortDate} />
             {reasonItems.length > 0 && (
               <>
-                <div className="admin-subtitle">Harcama nedeni ({days} gün)</div>
+                <div className="admin-subtitle">Harcama nedeni ({rangeLabel})</div>
                 <HBarList items={reasonItems} />
               </>
             )}

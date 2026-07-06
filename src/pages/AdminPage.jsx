@@ -9,7 +9,7 @@ import {
   LayoutDashboard, Users, ScrollText, Search, Shield, ShieldOff,
   Plus, Minus, ChevronLeft, ChevronRight, ArrowLeft,
   UserPlus, RotateCcw, Globe, User, Tag, ShoppingCart, TrendingDown, TrendingUp, Gift, ShieldAlert,
-  CalendarDays, CalendarRange, Calendar, History,
+  CalendarDays, CalendarRange, Calendar, History, Wallet, PiggyBank,
 } from 'lucide-react'
 
 const COST_TILE_ICONS = { today: CalendarDays, week: CalendarRange, month: Calendar, allTime: History }
@@ -178,8 +178,8 @@ function TopupSection({ provider, spentAllTime, currency = '$' }) {
   return (
     <>
       <div className="admin-stats-grid admin-stats-grid--compact">
-        <StatTile label="Toplam yüklenen kredi" value={`${currency}${local.total.toFixed(2)}`} />
-        <StatTile label="Tahmini kalan bakiye" value={`${currency}${remaining.toFixed(2)}`} />
+        <StatTile icon={Wallet} label="Toplam yüklenen kredi" value={`${currency}${local.total.toFixed(2)}`} />
+        <StatTile icon={PiggyBank} label="Tahmini kalan bakiye" value={`${currency}${remaining.toFixed(2)}`} />
       </div>
       {saveError && <div className="admin-error">{saveError}</div>}
       <div className="topup-form">

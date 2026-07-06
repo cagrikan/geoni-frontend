@@ -398,7 +398,7 @@ function OverviewTab() {
 
       <CreditsWidget />
 
-      <Widget title="Anthropic gerçek maliyet" path="/api/admin/stats/anthropic-cost" render={(data) => {
+      <Widget title="Anthropic gerçek maliyet" hint="Anthropic da kalan bakiyeyi API üzerinden vermiyor — her kredi yüklemenizi aşağıya kaydedin, gerçek harcamayı Cost Report API'den çekip kalanı buradan hesaplarız." path="/api/admin/stats/anthropic-cost" render={(data) => {
         if (!data || data.usd_today == null) {
           return <div className="admin-empty">Admin API key tanımlı değil, gerçek maliyet verisi yok.</div>
         }

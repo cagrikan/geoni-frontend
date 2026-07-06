@@ -9,7 +9,10 @@ import {
   LayoutDashboard, Users, ScrollText, Search, Shield, ShieldOff,
   Plus, Minus, ChevronLeft, ChevronRight, ArrowLeft,
   UserPlus, RotateCcw, Globe, User, Tag, ShoppingCart, TrendingDown, TrendingUp, Gift, ShieldAlert,
+  CalendarDays, CalendarRange, Calendar, History,
 } from 'lucide-react'
+
+const COST_TILE_ICONS = { today: CalendarDays, week: CalendarRange, month: Calendar, allTime: History }
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.geoni.ai'
 const PAGE_SIZE = 20
@@ -224,10 +227,10 @@ function OpenAiCostWidget() {
       <h3 className="admin-section__title">OpenAI gerçek maliyet</h3>
       <p className="admin-hint">OpenAI kalan bakiyeyi API üzerinden vermiyor — her kredi yüklemenizi aşağıya kaydedin, gerçek harcamayı Costs API'den çekip kalanı buradan hesaplarız.</p>
       <div className="admin-stats-grid admin-stats-grid--compact">
-        <StatTile label="Bugün (USD)" value={`$${cost.usd_today.toFixed(2)}`} />
-        <StatTile label="Son 7 gün (USD)" value={`$${cost.usd_week.toFixed(2)}`} />
-        <StatTile label="Bu ay - Toplam (USD)" value={`$${cost.usd_month.toFixed(2)}`} />
-        <StatTile label="Tüm zamanlar harcama (USD)" value={`$${cost.usd_all_time.toFixed(2)}`} />
+        <StatTile icon={COST_TILE_ICONS.today} label="Bugün" range="USD" value={`$${cost.usd_today.toFixed(2)}`} />
+        <StatTile icon={COST_TILE_ICONS.week} label="Son 7 gün" range="USD" value={`$${cost.usd_week.toFixed(2)}`} />
+        <StatTile icon={COST_TILE_ICONS.month} label="Bu ay - Toplam" range="USD" value={`$${cost.usd_month.toFixed(2)}`} />
+        <StatTile icon={COST_TILE_ICONS.allTime} label="Tüm zamanlar harcama" range="USD" value={`$${cost.usd_all_time.toFixed(2)}`} />
       </div>
       {cost.daily?.length > 0 && (
         <BarChart
@@ -268,10 +271,10 @@ function PerplexityCostWidget() {
       <h3 className="admin-section__title">Perplexity gerçek maliyet (tahmini)</h3>
       <p className="admin-hint">Perplexity'nin ne kalan bakiye ne de maliyet API'si var — her isteğin token sayısından ve yayınlanan fiyatlandırmadan GEONI kendisi hesaplıyor. Kredi yüklemenizi aşağıya kaydedin, kalanı buradan tahmin ederiz.</p>
       <div className="admin-stats-grid admin-stats-grid--compact">
-        <StatTile label="Bugün (USD)" value={`$${cost.usd_today.toFixed(2)}`} />
-        <StatTile label="Son 7 gün (USD)" value={`$${cost.usd_week.toFixed(2)}`} />
-        <StatTile label="Bu ay - Toplam (USD)" value={`$${cost.usd_month.toFixed(2)}`} />
-        <StatTile label="Tüm zamanlar harcama (USD)" value={`$${cost.usd_all_time.toFixed(2)}`} />
+        <StatTile icon={COST_TILE_ICONS.today} label="Bugün" range="USD" value={`$${cost.usd_today.toFixed(2)}`} />
+        <StatTile icon={COST_TILE_ICONS.week} label="Son 7 gün" range="USD" value={`$${cost.usd_week.toFixed(2)}`} />
+        <StatTile icon={COST_TILE_ICONS.month} label="Bu ay - Toplam" range="USD" value={`$${cost.usd_month.toFixed(2)}`} />
+        <StatTile icon={COST_TILE_ICONS.allTime} label="Tüm zamanlar harcama" range="USD" value={`$${cost.usd_all_time.toFixed(2)}`} />
       </div>
       {cost.daily?.length > 0 && (
         <BarChart
@@ -316,10 +319,10 @@ function UsersAndScansWidget() {
         <div className="admin-stats-grid">
           <StatTile icon={Users} label="Toplam kullanıcı" value={summary.total_users} />
           <StatTile icon={ScrollText} label="Toplam tarama" value={summary.total_audits} />
-          <StatTile icon={UserPlus} label="Bugünkü yeni kullanıcı" value={summary.new_users_today} />
-          <StatTile icon={RotateCcw} label="Bugün geri dönen kullanıcı" value={summary.returning_users_today} />
-          <StatTile icon={UserPlus} label="Son 7 gün yeni kullanıcı" value={summary.new_users_week} />
-          <StatTile icon={RotateCcw} label="Son 7 gün geri dönen kullanıcı" value={summary.returning_users_week} />
+          <StatTile icon={UserPlus} label="Yeni kullanıcı" range="Bugün" value={summary.new_users_today} />
+          <StatTile icon={RotateCcw} label="Geri dönen kullanıcı" range="Bugün" value={summary.returning_users_today} />
+          <StatTile icon={UserPlus} label="Yeni kullanıcı" range="Son 7 gün" value={summary.new_users_week} />
+          <StatTile icon={RotateCcw} label="Geri dönen kullanıcı" range="Son 7 gün" value={summary.returning_users_week} />
         </div>
       )}
 
@@ -364,10 +367,10 @@ function CreditsWidget() {
         return (
           <>
             <div className="admin-stats-grid admin-stats-grid--compact">
-              <StatTile icon={ShoppingCart} label="Satılan kredi (toplam)" value={data.purchased} />
-              <StatTile icon={TrendingDown} label="Harcanan kredi (toplam)" value={data.spent} />
-              <StatTile icon={Gift} label="Hediye edilen kredi (toplam)" value={data.gifted} />
-              <StatTile icon={ShieldAlert} label="Admin kullanıcı harcaması (ayrı)" value={data.admin_spent} />
+              <StatTile icon={ShoppingCart} label="Satılan kredi" range="Toplam" value={data.purchased} />
+              <StatTile icon={TrendingDown} label="Harcanan kredi" range="Toplam" value={data.spent} />
+              <StatTile icon={Gift} label="Hediye edilen kredi" range="Toplam" value={data.gifted} />
+              <StatTile icon={ShieldAlert} label="Admin harcaması" range="Ayrı" value={data.admin_spent} />
             </div>
             <RangeToggle days={days} onChange={setDays} />
             <div className="admin-stats-grid admin-stats-grid--compact">
@@ -402,10 +405,10 @@ function OverviewTab() {
         return (
           <>
             <div className="admin-stats-grid admin-stats-grid--compact">
-              <StatTile label="Bugün (USD)" value={`$${data.usd_today.toFixed(2)}`} />
-              <StatTile label="Son 7 gün (USD)" value={`$${data.usd_week.toFixed(2)}`} />
-              <StatTile label="Bu ay - Toplam (USD)" value={`$${data.usd_month.toFixed(2)}`} />
-              <StatTile label="Tüm zamanlar harcama (USD)" value={`$${data.usd_all_time.toFixed(2)}`} />
+              <StatTile icon={COST_TILE_ICONS.today} label="Bugün" range="USD" value={`$${data.usd_today.toFixed(2)}`} />
+              <StatTile icon={COST_TILE_ICONS.week} label="Son 7 gün" range="USD" value={`$${data.usd_week.toFixed(2)}`} />
+              <StatTile icon={COST_TILE_ICONS.month} label="Bu ay - Toplam" range="USD" value={`$${data.usd_month.toFixed(2)}`} />
+              <StatTile icon={COST_TILE_ICONS.allTime} label="Tüm zamanlar harcama" range="USD" value={`$${data.usd_all_time.toFixed(2)}`} />
             </div>
             {data.daily?.length > 0 && (
               <BarChart
@@ -433,9 +436,9 @@ function OverviewTab() {
         return (
           <>
             <div className="admin-stats-grid admin-stats-grid--compact">
-              <StatTile label="Bugün (USD)" value={`$${data.usd_today.toFixed(2)}`} />
-              <StatTile label="Son 7 gün (USD)" value={`$${data.usd_week.toFixed(2)}`} />
-              <StatTile label="Bu ay - Toplam (USD)" value={`$${data.usd_month.toFixed(2)}`} />
+              <StatTile icon={COST_TILE_ICONS.today} label="Bugün" range="USD" value={`$${data.usd_today.toFixed(2)}`} />
+              <StatTile icon={COST_TILE_ICONS.week} label="Son 7 gün" range="USD" value={`$${data.usd_week.toFixed(2)}`} />
+              <StatTile icon={COST_TILE_ICONS.month} label="Bu ay - Toplam" range="USD" value={`$${data.usd_month.toFixed(2)}`} />
             </div>
             {data.daily?.length > 0 && (
               <BarChart
@@ -462,10 +465,10 @@ function OverviewTab() {
         return (
           <>
             <div className="admin-stats-grid admin-stats-grid--compact">
-              <StatTile label="Bugün (₺)" value={`₺${data.usd_today.toFixed(2)}`} />
-              <StatTile label="Son 7 gün (₺)" value={`₺${data.usd_week.toFixed(2)}`} />
-              <StatTile label="Bu ay - Toplam (₺)" value={`₺${data.usd_month.toFixed(2)}`} />
-              <StatTile label="Tüm zamanlar harcama (₺)" value={`₺${data.usd_all_time.toFixed(2)}`} />
+              <StatTile icon={COST_TILE_ICONS.today} label="Bugün" range="₺" value={`₺${data.usd_today.toFixed(2)}`} />
+              <StatTile icon={COST_TILE_ICONS.week} label="Son 7 gün" range="₺" value={`₺${data.usd_week.toFixed(2)}`} />
+              <StatTile icon={COST_TILE_ICONS.month} label="Bu ay - Toplam" range="₺" value={`₺${data.usd_month.toFixed(2)}`} />
+              <StatTile icon={COST_TILE_ICONS.allTime} label="Tüm zamanlar harcama" range="₺" value={`₺${data.usd_all_time.toFixed(2)}`} />
             </div>
             {data.daily?.length > 0 && (
               <BarChart

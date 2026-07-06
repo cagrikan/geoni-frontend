@@ -91,7 +91,7 @@ const REASON_LABELS = {
 const PROVIDER_META = {
   anthropic: { label: 'Anthropic', color: 'var(--chart-3)' },
   openai: { label: 'OpenAI', color: 'var(--chart-1)' },
-  google: { label: 'Google', color: 'var(--chart-2)' },
+  google: { label: 'Gemini', color: 'var(--chart-2)' },
   perplexity: { label: 'Perplexity', color: 'var(--chart-4)' },
   'tavily-1': { label: 'Tavily (Hesap 1)', color: 'var(--chart-5)' },
   'tavily-2': { label: 'Tavily (Hesap 2)', color: 'var(--chart-6)' },
@@ -134,7 +134,7 @@ function ManualBalancesWidget() {
   return (
     <div className="admin-widget">
       <h3 className="admin-section__title">Manuel bakiyeler</h3>
-      <p className="admin-hint">OpenAI, Google, Perplexity ve Tavily kendi hesap bakiyelerini API üzerinden sunmuyor — gerçek bakiyeyi sağlayıcı panelinden bakıp buraya elle girip düzenli güncelleyebilirsiniz.</p>
+      <p className="admin-hint">Gemini'nin kendi hesap bakiyesini API üzerinden sunan bir yolu yok — gerçek bakiyeyi Google AI Studio/Cloud Console'dan bakıp buraya elle girip düzenli güncelleyebilirsiniz.</p>
       {error && <div className="admin-error">{error}</div>}
       {saveError && <div className="admin-error">{saveError}</div>}
       {!balances ? <div className="admin-loading admin-loading--widget">Yükleniyor…</div> : (
@@ -422,7 +422,7 @@ function OverviewTab() {
 
       <Widget
         title="Dış AI motoru kullanımı"
-        hint="Burada gösterilen GEONI'nin bu motorlara yaptığı çağrı sayısıdır - gerçek/tahmini USD maliyetleri her motorun kendi kartında (Google hariç, onun hiçbir API'si yok)."
+        hint="Burada gösterilen GEONI'nin bu motorlara yaptığı çağrı sayısıdır - gerçek/tahmini USD maliyetleri her motorun kendi kartında (Gemini hariç, onun hiçbir API'si yok)."
         path="/api/admin/stats/provider-usage"
         render={(data) => {
           const providers = Array.from(new Set([...Object.keys(data.today || {}), ...Object.keys(data.week || {})]))

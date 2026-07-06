@@ -15,6 +15,26 @@ import './App.css'
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.geoni.ai'
 
+// Ilk ziyarette (first-touch) UTM/referrer bilgisini yakalar - sadece bir
+// kez, sonraki ziyaretlerde uzerine yazilmaz. Kayit olma aninda
+// AuthContext bunu profile yazar (bkz. lib/AuthContext.jsx).
+function captureAcquisition() {
+  try {
+    if (localStorage.getItem('geoni_acq_captured')) return
+    const params = new URLSearchParams(window.location.search)
+    const data = {
+      utm_source: params.get('utm_source') || null,
+      utm_medium: params.get('utm_medium') || null,
+      utm_campaign: params.get('utm_campaign') || null,
+      signup_referrer: document.referrer || null,
+    }
+    if (data.utm_source || data.utm_medium || data.utm_campaign || data.signup_referrer) {
+      localStorage.setItem('geoni_acquisition', JSON.stringify(data))
+    }
+    localStorage.setItem('geoni_acq_captured', '1')
+  } catch { /* localStorage erisimi engellenmis olabilir - sessizce gec */ }
+}
+
 const SAMPLE_RESULT_BY_LANG = {
   tr: {
     domain: 'ornek-magaza.com',
@@ -68,6 +88,8 @@ function AppInner() {
     const desc = document.querySelector('meta[name="description"]')
     if (desc) desc.setAttribute('content', t('page_description'))
   }, [language])
+
+  useEffect(() => { captureAcquisition() }, [])
 
   const [view, setView] = useState(() => {
     if (window.location.pathname === '/auth/callback') return 'auth_callback'

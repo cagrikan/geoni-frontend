@@ -32,8 +32,29 @@ export function AuthProvider({ children }) {
       .select('*')
       .eq('id', userId)
       .single()
+    if (data && !data.utm_source && !data.signup_referrer) {
+      recordAcquisitionOnce(userId)
+    }
     setProfile(data)
     setLoading(false)
+  }
+
+  // App.jsx ilk ziyarette localStorage'a yazar; burada ilk girişte (profil
+  // henuz bos ise) profile tek seferlik aktarilir. Zaten yazilmissa (ya da
+  // hic acquisition verisi yoksa) sessizce hicbir sey yapmaz.
+  const recordAcquisitionOnce = async (userId) => {
+    try {
+      const raw = localStorage.getItem('geoni_acquisition')
+      if (!raw) return
+      const acq = JSON.parse(raw)
+      await supabase.from('profiles').update({
+        utm_source: acq.utm_source,
+        utm_medium: acq.utm_medium,
+        utm_campaign: acq.utm_campaign,
+        signup_referrer: acq.signup_referrer,
+      }).eq('id', userId)
+      localStorage.removeItem('geoni_acquisition')
+    } catch { /* ignore */ }
   }
 
   const signInWithGoogle = () => supabase.auth.signInWithOAuth({

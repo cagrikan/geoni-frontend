@@ -29,7 +29,7 @@ async function authedFetch(path, options = {}) {
   return res.json()
 }
 
-function StatTile({ label, value, icon: Icon }) {
+function StatTile({ label, value, icon: Icon, range }) {
   return (
     <div className="admin-stat">
       <div className="admin-stat__value">{value}</div>
@@ -37,6 +37,7 @@ function StatTile({ label, value, icon: Icon }) {
         {Icon && <Icon size={12} strokeWidth={1.75} className="admin-stat__icon" />}
         {label}
       </div>
+      {range && <div className="admin-stat__range">{range}</div>}
     </div>
   )
 }
@@ -332,10 +333,10 @@ function UsersAndScansWidget() {
         return (
           <>
             <div className="admin-stats-grid admin-stats-grid--compact">
-              <StatTile icon={ScrollText} label={`Toplam tarama (${rangeLabel})`} value={webTotal + personTotal + brandTotal} />
-              <StatTile icon={Globe} label={`Web Sitesi (${rangeLabel})`} value={webTotal} />
-              <StatTile icon={User} label={`Kişi (${rangeLabel})`} value={personTotal} />
-              <StatTile icon={Tag} label={`Marka (${rangeLabel})`} value={brandTotal} />
+              <StatTile icon={ScrollText} label="Toplam tarama" range={rangeLabel} value={webTotal + personTotal + brandTotal} />
+              <StatTile icon={Globe} label="Web Sitesi" range={rangeLabel} value={webTotal} />
+              <StatTile icon={User} label="Kişi" range={rangeLabel} value={personTotal} />
+              <StatTile icon={Tag} label="Marka" range={rangeLabel} value={brandTotal} />
             </div>
             <BarChart data={scans.days} series={SCAN_SERIES} stacked dateFormatter={shortDate} />
           </>
@@ -370,8 +371,8 @@ function CreditsWidget() {
             </div>
             <RangeToggle days={days} onChange={setDays} />
             <div className="admin-stats-grid admin-stats-grid--compact">
-              <StatTile icon={TrendingDown} label={`Harcanan (${rangeLabel})`} value={rangeSpent} />
-              <StatTile icon={TrendingUp} label={`Verilen (${rangeLabel})`} value={rangeGranted} />
+              <StatTile icon={TrendingDown} label="Harcanan" range={rangeLabel} value={rangeSpent} />
+              <StatTile icon={TrendingUp} label="Verilen" range={rangeLabel} value={rangeGranted} />
             </div>
             <BarChart data={data.daily} series={CREDIT_SERIES} dateFormatter={shortDate} />
             {reasonItems.length > 0 && (

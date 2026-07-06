@@ -61,11 +61,21 @@ function OverviewTab() {
         <StatTile label="Harcanan kredi (toplam)" value={data.credits_spent} />
       </div>
 
+      {data.anthropic_cost && (
+        <>
+          <h3 className="admin-section__title">Anthropic gerçek maliyet</h3>
+          <div className="admin-stats-grid">
+            <StatTile label="Bugün (USD)" value={`$${data.anthropic_cost.usd_today.toFixed(2)}`} />
+            <StatTile label="Son 7 gün (USD)" value={`$${data.anthropic_cost.usd_week.toFixed(2)}`} />
+          </div>
+        </>
+      )}
+
       <h3 className="admin-section__title">Dış AI motoru kullanımı</h3>
       <p className="admin-hint">
-        Bu motorların kendi hesap bakiyeleri API üzerinden çekilemiyor (OpenAI, Anthropic, Google ve
-        Perplexity bunun için bir uç nokta sunmuyor) — burada gösterilen, GEONI'nin bu motorlara yaptığı
-        çağrı sayısıdır, gerçek kalan krediniz için sağlayıcı panellerine bakmanız gerekir.
+        {data.anthropic_cost
+          ? 'Anthropic için yukarıda gerçek USD maliyeti var. OpenAI, Google ve Perplexity kendi hesap bakiyelerini API üzerinden sunmuyor — bu üçü için burada gösterilen sadece GEONI\'nin yaptığı çağrı sayısıdır.'
+          : 'Bu motorların hiçbirinin gerçek bakiyesi API üzerinden çekilemiyor — burada gösterilen, GEONI\'nin bu motorlara yaptığı çağrı sayısıdır. Anthropic için gerçek USD maliyeti görmek isterseniz bir Admin API key tanımlayın.'}
       </p>
       {providers.length === 0 ? (
         <div className="admin-empty">Henüz kayıtlı motor çağrısı yok.</div>

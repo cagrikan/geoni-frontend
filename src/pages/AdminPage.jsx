@@ -428,7 +428,7 @@ function OverviewTab() {
 
       <PerplexityCostWidget />
 
-      <Widget title="AWS gerçek maliyet" hint="Amazon Cost Explorer'dan gelen gerçek altyapı maliyeti (ECS, ALB, ECR vb.)." path="/api/admin/stats/aws-cost" render={(data) => {
+      <Widget title="AWS gerçek maliyet" hint="Amazon Cost Explorer'dan gelen gerçek altyapı maliyeti (ECS, ALB, ECR vb.). AWS faturalı (postpaid) çalıştığı için diğerlerinden farklı olarak kalan bakiye/kredi kavramı yok, yükleme takibi gerekmiyor. Bu yüzden burada sadece gerçek harcama gösterilir." path="/api/admin/stats/aws-cost" render={(data) => {
         if (!data || data.usd_today == null) {
           return <div className="admin-empty">AWS maliyet verisi alınamadı (IAM izni gerekebilir).</div>
         }

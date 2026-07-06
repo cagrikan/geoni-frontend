@@ -72,6 +72,13 @@ export const translations = {
     submit_brand: 'Markamı Sorgula',
 
     // ── Nasıl çalışır ──
+    pricing_title: 'Paketler',
+    pricing_usage_hint: 'Web sitesi taraması 10 token, kişi veya marka kontrolü 5 token harcar. Örneğin 100 token ile 10 web taraması ya da 20 kişi/marka kontrolü yapabilirsiniz.',
+    pricing_buy_btn: 'Satın Al',
+    pricing_enterprise_title: 'Kurumsal',
+    pricing_enterprise_desc: 'Yüksek hacimli kullanım mı gerekiyor? Bize ulaşın, size özel fiyat verelim.',
+    pricing_enterprise_cta: 'Bize Ulaşın',
+
     how_title: 'Nasıl çalışır',
     how_step1_title: 'Sorgula',
     how_step1_desc: "Sitenizi tarar, adınızı veya markanızı Claude, ChatGPT, Gemini ve Perplexity'ye gerçek zamanlı sorarız.",
@@ -432,6 +439,13 @@ export const translations = {
     submit_site: 'Start Free Scan',
     submit_person: 'Search for Me in AI',
     submit_brand: 'Check My Brand',
+
+    pricing_title: 'Packages',
+    pricing_usage_hint: 'A website scan uses 10 tokens, a person or brand check uses 5 tokens. For example, 100 tokens covers 10 website scans, or 20 person/brand checks.',
+    pricing_buy_btn: 'Buy Now',
+    pricing_enterprise_title: 'Enterprise',
+    pricing_enterprise_desc: 'Need high-volume usage? Reach out and we\'ll give you custom pricing.',
+    pricing_enterprise_cta: 'Contact Us',
 
     // ── How it works ──
     how_title: 'How it works',

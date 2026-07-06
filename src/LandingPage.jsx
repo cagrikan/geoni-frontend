@@ -11,6 +11,43 @@ const SITE_LAST_STEP = 1
 const PERSON_LAST_STEP = 3
 const BRAND_LAST_STEP = 2
 
+function PricingSection({ t, user, onDashboard, onLogin }) {
+  const [packages, setPackages] = useState(null)
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/credit-packages`)
+      .then((r) => r.json())
+      .then(setPackages)
+      .catch(() => setPackages([]))
+  }, [])
+
+  const handleBuy = () => { if (user) onDashboard(); else onLogin() }
+
+  return (
+    <section id="paketler" className="pricing-band">
+      <h2 className="landing__how-title-main">{t('pricing_title')}</h2>
+      <p className="pricing-usage-hint">{t('pricing_usage_hint')}</p>
+      {packages?.length > 0 && (
+        <div className="pricing-grid">
+          {packages.map((pkg) => (
+            <div key={pkg.id} className="pricing-card">
+              <div className="pricing-card__credits">{pkg.credits}</div>
+              <div className="pricing-card__unit">{t('dash_credit_unit')}</div>
+              <div className="pricing-card__price">{pkg.display_price} {pkg.currency}</div>
+              <button type="button" className="pricing-card__btn" onClick={handleBuy}>{t('pricing_buy_btn')}</button>
+            </div>
+          ))}
+          <div className="pricing-card pricing-card--enterprise">
+            <div className="pricing-card__name">{t('pricing_enterprise_title')}</div>
+            <p className="pricing-card__desc">{t('pricing_enterprise_desc')}</p>
+            <a href="mailto:mail@cagricakir.com.tr?subject=GEONI%20Enterprise" className="pricing-card__btn pricing-card__btn--enterprise">{t('pricing_enterprise_cta')}</a>
+          </div>
+        </div>
+      )}
+    </section>
+  )
+}
+
 export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading = false, statusText = '', error, user, onDashboard, onLogin, onViewSample }) {
   const { t } = useLanguage()
   const [mode, setMode] = useState('site') // 'site' | 'person' | 'brand'
@@ -337,6 +374,8 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
           ))}
         </div>
       </section>
+
+      <PricingSection t={t} user={user} onDashboard={onDashboard} onLogin={onLogin} />
     </div>
   )
 }

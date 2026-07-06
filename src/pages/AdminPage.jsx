@@ -137,9 +137,31 @@ function OverviewTab() {
         )
       }} />
 
+      <Widget title="Anthropic gerçek maliyet" path="/api/admin/stats/anthropic-cost" render={(data) => {
+        if (!data || data.usd_today == null) {
+          return <div className="admin-empty">Admin API key tanımlı değil, gerçek maliyet verisi yok.</div>
+        }
+        return (
+          <>
+            <div className="admin-stats-grid admin-stats-grid--compact">
+              <StatTile label="Bugün (USD)" value={`$${data.usd_today.toFixed(2)}`} />
+              <StatTile label="Son 7 gün (USD)" value={`$${data.usd_week.toFixed(2)}`} />
+            </div>
+            {data.daily?.length > 0 && (
+              <BarChart
+                data={data.daily}
+                series={[{ key: 'usd', label: 'Maliyet (USD)', color: 'var(--chart-3)' }]}
+                dateFormatter={shortDate}
+                valueFormatter={(v) => `$${v.toFixed(2)}`}
+              />
+            )}
+          </>
+        )
+      }} />
+
       <Widget
         title="Dış AI motoru kullanımı"
-        hint="OpenAI, Google ve Perplexity kendi hesap bakiyelerini API üzerinden sunmuyor — burada gösterilen GEONI'nin bu motorlara yaptığı çağrı sayısıdır. Anthropic için gerçek USD maliyeti aşağıdaki ayrı kartta."
+        hint="OpenAI, Google ve Perplexity kendi hesap bakiyelerini API üzerinden sunmuyor — burada gösterilen GEONI'nin bu motorlara yaptığı çağrı sayısıdır. Anthropic için gerçek USD maliyeti yukarıdaki ayrı kartta."
         path="/api/admin/stats/provider-usage"
         render={(data) => {
           const providers = Array.from(new Set([...Object.keys(data.today || {}), ...Object.keys(data.week || {})]))
@@ -168,28 +190,6 @@ function OverviewTab() {
           )
         }}
       />
-
-      <Widget title="Anthropic gerçek maliyet" path="/api/admin/stats/anthropic-cost" render={(data) => {
-        if (!data || data.usd_today == null) {
-          return <div className="admin-empty">Admin API key tanımlı değil, gerçek maliyet verisi yok.</div>
-        }
-        return (
-          <>
-            <div className="admin-stats-grid admin-stats-grid--compact">
-              <StatTile label="Bugün (USD)" value={`$${data.usd_today.toFixed(2)}`} />
-              <StatTile label="Son 7 gün (USD)" value={`$${data.usd_week.toFixed(2)}`} />
-            </div>
-            {data.daily?.length > 0 && (
-              <BarChart
-                data={data.daily}
-                series={[{ key: 'usd', label: 'Maliyet (USD)', color: 'var(--chart-3)' }]}
-                dateFormatter={shortDate}
-                valueFormatter={(v) => `$${v.toFixed(2)}`}
-              />
-            )}
-          </>
-        )
-      }} />
     </div>
   )
 }

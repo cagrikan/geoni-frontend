@@ -2021,9 +2021,10 @@ body {
 .admin-pagination button:disabled { opacity: .4; cursor: default; }
 
 /* Admin overview - bagimsiz yuklenen widget'lar + grafikler */
+.admin-page .dashboard__body { max-width: 1680px; }
 .admin-overview-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 16px;
   align-items: stretch;
 }

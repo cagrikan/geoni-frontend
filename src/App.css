@@ -1958,7 +1958,8 @@ body {
   border-radius: 12px; padding: 16px;
 }
 .admin-stat__value { font-size: 1.6rem; font-weight: 700; color: var(--text); font-family: var(--display); }
-.admin-stat__label { font-size: .78rem; color: var(--text-muted); margin-top: 4px; }
+.admin-stat__label { font-size: .78rem; color: var(--text-muted); margin-top: 4px; display: flex; align-items: center; gap: 5px; }
+.admin-stat__icon { flex-shrink: 0; opacity: .7; }
 
 .admin-search {
   display: flex; align-items: center; gap: 8px;

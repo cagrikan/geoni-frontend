@@ -8,6 +8,7 @@ import HBarList from '../components/HBarList'
 import {
   LayoutDashboard, Users, ScrollText, Search, Shield, ShieldOff,
   Plus, Minus, ChevronLeft, ChevronRight, ArrowLeft,
+  UserPlus, RotateCcw, Globe, User, Tag, ShoppingCart, TrendingDown, TrendingUp, Gift, ShieldAlert,
 } from 'lucide-react'
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.geoni.ai'
@@ -28,11 +29,14 @@ async function authedFetch(path, options = {}) {
   return res.json()
 }
 
-function StatTile({ label, value }) {
+function StatTile({ label, value, icon: Icon }) {
   return (
     <div className="admin-stat">
       <div className="admin-stat__value">{value}</div>
-      <div className="admin-stat__label">{label}</div>
+      <div className="admin-stat__label">
+        {Icon && <Icon size={12} strokeWidth={1.75} className="admin-stat__icon" />}
+        {label}
+      </div>
     </div>
   )
 }
@@ -309,12 +313,12 @@ function UsersAndScansWidget() {
       {summaryError && <div className="admin-error">{summaryError}</div>}
       {!summary ? <div className="admin-loading admin-loading--widget">Yükleniyor…</div> : (
         <div className="admin-stats-grid">
-          <StatTile label="Toplam kullanıcı" value={summary.total_users} />
-          <StatTile label="Toplam tarama" value={summary.total_audits} />
-          <StatTile label="Bugünkü yeni kullanıcı" value={summary.new_users_today} />
-          <StatTile label="Bugün geri dönen kullanıcı" value={summary.returning_users_today} />
-          <StatTile label="Son 7 gün yeni kullanıcı" value={summary.new_users_week} />
-          <StatTile label="Son 7 gün geri dönen kullanıcı" value={summary.returning_users_week} />
+          <StatTile icon={Users} label="Toplam kullanıcı" value={summary.total_users} />
+          <StatTile icon={ScrollText} label="Toplam tarama" value={summary.total_audits} />
+          <StatTile icon={UserPlus} label="Bugünkü yeni kullanıcı" value={summary.new_users_today} />
+          <StatTile icon={RotateCcw} label="Bugün geri dönen kullanıcı" value={summary.returning_users_today} />
+          <StatTile icon={UserPlus} label="Son 7 gün yeni kullanıcı" value={summary.new_users_week} />
+          <StatTile icon={RotateCcw} label="Son 7 gün geri dönen kullanıcı" value={summary.returning_users_week} />
         </div>
       )}
 
@@ -328,10 +332,10 @@ function UsersAndScansWidget() {
         return (
           <>
             <div className="admin-stats-grid admin-stats-grid--compact">
-              <StatTile label={`Toplam tarama (${rangeLabel})`} value={webTotal + personTotal + brandTotal} />
-              <StatTile label={`Web Sitesi (${rangeLabel})`} value={webTotal} />
-              <StatTile label={`Kişi (${rangeLabel})`} value={personTotal} />
-              <StatTile label={`Marka (${rangeLabel})`} value={brandTotal} />
+              <StatTile icon={ScrollText} label={`Toplam tarama (${rangeLabel})`} value={webTotal + personTotal + brandTotal} />
+              <StatTile icon={Globe} label={`Web Sitesi (${rangeLabel})`} value={webTotal} />
+              <StatTile icon={User} label={`Kişi (${rangeLabel})`} value={personTotal} />
+              <StatTile icon={Tag} label={`Marka (${rangeLabel})`} value={brandTotal} />
             </div>
             <BarChart data={scans.days} series={SCAN_SERIES} stacked dateFormatter={shortDate} />
           </>
@@ -359,15 +363,15 @@ function CreditsWidget() {
         return (
           <>
             <div className="admin-stats-grid admin-stats-grid--compact">
-              <StatTile label="Satılan kredi (toplam)" value={data.purchased} />
-              <StatTile label="Harcanan kredi (toplam)" value={data.spent} />
-              <StatTile label="Hediye edilen kredi (toplam)" value={data.gifted} />
-              <StatTile label="Admin kullanıcı harcaması (ayrı)" value={data.admin_spent} />
+              <StatTile icon={ShoppingCart} label="Satılan kredi (toplam)" value={data.purchased} />
+              <StatTile icon={TrendingDown} label="Harcanan kredi (toplam)" value={data.spent} />
+              <StatTile icon={Gift} label="Hediye edilen kredi (toplam)" value={data.gifted} />
+              <StatTile icon={ShieldAlert} label="Admin kullanıcı harcaması (ayrı)" value={data.admin_spent} />
             </div>
             <RangeToggle days={days} onChange={setDays} />
             <div className="admin-stats-grid admin-stats-grid--compact">
-              <StatTile label={`Harcanan (${rangeLabel})`} value={rangeSpent} />
-              <StatTile label={`Verilen (${rangeLabel})`} value={rangeGranted} />
+              <StatTile icon={TrendingDown} label={`Harcanan (${rangeLabel})`} value={rangeSpent} />
+              <StatTile icon={TrendingUp} label={`Verilen (${rangeLabel})`} value={rangeGranted} />
             </div>
             <BarChart data={data.daily} series={CREDIT_SERIES} dateFormatter={shortDate} />
             {reasonItems.length > 0 && (

@@ -147,6 +147,7 @@ function OverviewTab() {
             <div className="admin-stats-grid admin-stats-grid--compact">
               <StatTile label="Bugün (USD)" value={`$${data.usd_today.toFixed(2)}`} />
               <StatTile label="Son 7 gün (USD)" value={`$${data.usd_week.toFixed(2)}`} />
+              <StatTile label="Bu ay - Toplam (USD)" value={`$${data.usd_month.toFixed(2)}`} />
             </div>
             {data.daily?.length > 0 && (
               <BarChart
@@ -155,6 +156,36 @@ function OverviewTab() {
                 dateFormatter={shortDate}
                 valueFormatter={(v) => `$${v.toFixed(2)}`}
               />
+            )}
+          </>
+        )
+      }} />
+
+      <Widget title="AWS gerçek maliyet" hint="Amazon Cost Explorer'dan gelen gerçek altyapı maliyeti (ECS, ALB, ECR vb.)." path="/api/admin/stats/aws-cost" render={(data) => {
+        if (!data || data.usd_today == null) {
+          return <div className="admin-empty">AWS maliyet verisi alınamadı (IAM izni gerekebilir).</div>
+        }
+        const serviceItems = Object.entries(data.by_service || {}).map(([label, value]) => ({ label, value, color: 'var(--chart-1)' }))
+        return (
+          <>
+            <div className="admin-stats-grid admin-stats-grid--compact">
+              <StatTile label="Bugün (USD)" value={`$${data.usd_today.toFixed(2)}`} />
+              <StatTile label="Son 7 gün (USD)" value={`$${data.usd_week.toFixed(2)}`} />
+              <StatTile label="Bu ay - Toplam (USD)" value={`$${data.usd_month.toFixed(2)}`} />
+            </div>
+            {data.daily?.length > 0 && (
+              <BarChart
+                data={data.daily}
+                series={[{ key: 'usd', label: 'Maliyet (USD)', color: 'var(--chart-1)' }]}
+                dateFormatter={shortDate}
+                valueFormatter={(v) => `$${v.toFixed(2)}`}
+              />
+            )}
+            {serviceItems.length > 0 && (
+              <>
+                <div className="admin-subtitle">Servis bazlı (bu ay)</div>
+                <HBarList items={serviceItems} valueFormatter={(v) => `$${v.toFixed(2)}`} />
+              </>
             )}
           </>
         )

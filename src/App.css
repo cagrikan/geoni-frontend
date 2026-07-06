@@ -2021,12 +2021,15 @@ body {
 .admin-pagination button:disabled { opacity: .4; cursor: default; }
 
 /* Admin overview - bagimsiz yuklenen widget'lar + grafikler */
-.admin-page .dashboard__body { max-width: 2268px; }
+.admin-page .dashboard__body { max-width: none; }
 .admin-overview-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
   align-items: stretch;
+}
+@media (min-width: 1900px) {
+  .admin-overview-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 @media (max-width: 900px) {
   .admin-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }

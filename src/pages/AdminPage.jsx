@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
 import GeoniMark from '../GeoniMark'
+import BarChart from '../components/BarChart'
+import HBarList from '../components/HBarList'
 import {
   LayoutDashboard, Users, ScrollText, Search, Shield, ShieldOff,
   Plus, Minus, ChevronLeft, ChevronRight, ArrowLeft,
@@ -34,67 +36,158 @@ function StatTile({ label, value }) {
   )
 }
 
-function OverviewTab() {
+// Her widget kendi verisini bagimsiz ceker: sayfa iskeleti aninda gorunur,
+// yavas olan (dis API'ye giden) widget'lar digerlerini bekletmez.
+function useAdminFetch(path) {
   const [data, setData] = useState(null)
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    authedFetch('/api/admin/overview').then(setData).catch(e => setError(e.message))
-  }, [])
+    let cancelled = false
+    setData(null); setError(null)
+    authedFetch(path)
+      .then((d) => { if (!cancelled) setData(d) })
+      .catch((e) => { if (!cancelled) setError(e.message) })
+    return () => { cancelled = true }
+  }, [path])
 
-  if (error) return <div className="admin-error">{error}</div>
-  if (!data) return <div className="admin-loading">Yükleniyor…</div>
+  return { data, error }
+}
 
-  const providers = Array.from(new Set([
-    ...Object.keys(data.provider_usage?.today || {}),
-    ...Object.keys(data.provider_usage?.week || {}),
-  ]))
-
+function Widget({ title, hint, path, render }) {
+  const { data, error } = useAdminFetch(path)
   return (
-    <div className="admin-section">
-      <div className="admin-stats-grid">
-        <StatTile label="Toplam kullanıcı" value={data.total_users} />
-        <StatTile label="Toplam tarama" value={data.total_audits} />
-        <StatTile label="Bugünkü tarama" value={data.audits_today} />
-        <StatTile label="Son 7 gün tarama" value={data.audits_week} />
-        <StatTile label="Satılan kredi (toplam)" value={data.credits_purchased} />
-        <StatTile label="Harcanan kredi (toplam)" value={data.credits_spent} />
-      </div>
+    <div className="admin-widget">
+      {title && <h3 className="admin-section__title">{title}</h3>}
+      {hint && <p className="admin-hint">{hint}</p>}
+      {error ? <div className="admin-error">{error}</div>
+        : !data ? <div className="admin-loading admin-loading--widget">Yükleniyor…</div>
+        : render(data)}
+    </div>
+  )
+}
 
-      {data.anthropic_cost && (
+const shortDate = (d) => new Date(d).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })
+
+const SCAN_SERIES = [
+  { key: 'web', label: 'Web Sitesi', color: 'var(--chart-1)' },
+  { key: 'person', label: 'Kişi', color: 'var(--chart-2)' },
+  { key: 'brand', label: 'Marka', color: 'var(--chart-3)' },
+]
+
+const CREDIT_SERIES = [
+  { key: 'granted', label: 'Verilen', color: 'var(--chart-1)' },
+  { key: 'spent', label: 'Harcanan', color: 'var(--chart-4)' },
+]
+
+const REASON_LABELS = {
+  web_audit: 'Web taraması',
+  person_check: 'Kişi kontrolü',
+  brand_check: 'Marka kontrolü',
+  admin_deduct: 'Admin düzeltmesi',
+}
+
+const PROVIDER_META = {
+  anthropic: { label: 'Anthropic', color: 'var(--chart-3)' },
+  openai: { label: 'OpenAI', color: 'var(--chart-1)' },
+  google: { label: 'Google', color: 'var(--chart-2)' },
+  perplexity: { label: 'Perplexity', color: 'var(--chart-4)' },
+}
+
+function OverviewTab() {
+  return (
+    <div className="admin-section admin-overview-grid">
+      <Widget path="/api/admin/stats/summary" render={(data) => (
+        <div className="admin-stats-grid">
+          <StatTile label="Toplam kullanıcı" value={data.total_users} />
+          <StatTile label="Toplam tarama" value={data.total_audits} />
+        </div>
+      )} />
+
+      <Widget title="Taramalar (son 14 gün)" path="/api/admin/stats/scans-daily" render={(data) => (
         <>
-          <h3 className="admin-section__title">Anthropic gerçek maliyet</h3>
-          <div className="admin-stats-grid">
-            <StatTile label="Bugün (USD)" value={`$${data.anthropic_cost.usd_today.toFixed(2)}`} />
-            <StatTile label="Son 7 gün (USD)" value={`$${data.anthropic_cost.usd_week.toFixed(2)}`} />
+          <div className="admin-stats-grid admin-stats-grid--compact">
+            <StatTile label="Bugünkü tarama" value={data.today} />
+            <StatTile label="Son 7 gün tarama" value={data.week} />
           </div>
+          <BarChart data={data.days} series={SCAN_SERIES} stacked dateFormatter={shortDate} />
         </>
-      )}
+      )} />
 
-      <h3 className="admin-section__title">Dış AI motoru kullanımı</h3>
-      <p className="admin-hint">
-        {data.anthropic_cost
-          ? 'Anthropic için yukarıda gerçek USD maliyeti var. OpenAI, Google ve Perplexity kendi hesap bakiyelerini API üzerinden sunmuyor — bu üçü için burada gösterilen sadece GEONI\'nin yaptığı çağrı sayısıdır.'
-          : 'Bu motorların hiçbirinin gerçek bakiyesi API üzerinden çekilemiyor — burada gösterilen, GEONI\'nin bu motorlara yaptığı çağrı sayısıdır. Anthropic için gerçek USD maliyeti görmek isterseniz bir Admin API key tanımlayın.'}
-      </p>
-      {providers.length === 0 ? (
-        <div className="admin-empty">Henüz kayıtlı motor çağrısı yok.</div>
-      ) : (
-        <table className="admin-table">
-          <thead>
-            <tr><th>Motor</th><th>Bugün</th><th>Son 7 gün</th></tr>
-          </thead>
-          <tbody>
-            {providers.map(p => (
-              <tr key={p}>
-                <td style={{ textTransform: 'capitalize' }}>{p}</td>
-                <td>{data.provider_usage?.today?.[p] ?? 0}</td>
-                <td>{data.provider_usage?.week?.[p] ?? 0}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+      <Widget title="Krediler" path="/api/admin/stats/credits" render={(data) => {
+        const reasonItems = Object.entries(data.by_reason || {})
+          .sort((a, b) => b[1] - a[1])
+          .map(([key, value]) => ({ label: REASON_LABELS[key] || key, value, color: 'var(--chart-4)' }))
+        return (
+          <>
+            <div className="admin-stats-grid admin-stats-grid--compact">
+              <StatTile label="Satılan kredi (toplam)" value={data.purchased} />
+              <StatTile label="Harcanan kredi (toplam)" value={data.spent} />
+            </div>
+            <BarChart data={data.daily} series={CREDIT_SERIES} dateFormatter={shortDate} />
+            {reasonItems.length > 0 && (
+              <>
+                <div className="admin-subtitle">Harcama nedeni (son 14 gün)</div>
+                <HBarList items={reasonItems} />
+              </>
+            )}
+          </>
+        )
+      }} />
+
+      <Widget
+        title="Dış AI motoru kullanımı"
+        hint="OpenAI, Google ve Perplexity kendi hesap bakiyelerini API üzerinden sunmuyor — burada gösterilen GEONI'nin bu motorlara yaptığı çağrı sayısıdır. Anthropic için gerçek USD maliyeti aşağıdaki ayrı kartta."
+        path="/api/admin/stats/provider-usage"
+        render={(data) => {
+          const providers = Array.from(new Set([...Object.keys(data.today || {}), ...Object.keys(data.week || {})]))
+          if (providers.length === 0) return <div className="admin-empty">Henüz kayıtlı motor çağrısı yok.</div>
+          const weekItems = providers.map((p) => ({
+            label: PROVIDER_META[p]?.label || p,
+            value: data.week?.[p] ?? 0,
+            color: PROVIDER_META[p]?.color || 'var(--chart-1)',
+          })).sort((a, b) => b.value - a.value)
+          return (
+            <>
+              <HBarList items={weekItems} />
+              <table className="admin-table">
+                <thead><tr><th>Motor</th><th>Bugün</th><th>Son 7 gün</th></tr></thead>
+                <tbody>
+                  {providers.map((p) => (
+                    <tr key={p}>
+                      <td>{PROVIDER_META[p]?.label || p}</td>
+                      <td>{data.today?.[p] ?? 0}</td>
+                      <td>{data.week?.[p] ?? 0}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
+          )
+        }}
+      />
+
+      <Widget title="Anthropic gerçek maliyet" path="/api/admin/stats/anthropic-cost" render={(data) => {
+        if (!data || data.usd_today == null) {
+          return <div className="admin-empty">Admin API key tanımlı değil, gerçek maliyet verisi yok.</div>
+        }
+        return (
+          <>
+            <div className="admin-stats-grid admin-stats-grid--compact">
+              <StatTile label="Bugün (USD)" value={`$${data.usd_today.toFixed(2)}`} />
+              <StatTile label="Son 7 gün (USD)" value={`$${data.usd_week.toFixed(2)}`} />
+            </div>
+            {data.daily?.length > 0 && (
+              <BarChart
+                data={data.daily}
+                series={[{ key: 'usd', label: 'Maliyet (USD)', color: 'var(--chart-3)' }]}
+                dateFormatter={shortDate}
+                valueFormatter={(v) => `$${v.toFixed(2)}`}
+              />
+            )}
+          </>
+        )
+      }} />
     </div>
   )
 }

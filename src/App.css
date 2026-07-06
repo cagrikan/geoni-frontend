@@ -23,6 +23,10 @@
   --tint-strongest: rgba(255, 255, 255, .10);
   --tint-border: rgba(255, 255, 255, .2);
   --shadow-color: rgba(0, 0, 0, .18);
+  --chart-1: #3987e5;
+  --chart-2: #199e70;
+  --chart-3: #9085e9;
+  --chart-4: #d95926;
   --display: 'Space Grotesk', sans-serif;
   --body: 'Inter', sans-serif;
   --mono: 'JetBrains Mono', monospace;
@@ -49,6 +53,10 @@
   --tint-strongest: rgba(20, 20, 45, .10);
   --tint-border: rgba(20, 20, 45, .16);
   --shadow-color: rgba(20, 20, 45, .12);
+  --chart-1: #2a78d6;
+  --chart-2: #1baf7a;
+  --chart-3: #4a3aa7;
+  --chart-4: #eb6834;
 }
 
 html { scroll-behavior: smooth; }
@@ -1950,3 +1958,37 @@ body {
   color: var(--text-sub); cursor: pointer;
 }
 .admin-pagination button:disabled { opacity: .4; cursor: default; }
+
+/* Admin overview - bagimsiz yuklenen widget'lar + grafikler */
+.admin-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+.admin-widget {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 18px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.admin-widget .admin-section__title { margin: 0; }
+.admin-loading--widget { padding: 24px 0; }
+.admin-subtitle { font-size: .8rem; font-weight: 600; color: var(--text-sub); margin-top: 4px; }
+.admin-stats-grid--compact { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+
+.barchart { display: flex; flex-direction: column; gap: 8px; }
+.barchart__legend { display: flex; flex-wrap: wrap; gap: 12px; }
+.barchart__legend-item {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: .76rem; color: var(--text-muted);
+}
+.barchart__legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+.barchart__svg { display: block; }
+.barchart__axis-label { font-size: 6px; fill: var(--text-muted); font-family: var(--body); }
+
+.hbarlist { display: flex; flex-direction: column; gap: 8px; }
+.hbarlist__row { display: grid; grid-template-columns: 110px 1fr 44px; align-items: center; gap: 8px; }
+.hbarlist__label { font-size: .78rem; color: var(--text-sub); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hbarlist__track { background: var(--tint); border-radius: 4px; height: 8px; overflow: hidden; }
+.hbarlist__fill { height: 100%; border-radius: 4px; }
+.hbarlist__value { font-size: .78rem; color: var(--text-muted); text-align: right; font-family: var(--mono); }

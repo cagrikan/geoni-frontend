@@ -2066,8 +2066,9 @@ body {
   font-size: .76rem; color: var(--text-muted);
 }
 .barchart__legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+.barchart__scroll { overflow-x: auto; }
 .barchart__svg { display: block; }
-.barchart__axis-label { font-size: 6px; fill: var(--text-muted); font-family: var(--body); }
+.barchart__axis-label { font-size: 11px; fill: var(--text-muted); font-family: var(--body); }
 
 .barchart__tooltip {
   position: absolute;

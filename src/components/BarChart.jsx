@@ -64,7 +64,8 @@ export default function BarChart({
           ))}
         </div>
       )}
-      <svg viewBox={`0 0 ${width} ${height}`} width="100%" height={height} preserveAspectRatio="none" className="barchart__svg">
+      <div className="barchart__scroll">
+      <svg width={width} height={height} className="barchart__svg">
         <line x1="0" y1={padTop + plotH} x2={width} y2={padTop + plotH} stroke="var(--border)" strokeWidth="1" />
         {data.map((d, i) => {
           const slotX = i * unitW
@@ -127,6 +128,7 @@ export default function BarChart({
           )
         })}
       </svg>
+      </div>
       {hover && (
         <div className="barchart__tooltip" style={{ left: hover.x, top: hover.y }}>
           <div className="barchart__tooltip-date">{hover.dateLabel}</div>

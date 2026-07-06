@@ -1636,6 +1636,16 @@ body {
 }
 .dash-signout-full:hover { background: rgba(248,113,113,.08); }
 
+/* Dashboard/Admin ortak yan menu - dar ekranda yan yana degil ust uste,
+   sekmeler dikey degil yatay kaydirilabilir bir satir olarak dizilir. */
+@media (max-width: 760px) {
+  .dashboard__body { flex-direction: column; padding: 20px 16px; gap: 20px; }
+  .dashboard__sidebar { width: 100%; gap: 16px; }
+  .dash-nav { flex-direction: row; flex-wrap: wrap; gap: 6px; }
+  .dash-nav__item { flex: 0 0 auto; padding: 8px 12px; }
+  .dash-new-scan { width: 100%; }
+}
+
 /* Skeleton loading (Premium Oneri Dok. 2.3) */
 @keyframes skeleton-shimmer {
   0% { background-position: -200% 0; }
@@ -1872,6 +1882,8 @@ body {
   color: var(--text-sub); border-radius: 8px;
   padding: 8px 14px; font-size: .82rem; cursor: pointer;
   transition: border-color .2s, color .2s;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 .admin-back:hover { border-color: var(--accent); color: var(--text); }
 .admin-denied {

@@ -2023,6 +2023,10 @@ body {
 /* Admin overview - bagimsiz yuklenen widget'lar + grafikler */
 .admin-page .dashboard__body { max-width: none; width: 100%; box-sizing: border-box; }
 .admin-page.dashboard { width: 100%; }
+/* index.css'teki #root'un sabit 1126px genisligi (eski bir sablon kalintisi)
+   admin sayfasindaki her genislik denemesini bosa cikariyordu - gercek engel
+   buradaymis, .dashboard/.dashboard__body degil. Sadece admin acikken kaldir. */
+#root:has(.admin-page) { width: 100%; border-inline: none; }
 .admin-overview-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

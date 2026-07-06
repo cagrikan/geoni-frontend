@@ -97,75 +97,10 @@ const PROVIDER_META = {
   'tavily-2': { label: 'Tavily (Hesap 2)', color: 'var(--chart-6)' },
 }
 
-// Anthropic ve AWS'nin gercek API'den maliyeti var - geri kalani icin
-// (bakiye API'si olmadigindan) admin panelden elle girilip guncelleniyor.
-// OpenAI'nin kendi "OpenAI gercek maliyet" widget'i var (Costs API + yukleme
-// gecmisi), Tavily'nin gercek /usage endpoint'i, Perplexity'nin de kendi
-// hesapladigimiz (tahmini) maliyet widget'i var - burada sadece hicbir
-// veri kaynagi olmayan Google kalir.
-const MANUAL_BALANCE_PROVIDERS = ['google']
-
-function ManualBalancesWidget() {
-  const { data, error } = useAdminFetch('/api/admin/stats/manual-balances')
-  const [balances, setBalances] = useState(null)
-  const [inputs, setInputs] = useState({})
-  const [savingKey, setSavingKey] = useState(null)
-  const [saveError, setSaveError] = useState(null)
-
-  useEffect(() => { if (data) setBalances(data) }, [data])
-
-  const save = async (providerKey) => {
-    const raw = inputs[providerKey]
-    const value = parseFloat(raw)
-    if (Number.isNaN(value)) return
-    setSavingKey(providerKey)
-    setSaveError(null)
-    try {
-      await authedFetch('/api/admin/stats/manual-balances', {
-        method: 'POST',
-        body: JSON.stringify({ provider: providerKey, balance: value }),
-      })
-      setBalances((prev) => ({ ...prev, [providerKey]: { provider: providerKey, balance: value, updated_at: new Date().toISOString() } }))
-      setInputs((prev) => ({ ...prev, [providerKey]: '' }))
-    } catch (e) { setSaveError(e.message) }
-    setSavingKey(null)
-  }
-
-  return (
-    <div className="admin-widget">
-      <h3 className="admin-section__title">Manuel bakiyeler</h3>
-      <p className="admin-hint">Gemini'nin kendi hesap bakiyesini API üzerinden sunan bir yolu yok — gerçek bakiyeyi Google AI Studio/Cloud Console'dan bakıp buraya elle girip düzenli güncelleyebilirsiniz.</p>
-      {error && <div className="admin-error">{error}</div>}
-      {saveError && <div className="admin-error">{saveError}</div>}
-      {!balances ? <div className="admin-loading admin-loading--widget">Yükleniyor…</div> : (
-        <div className="manual-balance-list">
-          {MANUAL_BALANCE_PROVIDERS.map((key) => {
-            const row = balances[key]
-            return (
-              <div key={key} className="manual-balance-row">
-                <div className="manual-balance-info">
-                  <span className="manual-balance-label">{PROVIDER_META[key]?.label || key}</span>
-                  <span className="manual-balance-meta">
-                    {row ? `$${Number(row.balance).toFixed(2)} — ${new Date(row.updated_at).toLocaleDateString('tr-TR')}` : 'henüz girilmedi'}
-                  </span>
-                </div>
-                <input
-                  type="number" step="0.01" placeholder="Yeni bakiye ($)"
-                  value={inputs[key] ?? ''}
-                  onChange={(e) => setInputs((prev) => ({ ...prev, [key]: e.target.value }))}
-                />
-                <button
-                  disabled={savingKey === key || !inputs[key]}
-                  onClick={() => save(key)}
-                >Kaydet</button>
-              </div>
-            )
-          })}
-        </div>
-      )}
-    </div>
-  )
-}
+// Artik butun dis motorlarin ya gercek ya da kendi hesapladigimiz (tahmini)
+// bir maliyet kaynagi var (Anthropic/AWS/Gemini: gercek API; OpenAI/Tavily:
+// gercek; Perplexity: kendi hesapladigimiz) - manuel bakiye girisine gerek
+// kalmadi.
 
 // Herhangi bir "gercek maliyet" karti icin ortak yukleme-gecmisi bolumu:
 // toplam yuklenen kredi - API'den gelen tum-zamanlar harcama = tahmini kalan.
@@ -420,9 +355,33 @@ function OverviewTab() {
         )
       }} />
 
+      <Widget title="Gemini gerçek maliyet" hint="GCP Billing export → BigQuery üzerinden gelen gerçek maliyet. Google Cloud faturalı (postpaid) çalıştığı için kalan bakiye kavramı yok - AWS gibi. Not: export verisi ~24 saat gecikmeli akabilir." path="/api/admin/stats/gemini-cost" render={(data) => {
+        if (!data || data.usd_today == null) {
+          return <div className="admin-empty">Gemini maliyet verisi yok - service account key tanımlı değil ya da export verisi henüz oluşmadı.</div>
+        }
+        return (
+          <>
+            <div className="admin-stats-grid admin-stats-grid--compact">
+              <StatTile label="Bugün (USD)" value={`$${data.usd_today.toFixed(2)}`} />
+              <StatTile label="Son 7 gün (USD)" value={`$${data.usd_week.toFixed(2)}`} />
+              <StatTile label="Bu ay - Toplam (USD)" value={`$${data.usd_month.toFixed(2)}`} />
+              <StatTile label="Tüm zamanlar harcama (USD)" value={`$${data.usd_all_time.toFixed(2)}`} />
+            </div>
+            {data.daily?.length > 0 && (
+              <BarChart
+                data={data.daily}
+                series={[{ key: 'usd', label: 'Maliyet (USD)', color: 'var(--chart-2)' }]}
+                dateFormatter={shortDate}
+                valueFormatter={(v) => `$${v.toFixed(2)}`}
+              />
+            )}
+          </>
+        )
+      }} />
+
       <Widget
         title="Dış AI motoru kullanımı"
-        hint="Burada gösterilen GEONI'nin bu motorlara yaptığı çağrı sayısıdır - gerçek/tahmini USD maliyetleri her motorun kendi kartında (Gemini hariç, onun hiçbir API'si yok)."
+        hint="Burada gösterilen GEONI'nin bu motorlara yaptığı çağrı sayısıdır - gerçek/tahmini USD maliyetleri her motorun kendi kartında."
         path="/api/admin/stats/provider-usage"
         render={(data) => {
           const providers = Array.from(new Set([...Object.keys(data.today || {}), ...Object.keys(data.week || {})]))
@@ -478,7 +437,6 @@ function OverviewTab() {
         }}
       />
 
-      <ManualBalancesWidget />
     </div>
   )
 }

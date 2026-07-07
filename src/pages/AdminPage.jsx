@@ -709,7 +709,7 @@ function UsersTab() {
                 <td className="admin-table__num">{u.total_credits_purchased ?? 0}</td>
                 <td className="admin-table__num">{u.total_credits_spent ?? 0}</td>
                 <td className="admin-table__num">{u.total_credits_gifted ?? 0}</td>
-                <td className="admin-user-cell__sub">{formatDate(u.created_at)}</td>
+                <td className="admin-table__muted">{formatDate(u.created_at)}</td>
               </tr>
             ))}
           </tbody>
@@ -822,11 +822,14 @@ function UserDetailModal({ userId, onClose, onChanged }) {
           return (
             <>
               <div className="admin-modal__header">
-                <div className="admin-modal__title">{p.email || '—'}</div>
-                {p.full_name && <div className="admin-user-cell__sub">{p.full_name}</div>}
-                <div className="admin-modal__meta">
-                  {t('admin_user_joined')}: {formatDate(p.created_at)} · {t('admin_user_last_seen')}: {formatDate(p.last_sign_in_at)}
-                  {p.utm_source && <> · {t('admin_user_source')}: {p.utm_source}</>}
+                <div className="admin-user-avatar">{(p.full_name || p.email || '?')[0]?.toUpperCase()}</div>
+                <div>
+                  <div className="admin-modal__title">{p.email || '—'}</div>
+                  {p.full_name && <div className="admin-user-cell__sub">{p.full_name}</div>}
+                  <div className="admin-modal__meta">
+                    {t('admin_user_joined')}: {formatDate(p.created_at)} · {t('admin_user_last_seen')}: {formatDate(p.last_sign_in_at)}
+                    {p.utm_source && <> · {t('admin_user_source')}: {p.utm_source}</>}
+                  </div>
                 </div>
               </div>
 
@@ -1301,7 +1304,7 @@ function TicketsAdminTab() {
                     </td>
                     <td>
                       {tk.evidence_url ? <a href={tk.evidence_url} target="_blank" rel="noopener noreferrer">{t('admin_tickets_view_evidence')}</a> : '—'}
-                      {tk.evidence_note && <div className="admin-user-cell__sub">{tk.evidence_note}</div>}
+                      {tk.evidence_note && <div className="admin-table__muted">{tk.evidence_note}</div>}
                     </td>
                     <td>
                       {tk.status === 'submitted' && (

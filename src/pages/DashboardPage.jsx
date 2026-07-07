@@ -12,7 +12,7 @@ import TicketThread from '../components/TicketThread'
 import {
   Gem, History, Bookmark, Settings, Globe, User, Building2, FileText,
   TrendingUp, TrendingDown, ChevronRight, X, RefreshCw, ShieldCheck, Wrench, ClipboardList,
-  Ticket, Braces, Bot, Landmark, Link2,
+  Ticket, Braces, Bot, Landmark, Link2, Search,
 } from 'lucide-react'
 
 const TICKET_TYPE_ICONS = {
@@ -166,6 +166,11 @@ function MyTicketsSection({ t, userId }) {
     authedFetch('/api/tickets').then(setMyTickets).catch(() => setMyTickets([]))
   }, [])
 
+  const toggleOpen = (id) => {
+    setOpenId((cur) => (cur === id ? null : id))
+    setMyTickets((list) => list?.map((t) => (t.id === id ? { ...t, has_unread: false } : t)))
+  }
+
   return (
     <div className="dash-section">
       <h2 className="dash-section__title">{t('dash_tickets_mine')}</h2>
@@ -179,10 +184,13 @@ function MyTicketsSection({ t, userId }) {
             const isOpen = openId === tk.id
             return (
               <div key={tk.id} className="ticket-row-wrap">
-                <div className="ticket-row ticket-row--clickable" onClick={() => setOpenId(isOpen ? null : tk.id)}>
-                  <div className="ticket-row__icon"><Icon size={16} strokeWidth={1.5} /></div>
+                <div className="ticket-row ticket-row--clickable" onClick={() => toggleOpen(tk.id)}>
+                  <div className="ticket-row__icon">
+                    <Icon size={16} strokeWidth={1.5} />
+                    {tk.has_unread && <span className="ticket-unread-dot" title={t('ticket_unread_hint')} />}
+                  </div>
                   <div className="ticket-row__info">
-                    <div className="ticket-row__name">{tk.ticket_type_name}</div>
+                    <div className="ticket-row__name">#{tk.id} · {tk.ticket_type_name}</div>
                     <div className="ticket-row__meta">
                       {tk.target && <>{tk.target} · </>}
                       {new Date(tk.created_at).toLocaleDateString()} · {tk.token_cost} {t('dash_credit_unit')}
@@ -206,9 +214,15 @@ function ExpertPanelSection({ t, userId }) {
   const [forms, setForms] = useState({})
   const [submittingId, setSubmittingId] = useState(null)
   const [openId, setOpenId] = useState(null)
+  const [search, setSearch] = useState('')
 
   const load = () => authedFetch('/api/expert/tickets').then(setTickets).catch(() => setTickets([]))
   useEffect(() => { load() }, [])
+
+  const toggleOpen = (id) => {
+    setOpenId((cur) => (cur === id ? null : id))
+    setTickets((list) => list?.map((t) => (t.id === id ? { ...t, has_unread: false } : t)))
+  }
 
   const submit = async (ticketId) => {
     const form = forms[ticketId] || {}
@@ -224,24 +238,36 @@ function ExpertPanelSection({ t, userId }) {
     setSubmittingId(null)
   }
 
+  const q = search.trim().toLowerCase()
+  const visibleTickets = tickets?.filter((tk) => (
+    !q || String(tk.id).includes(q) || (tk.target || '').toLowerCase().includes(q) || (tk.ticket_type_name || '').toLowerCase().includes(q)
+  ))
+
   return (
     <div className="dash-section">
       <h2 className="dash-section__title">{t('dash_expert_title')}</h2>
       <p className="dash-hint">{t('dash_expert_hint')}</p>
-      {tickets === null ? <div className="dash-loading">{t('dash_loading')}</div> : tickets.length === 0 ? (
+      <div className="admin-search dash-expert-search">
+        <Search size={15} strokeWidth={1.5} />
+        <input placeholder={t('dash_expert_search_ph')} value={search} onChange={(e) => setSearch(e.target.value)} />
+      </div>
+      {tickets === null ? <div className="dash-loading">{t('dash_loading')}</div> : visibleTickets.length === 0 ? (
         <div className="dash-empty"><p>{t('dash_expert_empty')}</p></div>
       ) : (
         <div className="ticket-list">
-          {tickets.map((tk) => {
+          {visibleTickets.map((tk) => {
             const Icon = TICKET_TYPE_ICONS[tk.ticket_type_key] || Wrench
             const isOpen = openId === tk.id
             return (
             <div key={tk.id} className="ticket-row-wrap">
             <div className="ticket-row ticket-row--expert">
-              <div className="ticket-row__top ticket-row__top--clickable" onClick={() => setOpenId(isOpen ? null : tk.id)}>
-                <div className="ticket-row__icon"><Icon size={16} strokeWidth={1.5} /></div>
+              <div className="ticket-row__top ticket-row__top--clickable" onClick={() => toggleOpen(tk.id)}>
+                <div className="ticket-row__icon">
+                  <Icon size={16} strokeWidth={1.5} />
+                  {tk.has_unread && <span className="ticket-unread-dot" title={t('ticket_unread_hint')} />}
+                </div>
                 <div className="ticket-row__info">
-                  <div className="ticket-row__name">{tk.ticket_type_name}</div>
+                  <div className="ticket-row__name">#{tk.id} · {tk.ticket_type_name}</div>
                   <div className="ticket-row__meta">{tk.target || tk.user_email} · {new Date(tk.created_at).toLocaleDateString()}</div>
                 </div>
                 <TicketStatusBadge status={tk.status} t={t} />

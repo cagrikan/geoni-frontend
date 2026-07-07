@@ -1453,6 +1453,7 @@ function TicketsAdminTab() {
             <table className="admin-table">
               <thead>
                 <tr>
+                  <th>#</th>
                   <th>{t('admin_table_user')}</th>
                   <th>{t('admin_campaigns_name')}</th>
                   <th>{t('admin_tickets_target')}</th>
@@ -1467,6 +1468,7 @@ function TicketsAdminTab() {
                 {local.map((tk) => (
                   <Fragment key={tk.id}>
                   <tr>
+                    <td className="admin-table__muted">{tk.id}</td>
                     <td>{tk.user_email || '—'}</td>
                     <td>{tk.ticket_type_name}</td>
                     <td>{tk.target || '—'}</td>
@@ -1497,14 +1499,22 @@ function TicketsAdminTab() {
                       )}
                     </td>
                     <td>
-                      <button className="admin-icon-btn" title={t('admin_tickets_messages')} onClick={() => setOpenId(openId === tk.id ? null : tk.id)}>
+                      <button
+                        className="admin-icon-btn admin-icon-btn--relative"
+                        title={t('admin_tickets_messages')}
+                        onClick={() => {
+                          setOpenId(openId === tk.id ? null : tk.id)
+                          setLocal((list) => list.map((x) => (x.id === tk.id ? { ...x, has_unread: false } : x)))
+                        }}
+                      >
                         <MessageSquare size={14} strokeWidth={1.5} />
+                        {tk.has_unread && <span className="ticket-unread-dot" />}
                       </button>
                     </td>
                   </tr>
                   {openId === tk.id && (
                     <tr>
-                      <td colSpan={8} className="admin-table__thread-cell">
+                      <td colSpan={9} className="admin-table__thread-cell">
                         <TicketThread ticketId={tk.id} currentUserId={user?.id} authedFetch={authedFetch} t={t} />
                       </td>
                     </tr>

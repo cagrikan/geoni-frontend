@@ -2029,6 +2029,9 @@ body {
 }
 .admin-table__num { text-align: right; font-variant-numeric: tabular-nums; }
 .admin-table__center { text-align: center; }
+.admin-table__sortable { cursor: pointer; user-select: none; }
+.admin-table__sortable:hover { color: var(--text); }
+.admin-table__sort-label { display: inline-flex; align-items: center; gap: 3px; }
 .admin-user-cell { display: flex; flex-direction: column; }
 .admin-user-cell__sub { font-size: .76rem; color: var(--text-muted); }
 

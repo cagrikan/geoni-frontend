@@ -333,6 +333,7 @@ export const translations = {
     admin_asof_note: 'Veri {time} alındı - önbelleklenmiş olabilir, yeni yükleme eklediğinizde kalan bakiye birkaç dakika gecikmeli güncellenebilir.',
 
     admin_search_placeholder: 'E-posta veya isimle ara…',
+    admin_search_placeholder_audits: 'E-posta, alan adı veya isimle ara…',
     admin_table_user: 'Kullanıcı',
     admin_table_credit: 'Token',
     admin_table_received: 'Alınan',
@@ -713,6 +714,7 @@ export const translations = {
     admin_asof_note: 'Data fetched {time} - may be cached; after adding a new top-up, the remaining balance may take a few minutes to update.',
 
     admin_search_placeholder: 'Search by email or name…',
+    admin_search_placeholder_audits: 'Search by email, domain or name…',
     admin_table_user: 'User',
     admin_table_credit: 'Token',
     admin_table_received: 'Received',

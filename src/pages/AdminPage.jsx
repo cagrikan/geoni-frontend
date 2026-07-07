@@ -9,7 +9,7 @@ import BarChart from '../components/BarChart'
 import HBarList from '../components/HBarList'
 import {
   LayoutDashboard, Users, ScrollText, Search, Shield, ShieldOff,
-  Plus, Minus, ChevronLeft, ChevronRight, ArrowLeft,
+  Plus, Minus, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ArrowLeft,
   UserPlus, RotateCcw, Globe, User, Tag, ShoppingCart, TrendingDown, TrendingUp, Gift, ShieldAlert,
   CalendarDays, CalendarRange, Calendar, History, Wallet, PiggyBank, Database,
 } from 'lucide-react'
@@ -769,18 +769,40 @@ function AuditsTab() {
   const { t, language } = useLanguage()
   const [audits, setAudits] = useState([])
   const [total, setTotal] = useState(0)
+  const [search, setSearch] = useState('')
   const [page, setPage] = useState(0)
+  const [sortBy, setSortBy] = useState('created_at')
+  const [sortDir, setSortDir] = useState('desc')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
   useEffect(() => {
     setLoading(true)
-    const params = new URLSearchParams({ limit: PAGE_SIZE, offset: page * PAGE_SIZE })
+    const params = new URLSearchParams({ search, sort_by: sortBy, sort_dir: sortDir, limit: PAGE_SIZE, offset: page * PAGE_SIZE })
     authedFetch(`/api/admin/audits?${params}`)
       .then(res => { setAudits(res.audits || []); setTotal(res.total || 0); setError(null) })
       .catch(e => setError(e.message))
       .finally(() => setLoading(false))
-  }, [page])
+  }, [search, sortBy, sortDir, page])
+
+  const toggleSort = (field) => {
+    setPage(0)
+    if (sortBy === field) {
+      setSortDir(d => d === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortBy(field)
+      setSortDir(field === 'email' || field === 'type' ? 'asc' : 'desc')
+    }
+  }
+
+  const SortHeader = ({ field, children }) => (
+    <th className="admin-table__sortable" onClick={() => toggleSort(field)}>
+      <span className="admin-table__sort-label">
+        {children}
+        {sortBy === field && (sortDir === 'asc' ? <ChevronUp size={12} strokeWidth={2} /> : <ChevronDown size={12} strokeWidth={2} />)}
+      </span>
+    </th>
+  )
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
   const locale = language === 'en' ? 'en-US' : 'tr-TR'
@@ -788,11 +810,27 @@ function AuditsTab() {
 
   return (
     <div className="admin-section">
+      <div className="admin-search">
+        <Search size={15} strokeWidth={1.5} />
+        <input
+          placeholder={t('admin_search_placeholder_audits')}
+          value={search}
+          onChange={e => { setPage(0); setSearch(e.target.value) }}
+        />
+      </div>
+
       {error && <div className="admin-error">{error}</div>}
       <div className="admin-table-wrap">
         <table className="admin-table">
           <thead>
-            <tr><th>{t('admin_table_user')}</th><th>{t('admin_table_type')}</th><th>{t('admin_table_target')}</th><th>{t('admin_table_score')}</th><th>{t('admin_table_credit')}</th><th>{t('admin_table_date')}</th></tr>
+            <tr>
+              <SortHeader field="email">{t('admin_table_user')}</SortHeader>
+              <SortHeader field="type">{t('admin_table_type')}</SortHeader>
+              <SortHeader field="target">{t('admin_table_target')}</SortHeader>
+              <SortHeader field="score">{t('admin_table_score')}</SortHeader>
+              <SortHeader field="credits_spent">{t('admin_table_credit')}</SortHeader>
+              <SortHeader field="created_at">{t('admin_table_date')}</SortHeader>
+            </tr>
           </thead>
           <tbody>
             {loading ? (
@@ -804,8 +842,8 @@ function AuditsTab() {
                 <td>{a.email || '—'}</td>
                 <td>{a.type}</td>
                 <td>{a.domain || a.name || '—'}</td>
-                <td>{a.score ?? '—'}</td>
-                <td>{a.credits_spent ?? 0}</td>
+                <td className="admin-table__num">{a.score ?? '—'}</td>
+                <td className="admin-table__num">{a.credits_spent ?? 0}</td>
                 <td>{formatDate(a.created_at)}</td>
               </tr>
             ))}

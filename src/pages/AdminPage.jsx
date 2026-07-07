@@ -286,7 +286,6 @@ function TotalCostWidget() {
 
   const providerLabels = { anthropic: 'Anthropic', openai: 'OpenAI', aws: 'AWS', perplexity: 'Perplexity', gemini_usd: 'Gemini', supabase: 'Supabase' }
   const byProviderItems = Object.entries(data.by_provider_this_month || {})
-    .filter(([, v]) => v > 0)
     .sort((a, b) => b[1] - a[1])
     .map(([key, value]) => ({ label: providerLabels[key] || key, value, color: 'var(--chart-1)' }))
 

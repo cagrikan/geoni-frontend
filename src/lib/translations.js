@@ -291,6 +291,11 @@ export const translations = {
     admin_hint_aws: "Amazon Cost Explorer'dan gelen gerçek altyapı maliyeti (ECS, ALB, ECR vb.). AWS faturalı (postpaid) çalıştığı için diğerlerinden farklı olarak kalan bakiye/kredi kavramı yok, yükleme takibi gerekmiyor. Bu yüzden burada sadece gerçek harcama gösterilir.",
     admin_empty_aws: 'AWS maliyet verisi alınamadı (IAM izni gerekebilir).',
     admin_subtitle_service: 'Servis bazlı (bu ay)',
+    admin_title_supabase: 'Supabase maliyeti',
+    admin_hint_supabase: "Supabase'in gerçek zamanlı bir maliyet API'si yok (Management API sadece istek sayısı verir, dolar tutarı vermez) - bu yüzden Dashboard'daki fatura bilgisini buraya manuel giriyorsunuz.",
+    admin_empty_supabase: 'Henüz maliyet girilmedi.',
+    admin_stat_current_cost: 'Bu ayki maliyet',
+    admin_stat_projected_cost: 'Tahmini maliyet',
 
     admin_title_gemini: 'Gemini gerçek maliyet',
     admin_hint_gemini: 'GCP Billing export → BigQuery üzerinden gelen gerçek maliyet, faturalandırma hesabınızın para biriminde (₺). AI Studio ön ödemeli (prepay) çalıştığı için kredi yüklemenizi aşağıya kaydedin, kalanı buradan hesaplarız. Not: export verisi ~24 saat gecikmeli akabilir.',
@@ -654,6 +659,11 @@ export const translations = {
     admin_hint_aws: 'Real infrastructure cost from Amazon Cost Explorer (ECS, ALB, ECR, etc.). AWS runs postpaid, so unlike the others there is no remaining-balance/credit concept - no top-up tracking needed. Only real spend is shown here.',
     admin_empty_aws: 'Could not fetch AWS cost data (IAM permission may be required).',
     admin_subtitle_service: 'By service (this month)',
+    admin_title_supabase: 'Supabase cost',
+    admin_hint_supabase: "Supabase has no real-time cost API (the Management API only returns request counts, not dollar amounts) - so you manually enter the invoice figure from the Dashboard here.",
+    admin_empty_supabase: 'No cost logged yet.',
+    admin_stat_current_cost: 'Cost this month',
+    admin_stat_projected_cost: 'Projected cost',
 
     admin_title_gemini: 'Gemini real cost',
     admin_hint_gemini: "Real cost via GCP Billing export → BigQuery, in your billing account's currency (₺). AI Studio runs prepaid, so log your credit top-ups below and we compute the remainder from there. Note: export data can lag ~24 hours.",

@@ -11,7 +11,7 @@ import {
   LayoutDashboard, Users, ScrollText, Search, Shield, ShieldOff,
   Plus, Minus, ChevronLeft, ChevronRight, ArrowLeft,
   UserPlus, RotateCcw, Globe, User, Tag, ShoppingCart, TrendingDown, TrendingUp, Gift, ShieldAlert,
-  CalendarDays, CalendarRange, Calendar, History, Wallet, PiggyBank,
+  CalendarDays, CalendarRange, Calendar, History, Wallet, PiggyBank, Database,
 } from 'lucide-react'
 
 const COST_TILE_ICONS = { today: CalendarDays, week: CalendarRange, month: Calendar, allTime: History }
@@ -216,6 +216,64 @@ function TopupSection({ provider, spentAllTime, currency = '$' }) {
         </div>
       )}
     </>
+  )
+}
+
+function SupabaseCostWidget() {
+  const { t } = useLanguage()
+  const { data, error } = useAdminFetch('/api/admin/stats/manual-cost?provider=supabase')
+  const [local, setLocal] = useState(null)
+  const [currentCost, setCurrentCost] = useState('')
+  const [projectedCost, setProjectedCost] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState(null)
+
+  useEffect(() => { if (data) setLocal(data) }, [data])
+
+  const save = async () => {
+    const current = parseFloat(currentCost)
+    if (Number.isNaN(current) || current < 0) return
+    const projected = projectedCost ? parseFloat(projectedCost) : null
+    setSaving(true)
+    setSaveError(null)
+    try {
+      await authedFetch('/api/admin/stats/manual-cost', {
+        method: 'POST',
+        body: JSON.stringify({ provider: 'supabase', current_cost: current, projected_cost: projected }),
+      })
+      setLocal({ current_cost: current, projected_cost: projected, created_at: new Date().toISOString() })
+      setCurrentCost(''); setProjectedCost('')
+    } catch (e) { setSaveError(e.message) }
+    setSaving(false)
+  }
+
+  if (error) return <div className="admin-widget"><h3 className="admin-section__title">{t('admin_title_supabase')}</h3><div className="admin-error">{error}</div></div>
+  if (!local) return <div className="admin-widget"><h3 className="admin-section__title">{t('admin_title_supabase')}</h3><div className="admin-loading admin-loading--widget">{t('admin_loading')}</div></div>
+
+  return (
+    <div className="admin-widget">
+      <h3 className="admin-section__title">{t('admin_title_supabase')}</h3>
+      <p className="admin-hint">{t('admin_hint_supabase')}</p>
+      {local.current_cost != null ? (
+        <>
+          <div className="admin-stats-grid admin-stats-grid--compact">
+            <StatTile icon={Database} label={t('admin_stat_current_cost')} range="USD" value={`$${Number(local.current_cost).toFixed(2)}`} />
+            {local.projected_cost != null && (
+              <StatTile icon={TrendingUp} label={t('admin_stat_projected_cost')} range="USD" value={`$${Number(local.projected_cost).toFixed(2)}`} />
+            )}
+          </div>
+          <AsOfNote asOf={local.created_at} />
+        </>
+      ) : (
+        <div className="admin-empty">{t('admin_empty_supabase')}</div>
+      )}
+      {saveError && <div className="admin-error">{saveError}</div>}
+      <div className="topup-form">
+        <input type="number" step="0.01" placeholder={t('admin_stat_current_cost')} value={currentCost} onChange={(e) => setCurrentCost(e.target.value)} />
+        <input type="number" step="0.01" placeholder={t('admin_stat_projected_cost')} value={projectedCost} onChange={(e) => setProjectedCost(e.target.value)} />
+        <button disabled={saving || !currentCost} onClick={save}>{t('admin_topup_add_btn')}</button>
+      </div>
+    </div>
   )
 }
 
@@ -451,6 +509,8 @@ function OverviewTab() {
       <OpenAiCostWidget />
 
       <PerplexityCostWidget />
+
+      <SupabaseCostWidget />
 
       <Widget title={t('admin_title_aws')} hint={t('admin_hint_aws')} path="/api/admin/stats/aws-cost" render={(data) => {
         if (!data || data.usd_today == null) {

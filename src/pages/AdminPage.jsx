@@ -983,6 +983,19 @@ function SalesTab() {
       </div>
 
       <div className="admin-widget">
+        <h3 className="admin-section__title">{t('admin_sales_revenue_by_source')}</h3>
+        <p className="admin-hint">{t('admin_sales_revenue_by_source_hint')}</p>
+        {!data ? <div className="admin-loading admin-loading--widget">{t('admin_loading')}</div> : (() => {
+          const items = Object.entries(data.revenue_by_source || {})
+            .sort((a, b) => b[1] - a[1])
+            .map(([key, value]) => ({ label: key === 'direct' ? t('admin_sales_source_direct') : key, value, color: 'var(--chart-1)' }))
+          return items.length > 0
+            ? <HBarList items={items} valueFormatter={(v) => `${v.toFixed(2)} ${data.currency}`} />
+            : <div className="admin-empty">{t('admin_empty_no_data')}</div>
+        })()}
+      </div>
+
+      <div className="admin-widget">
         <h3 className="admin-section__title">{t('admin_sales_recent_purchases')}</h3>
         {!data ? <div className="admin-loading admin-loading--widget">{t('admin_loading')}</div> : data.recent.length === 0 ? (
           <div className="admin-empty">{t('admin_no_sales')}</div>

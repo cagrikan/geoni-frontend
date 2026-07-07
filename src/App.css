@@ -2027,8 +2027,8 @@ body {
   padding: 10px; border-bottom: 1px solid var(--border);
   color: var(--text-sub); white-space: nowrap;
 }
-.admin-table__num { text-align: right; font-variant-numeric: tabular-nums; }
-.admin-table__center { text-align: center; }
+.admin-table th.admin-table__num, .admin-table td.admin-table__num { text-align: right; font-variant-numeric: tabular-nums; }
+.admin-table th.admin-table__center, .admin-table td.admin-table__center { text-align: center; }
 
 .admin-table--users { table-layout: fixed; }
 .admin-table--users th:nth-child(1), .admin-table--users td:nth-child(1) { width: 34%; }

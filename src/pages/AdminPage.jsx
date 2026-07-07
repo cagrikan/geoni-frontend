@@ -11,7 +11,7 @@ import {
   LayoutDashboard, Users, ScrollText, Search, Shield, ShieldOff,
   Plus, Minus, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ArrowLeft,
   UserPlus, RotateCcw, Globe, User, Tag, ShoppingCart, TrendingDown, TrendingUp, Gift, ShieldAlert,
-  CalendarDays, CalendarRange, Calendar, History, Wallet, PiggyBank, Database,
+  CalendarDays, CalendarRange, Calendar, History, Wallet, PiggyBank, Database, Megaphone, Copy, Check,
 } from 'lucide-react'
 
 const COST_TILE_ICONS = { today: CalendarDays, week: CalendarRange, month: Calendar, allTime: History }
@@ -930,6 +930,106 @@ function PricingTiersWidget() {
   )
 }
 
+function CampaignsTab() {
+  const { t } = useLanguage()
+  const { data: campaigns, error } = useAdminFetch('/api/admin/campaigns')
+  const [local, setLocal] = useState(null)
+  const [form, setForm] = useState({ name: '', slug: '', target_url: 'https://geoni.ai', utm_source: 'instagram', utm_medium: 'bio', utm_campaign: '' })
+  const [saving, setSaving] = useState(false)
+  const [formError, setFormError] = useState(null)
+  const [copiedId, setCopiedId] = useState(null)
+
+  useEffect(() => { if (campaigns) setLocal(campaigns) }, [campaigns])
+
+  const addCampaign = async () => {
+    if (!form.name || !form.slug || !form.utm_source) return
+    setSaving(true)
+    setFormError(null)
+    try {
+      await authedFetch('/api/admin/campaigns', { method: 'POST', body: JSON.stringify(form) })
+      const res = await authedFetch('/api/admin/campaigns')
+      setLocal(res)
+      setForm((f) => ({ ...f, name: '', slug: '', utm_campaign: '' }))
+    } catch (e) {
+      setFormError(e.message)
+    }
+    setSaving(false)
+  }
+
+  const deleteCampaign = async (id) => {
+    try {
+      await authedFetch(`/api/admin/campaigns/${id}`, { method: 'DELETE' })
+      setLocal((prev) => prev.filter((c) => c.id !== id))
+    } catch { /* ignore - kullanici tekrar deneyebilir */ }
+  }
+
+  const copyLink = (c) => {
+    const url = `https://geoni.ai/r/${c.slug}`
+    navigator.clipboard?.writeText(url)
+    setCopiedId(c.id)
+    setTimeout(() => setCopiedId(null), 1500)
+  }
+
+  return (
+    <div className="admin-section">
+      <div className="admin-widget">
+        <h3 className="admin-section__title">{t('admin_campaigns_title')}</h3>
+        <p className="admin-hint">{t('admin_campaigns_hint')}</p>
+
+        {error && <div className="admin-error">{error}</div>}
+        {!local ? <div className="admin-loading admin-loading--widget">{t('admin_loading')}</div> : (
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>{t('admin_campaigns_name')}</th>
+                  <th>{t('admin_campaigns_link')}</th>
+                  <th>{t('admin_campaigns_utm')}</th>
+                  <th className="admin-table__num">{t('admin_campaigns_clicks')}</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {local.length === 0 ? (
+                  <tr><td colSpan={5} className="admin-empty">{t('admin_campaigns_empty')}</td></tr>
+                ) : local.map((c) => (
+                  <tr key={c.id}>
+                    <td>{c.name}</td>
+                    <td>
+                      <button type="button" className="admin-copy-link" onClick={() => copyLink(c)} title={t('admin_campaigns_copy')}>
+                        geoni.ai/r/{c.slug} {copiedId === c.id ? <Check size={13} strokeWidth={2} /> : <Copy size={13} strokeWidth={1.5} />}
+                      </button>
+                    </td>
+                    <td className="admin-campaigns-utm">
+                      {c.utm_source}{c.utm_medium ? ` / ${c.utm_medium}` : ''}{c.utm_campaign ? ` / ${c.utm_campaign}` : ''}
+                    </td>
+                    <td className="admin-table__num">{c.click_count ?? 0}</td>
+                    <td><button onClick={() => deleteCampaign(c.id)}>{t('admin_pricing_delete')}</button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        <div className="topup-form">
+          <input type="text" placeholder={t('admin_campaigns_name')} value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
+          <input type="text" placeholder={t('admin_campaigns_slug_placeholder')} value={form.slug} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value.trim() }))} />
+          <select value={form.target_url} onChange={(e) => setForm((f) => ({ ...f, target_url: e.target.value }))}>
+            <option value="https://geoni.ai">geoni.ai</option>
+            <option value="https://app.geoni.ai">app.geoni.ai</option>
+          </select>
+          <input type="text" placeholder="utm_source" value={form.utm_source} onChange={(e) => setForm((f) => ({ ...f, utm_source: e.target.value }))} />
+          <input type="text" placeholder="utm_medium" value={form.utm_medium} onChange={(e) => setForm((f) => ({ ...f, utm_medium: e.target.value }))} />
+          <input type="text" placeholder="utm_campaign" value={form.utm_campaign} onChange={(e) => setForm((f) => ({ ...f, utm_campaign: e.target.value }))} />
+          <button disabled={saving || !form.name || !form.slug || !form.utm_source} onClick={addCampaign}>{t('admin_campaigns_add')}</button>
+        </div>
+        {formError && <div className="admin-error">{formError}</div>}
+      </div>
+    </div>
+  )
+}
+
 function SalesTab() {
   const { t, language } = useLanguage()
   const [days, setDays] = useState(14)
@@ -1065,6 +1165,9 @@ export default function AdminPage({ onBack }) {
             <button className={`dash-nav__item ${tab === 'sales' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('sales')}>
               <TrendingUp size={16} strokeWidth={1.5} /> {t('admin_nav_sales')}
             </button>
+            <button className={`dash-nav__item ${tab === 'campaigns' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('campaigns')}>
+              <Megaphone size={16} strokeWidth={1.5} /> {t('admin_nav_campaigns')}
+            </button>
           </nav>
         </aside>
 
@@ -1073,6 +1176,7 @@ export default function AdminPage({ onBack }) {
           {tab === 'users' && <UsersTab />}
           {tab === 'audits' && <AuditsTab />}
           {tab === 'sales' && <SalesTab />}
+          {tab === 'campaigns' && <CampaignsTab />}
         </main>
       </div>
     </div>

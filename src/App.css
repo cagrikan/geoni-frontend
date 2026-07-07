@@ -2032,6 +2032,15 @@ body {
 .admin-table__sortable { cursor: pointer; user-select: none; }
 .admin-table__sortable:hover { color: var(--text); }
 .admin-table__sort-label { display: inline-flex; align-items: center; gap: 3px; }
+
+.admin-copy-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--tint); border: 1px solid var(--border);
+  border-radius: 6px; padding: 4px 8px; font-size: .78rem;
+  font-family: var(--mono); color: var(--text-sub); cursor: pointer;
+}
+.admin-copy-link:hover { border-color: var(--accent); color: var(--accent); }
+.admin-campaigns-utm { color: var(--text-muted); font-size: .78rem; }
 .admin-user-cell { display: flex; flex-direction: column; }
 .admin-user-cell__sub { font-size: .76rem; color: var(--text-muted); }
 

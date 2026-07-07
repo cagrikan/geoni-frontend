@@ -2029,6 +2029,14 @@ body {
 }
 .admin-table__num { text-align: right; font-variant-numeric: tabular-nums; }
 .admin-table__center { text-align: center; }
+
+.admin-table--users { table-layout: fixed; }
+.admin-table--users th:nth-child(1), .admin-table--users td:nth-child(1) { width: 34%; }
+.admin-table--users th:nth-child(2), .admin-table--users td:nth-child(2),
+.admin-table--users th:nth-child(3), .admin-table--users td:nth-child(3),
+.admin-table--users th:nth-child(4), .admin-table--users td:nth-child(4),
+.admin-table--users th:nth-child(5), .admin-table--users td:nth-child(5) { width: 12%; }
+.admin-table--users th:nth-child(6), .admin-table--users td:nth-child(6) { width: 18%; }
 .admin-table__sortable { cursor: pointer; user-select: none; }
 .admin-table__sortable:hover { color: var(--text); }
 .admin-table__sort-label { display: inline-flex; align-items: center; gap: 3px; }
@@ -2063,14 +2071,22 @@ body {
 .admin-table__row--clickable:hover { background: var(--tint); }
 .admin-table__muted { color: var(--text-muted); font-size: .78rem; }
 
-.admin-user-cell { display: flex; align-items: center; gap: 10px; }
-.admin-user-cell__sub { font-size: .76rem; color: var(--text-muted); margin-top: 1px; }
+.admin-user-cell { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.admin-user-cell > div { min-width: 0; overflow: hidden; }
+.admin-user-cell__sub {
+  font-size: .76rem; color: var(--text-muted); margin-top: 1px; text-align: left;
+  display: block; overflow: hidden; text-overflow: ellipsis;
+}
 .admin-user-avatar {
   flex: 0 0 auto; width: 32px; height: 32px; border-radius: 50%;
   background: var(--accent); color: #FFFFFF; font-weight: 700; font-size: .82rem;
   display: flex; align-items: center; justify-content: center; line-height: 1;
 }
-.admin-user-cell__name { display: flex; align-items: center; gap: 6px; font-weight: 500; color: var(--text); flex-wrap: wrap; line-height: 1.3; }
+.admin-user-cell__name {
+  display: flex; align-items: center; gap: 6px; font-weight: 500; color: var(--text);
+  line-height: 1.3; overflow: hidden;
+}
+.admin-user-cell__name > span:first-child { overflow: hidden; text-overflow: ellipsis; }
 .admin-badge {
   display: inline-flex; align-items: center; height: 17px; padding: 0 6px; border-radius: 5px;
   font-size: .64rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;

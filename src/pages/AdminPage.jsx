@@ -640,20 +640,41 @@ function UsersTab() {
   const [total, setTotal] = useState(0)
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(0)
+  const [sortBy, setSortBy] = useState('created_at')
+  const [sortDir, setSortDir] = useState('desc')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [selectedUserId, setSelectedUserId] = useState(null)
 
   const load = useCallback(() => {
     setLoading(true)
-    const params = new URLSearchParams({ search, limit: PAGE_SIZE, offset: page * PAGE_SIZE })
+    const params = new URLSearchParams({ search, sort_by: sortBy, sort_dir: sortDir, limit: PAGE_SIZE, offset: page * PAGE_SIZE })
     authedFetch(`/api/admin/users?${params}`)
       .then(res => { setUsers(res.users || []); setTotal(res.total || 0); setError(null) })
       .catch(e => setError(e.message))
       .finally(() => setLoading(false))
-  }, [search, page])
+  }, [search, sortBy, sortDir, page])
 
   useEffect(() => { load() }, [load])
+
+  const toggleSort = (field) => {
+    setPage(0)
+    if (sortBy === field) {
+      setSortDir(d => d === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortBy(field)
+      setSortDir(field === 'email' ? 'asc' : 'desc')
+    }
+  }
+
+  const SortHeader = ({ field, className, children }) => (
+    <th className={`admin-table__sortable ${className || ''}`} onClick={() => toggleSort(field)}>
+      <span className="admin-table__sort-label">
+        {children}
+        {sortBy === field && (sortDir === 'asc' ? <ChevronUp size={12} strokeWidth={2} /> : <ChevronDown size={12} strokeWidth={2} />)}
+      </span>
+    </th>
+  )
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
   const locale = language === 'en' ? 'en-US' : 'tr-TR'
@@ -676,12 +697,12 @@ function UsersTab() {
         <table className="admin-table admin-table--users">
           <thead>
             <tr>
-              <th>{t('admin_table_user')}</th>
-              <th className="admin-table__num">{t('admin_table_credit')}</th>
-              <th className="admin-table__num">{t('admin_table_received')}</th>
-              <th className="admin-table__num">{t('admin_stat_spent')}</th>
-              <th className="admin-table__num">{t('admin_table_gifted')}</th>
-              <th>{t('admin_user_joined')}</th>
+              <SortHeader field="email">{t('admin_table_user')}</SortHeader>
+              <SortHeader field="credit_balance" className="admin-table__num">{t('admin_table_credit')}</SortHeader>
+              <SortHeader field="total_credits_purchased" className="admin-table__num">{t('admin_table_received')}</SortHeader>
+              <SortHeader field="total_credits_spent" className="admin-table__num">{t('admin_stat_spent')}</SortHeader>
+              <SortHeader field="total_credits_gifted" className="admin-table__num">{t('admin_table_gifted')}</SortHeader>
+              <SortHeader field="created_at">{t('admin_user_joined')}</SortHeader>
             </tr>
           </thead>
           <tbody>

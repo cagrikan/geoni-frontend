@@ -702,7 +702,7 @@ function UsersTab() {
               <SortHeader field="total_credits_purchased" className="admin-table__num">{t('admin_table_received')}</SortHeader>
               <SortHeader field="total_credits_spent" className="admin-table__num">{t('admin_stat_spent')}</SortHeader>
               <SortHeader field="total_credits_gifted" className="admin-table__num">{t('admin_table_gifted')}</SortHeader>
-              <SortHeader field="created_at">{t('admin_user_joined')}</SortHeader>
+              <SortHeader field="created_at" className="admin-table__num">{t('admin_user_joined')}</SortHeader>
             </tr>
           </thead>
           <tbody>
@@ -730,7 +730,7 @@ function UsersTab() {
                 <td className="admin-table__num">{u.total_credits_purchased ?? 0}</td>
                 <td className="admin-table__num">{u.total_credits_spent ?? 0}</td>
                 <td className="admin-table__num">{u.total_credits_gifted ?? 0}</td>
-                <td className="admin-table__muted">{formatDate(u.created_at)}</td>
+                <td className="admin-table__muted admin-table__num">{formatDate(u.created_at)}</td>
               </tr>
             ))}
           </tbody>

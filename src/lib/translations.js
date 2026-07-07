@@ -278,8 +278,6 @@ export const translations = {
     admin_hint_total_cost: 'Anthropic + OpenAI + AWS + Perplexity + Supabase (USD) + Gemini (TRY, güncel TCMB kuruyla USD\'ye çevrilir). Aylar takvim ayı bazlıdır (bu ay, bu ay + geçen ay, ...).',
     admin_stat_2_months: 'Son 2 ay',
     admin_stat_3_months: 'Son 3 ay',
-    admin_hint_gemini_fx: 'Gemini bu ay: ₺{try} (kur: 1 USD = ₺{rate})',
-    admin_hint_gemini_fx_unavailable: 'Kur bilgisi alınamadı - Gemini toplama dahil edilmedi.',
     admin_series_cost_try: 'Maliyet (₺)',
 
     admin_title_anthropic: 'Anthropic gerçek maliyet',
@@ -652,8 +650,6 @@ export const translations = {
     admin_hint_total_cost: "Anthropic + OpenAI + AWS + Perplexity + Supabase (USD) + Gemini (TRY, converted to USD via the current TCMB rate). Months are calendar-based (this month, this + last month, ...).",
     admin_stat_2_months: 'Last 2 months',
     admin_stat_3_months: 'Last 3 months',
-    admin_hint_gemini_fx: 'Gemini this month: ₺{try} (rate: 1 USD = ₺{rate})',
-    admin_hint_gemini_fx_unavailable: 'Exchange rate unavailable - Gemini excluded from the total.',
     admin_series_cost_try: 'Cost (₺)',
 
     admin_title_anthropic: 'Anthropic real cost',

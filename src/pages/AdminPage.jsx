@@ -284,10 +284,11 @@ function TotalCostWidget() {
   if (error) return <div className="admin-widget"><h3 className="admin-section__title">{t('admin_title_total_cost')}</h3><div className="admin-error">{error}</div></div>
   if (!data) return <div className="admin-widget"><h3 className="admin-section__title">{t('admin_title_total_cost')}</h3><div className="admin-loading admin-loading--widget">{t('admin_loading')}</div></div>
 
+  const providerLabels = { anthropic: 'Anthropic', openai: 'OpenAI', aws: 'AWS', perplexity: 'Perplexity', gemini_usd: 'Gemini', supabase: 'Supabase' }
   const byProviderItems = Object.entries(data.by_provider_this_month || {})
     .filter(([, v]) => v > 0)
     .sort((a, b) => b[1] - a[1])
-    .map(([key, value]) => ({ label: key, value, color: 'var(--chart-1)' }))
+    .map(([key, value]) => ({ label: providerLabels[key] || key, value, color: 'var(--chart-1)' }))
 
   return (
     <div className="admin-widget">
@@ -304,11 +305,6 @@ function TotalCostWidget() {
           <div className="admin-subtitle">{t('admin_subtitle_service')}</div>
           <HBarList items={byProviderItems} valueFormatter={(v) => `$${v.toFixed(2)}`} />
         </>
-      )}
-      {data.usd_try_rate ? (
-        <p className="admin-hint">{t('admin_hint_gemini_fx', { try: data.gemini_try_this_month.toFixed(2), rate: data.usd_try_rate.toFixed(2) })}</p>
-      ) : (
-        <p className="admin-hint">{t('admin_hint_gemini_fx_unavailable')}</p>
       )}
       <AsOfNote asOf={data.as_of} />
     </div>

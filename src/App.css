@@ -2135,7 +2135,7 @@ body {
 
 .hbarlist { display: flex; flex-direction: column; gap: 8px; }
 .hbarlist__row { display: grid; grid-template-columns: 110px 1fr 44px; align-items: center; gap: 8px; }
-.hbarlist__label { font-size: .78rem; color: var(--text-sub); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hbarlist__label { font-size: .78rem; color: var(--text-sub); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: right; }
 .hbarlist__track { background: var(--tint); border-radius: 4px; height: 8px; overflow: hidden; }
 .hbarlist__fill { height: 100%; border-radius: 4px; }
 .hbarlist__value { font-size: .78rem; color: var(--text-muted); text-align: right; font-family: var(--mono); }

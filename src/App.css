@@ -2159,7 +2159,7 @@ body {
   font-size: .66rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .02em;
   padding-bottom: 8px; border-bottom: 1px solid var(--border); margin-bottom: 2px;
 }
-.admin-sublist__head span:first-child { text-align: right; }
+.admin-sublist__head span:first-child { text-align: left; }
 .admin-sublist__head span:nth-child(2) { text-align: right; }
 .admin-sublist__head span:nth-child(3) { text-align: right; }
 .admin-sublist__row {
@@ -2167,7 +2167,7 @@ body {
   font-size: .82rem; color: var(--text-sub); padding: 9px 0; border-bottom: 1px solid var(--border);
 }
 .admin-sublist__row:last-child { border-bottom: none; }
-.admin-sublist__row > span:first-child { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: right; }
+.admin-sublist__row > span:first-child { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
 .admin-sublist__row > span:nth-child(2) { text-align: right; color: var(--text-muted); }
 .admin-sublist__row > span:nth-child(3) { text-align: right; color: var(--text-muted); font-size: .78rem; white-space: nowrap; }
 .admin-sublist__row--clickable { cursor: pointer; }

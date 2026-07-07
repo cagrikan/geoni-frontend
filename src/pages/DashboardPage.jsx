@@ -10,7 +10,7 @@ import ThemeSwitcher from '../components/ThemeSwitcher'
 import ConfirmDialog from '../components/ConfirmDialog'
 import {
   Gem, History, Bookmark, Settings, Globe, User, Building2, FileText,
-  TrendingUp, TrendingDown, ChevronRight, X, RefreshCw, ShieldCheck,
+  TrendingUp, TrendingDown, ChevronRight, X, RefreshCw, ShieldCheck, Wrench, ClipboardList,
 } from 'lucide-react'
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.geoni.ai'
@@ -79,6 +79,145 @@ function BuyCreditsSection({ t }) {
           </div>
         ))}
       </div>
+    </div>
+  )
+}
+
+const TICKET_STATUS_KEY = {
+  open: 'ticket_status_open', assigned: 'ticket_status_assigned', in_progress: 'ticket_status_in_progress',
+  submitted: 'ticket_status_submitted', verified: 'ticket_status_verified', rejected: 'ticket_status_rejected',
+}
+
+function TicketStatusBadge({ status, t }) {
+  return <span className={`ticket-status ticket-status--${status}`}>{t(TICKET_STATUS_KEY[status] || status)}</span>
+}
+
+function TicketsSection({ t, profile }) {
+  const [types, setTypes] = useState(null)
+  const [myTickets, setMyTickets] = useState(null)
+  const [buyingId, setBuyingId] = useState(null)
+  const [error, setError] = useState(null)
+
+  const loadTickets = () => authedFetch('/api/tickets').then(setMyTickets).catch(() => setMyTickets([]))
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/ticket-types`).then((r) => r.json()).then(setTypes).catch(() => setTypes([]))
+    loadTickets()
+  }, [])
+
+  const buy = async (ticketTypeId) => {
+    setBuyingId(ticketTypeId)
+    setError(null)
+    try {
+      await authedFetch('/api/tickets', { method: 'POST', body: JSON.stringify({ ticket_type_id: ticketTypeId }) })
+      loadTickets()
+    } catch (e) {
+      setError(e.message)
+    }
+    setBuyingId(null)
+  }
+
+  return (
+    <div className="dash-section">
+      <h2 className="dash-section__title">{t('dash_tickets_title')}</h2>
+      <p className="dash-hint">{t('dash_tickets_hint')}</p>
+
+      {error && <div className="dash-buy-error">{error}</div>}
+
+      {types === null ? <div className="dash-loading">{t('dash_loading')}</div> : (
+        <div className="dash-buy-credits__grid">
+          {types.map((tt) => (
+            <div key={tt.id} className="dash-buy-credits__card">
+              <div className="dash-buy-credits__name">{tt.name}</div>
+              <p className="ticket-type-desc">{tt.description}</p>
+              <div className="dash-buy-credits__credits">{tt.token_cost} <span className="dash-credit-unit">{t('dash_credit_unit')}</span></div>
+              <button
+                className="dash-buy-btn"
+                disabled={buyingId === tt.id || (profile?.credit_balance ?? 0) < tt.token_cost}
+                onClick={() => buy(tt.id)}
+              >{t('dash_tickets_buy')}</button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <h3 className="dash-subsection__title">{t('dash_tickets_mine')}</h3>
+      {myTickets === null ? <div className="dash-loading">{t('dash_loading')}</div> : myTickets.length === 0 ? (
+        <div className="dash-empty"><p>{t('dash_tickets_empty')}</p></div>
+      ) : (
+        <div className="ticket-list">
+          {myTickets.map((tk) => (
+            <div key={tk.id} className="ticket-row">
+              <div className="ticket-row__info">
+                <div className="ticket-row__name">{tk.ticket_type_name}</div>
+                <div className="ticket-row__meta">{new Date(tk.created_at).toLocaleDateString()} · {tk.token_cost} {t('dash_credit_unit')}</div>
+              </div>
+              <TicketStatusBadge status={tk.status} t={t} />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ExpertPanelSection({ t }) {
+  const [tickets, setTickets] = useState(null)
+  const [forms, setForms] = useState({})
+  const [submittingId, setSubmittingId] = useState(null)
+
+  const load = () => authedFetch('/api/expert/tickets').then(setTickets).catch(() => setTickets([]))
+  useEffect(() => { load() }, [])
+
+  const submit = async (ticketId) => {
+    const form = forms[ticketId] || {}
+    if (!form.evidence_url) return
+    setSubmittingId(ticketId)
+    try {
+      await authedFetch(`/api/expert/tickets/${ticketId}/submit`, {
+        method: 'POST',
+        body: JSON.stringify({ evidence_url: form.evidence_url, evidence_note: form.evidence_note || '' }),
+      })
+      load()
+    } catch { /* kullanici tekrar deneyebilir */ }
+    setSubmittingId(null)
+  }
+
+  return (
+    <div className="dash-section">
+      <h2 className="dash-section__title">{t('dash_expert_title')}</h2>
+      <p className="dash-hint">{t('dash_expert_hint')}</p>
+      {tickets === null ? <div className="dash-loading">{t('dash_loading')}</div> : tickets.length === 0 ? (
+        <div className="dash-empty"><p>{t('dash_expert_empty')}</p></div>
+      ) : (
+        <div className="ticket-list">
+          {tickets.map((tk) => (
+            <div key={tk.id} className="ticket-row ticket-row--expert">
+              <div className="ticket-row__info">
+                <div className="ticket-row__name">{tk.ticket_type_name}</div>
+                <div className="ticket-row__meta">{tk.target || tk.user_email} · {new Date(tk.created_at).toLocaleDateString()}</div>
+              </div>
+              <TicketStatusBadge status={tk.status} t={t} />
+              {(tk.status === 'assigned' || tk.status === 'in_progress') && (
+                <div className="ticket-submit-form">
+                  <input
+                    type="text" placeholder={t('dash_expert_evidence_url_ph')}
+                    value={forms[tk.id]?.evidence_url || ''}
+                    onChange={(e) => setForms((f) => ({ ...f, [tk.id]: { ...f[tk.id], evidence_url: e.target.value } }))}
+                  />
+                  <input
+                    type="text" placeholder={t('dash_expert_evidence_note_ph')}
+                    value={forms[tk.id]?.evidence_note || ''}
+                    onChange={(e) => setForms((f) => ({ ...f, [tk.id]: { ...f[tk.id], evidence_note: e.target.value } }))}
+                  />
+                  <button disabled={submittingId === tk.id || !forms[tk.id]?.evidence_url} onClick={() => submit(tk.id)}>{t('dash_expert_submit')}</button>
+                </div>
+              )}
+              {tk.status === 'rejected' && tk.reject_reason && <div className="ticket-reject-reason">{tk.reject_reason}</div>}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -357,6 +496,14 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
             <button className={`dash-nav__item ${tab === 'credits' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('credits')}>
               <Gem size={16} strokeWidth={1.5} /> {t('dash_nav_credits')}
             </button>
+            <button className={`dash-nav__item ${tab === 'tickets' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('tickets')}>
+              <Wrench size={16} strokeWidth={1.5} /> {t('dash_nav_tickets')}
+            </button>
+            {profile?.is_expert && (
+              <button className={`dash-nav__item ${tab === 'expert' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('expert')}>
+                <ClipboardList size={16} strokeWidth={1.5} /> {t('dash_nav_expert')}
+              </button>
+            )}
             <button className={`dash-nav__item ${tab === 'settings' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('settings')}>
               <Settings size={16} strokeWidth={1.5} /> {t('dash_nav_settings')}
             </button>
@@ -548,6 +695,9 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
               <BuyCreditsSection t={t} />
             </div>
           )}
+
+          {tab === 'tickets' && <TicketsSection t={t} profile={profile} />}
+          {tab === 'expert' && profile?.is_expert && <ExpertPanelSection t={t} />}
 
           {/* Settings tab */}
           {tab === 'settings' && (

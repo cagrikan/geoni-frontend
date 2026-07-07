@@ -11,7 +11,7 @@ import {
   LayoutDashboard, Users, ScrollText, Search, Shield, ShieldOff,
   Plus, Minus, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ArrowLeft,
   UserPlus, RotateCcw, Globe, User, Tag, ShoppingCart, TrendingDown, TrendingUp, Gift, ShieldAlert,
-  CalendarDays, CalendarRange, Calendar, History, Wallet, PiggyBank, Database, Megaphone, Copy, Check,
+  CalendarDays, CalendarRange, Calendar, History, Wallet, PiggyBank, Database, Megaphone, Copy, Check, Wrench,
 } from 'lucide-react'
 
 const COST_TILE_ICONS = { today: CalendarDays, week: CalendarRange, month: Calendar, allTime: History }
@@ -680,6 +680,17 @@ function UsersTab() {
     } catch (e) { setError(e.message) } finally { setBusyId(null) }
   }
 
+  const toggleExpert = async (userId, current) => {
+    setBusyId(userId)
+    try {
+      await authedFetch(`/api/admin/users/${userId}/expert-flag`, {
+        method: 'POST',
+        body: JSON.stringify({ is_expert: !current }),
+      })
+      load()
+    } catch (e) { setError(e.message) } finally { setBusyId(null) }
+  }
+
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
 
   return (
@@ -699,14 +710,14 @@ function UsersTab() {
         <table className="admin-table">
           <thead>
             <tr>
-              <th>{t('admin_table_user')}</th><th className="admin-table__num">{t('admin_table_credit')}</th><th className="admin-table__num">{t('admin_table_received')}</th><th className="admin-table__num">{t('admin_stat_spent')}</th><th className="admin-table__num">{t('admin_table_gifted')}</th><th className="admin-table__center">{t('admin_table_admin')}</th><th>{t('admin_table_credit_fix')}</th>
+              <th>{t('admin_table_user')}</th><th className="admin-table__num">{t('admin_table_credit')}</th><th className="admin-table__num">{t('admin_table_received')}</th><th className="admin-table__num">{t('admin_stat_spent')}</th><th className="admin-table__num">{t('admin_table_gifted')}</th><th className="admin-table__center">{t('admin_table_admin')}</th><th className="admin-table__center">{t('admin_table_expert')}</th><th>{t('admin_table_credit_fix')}</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={7} className="admin-loading">{t('admin_loading')}</td></tr>
+              <tr><td colSpan={8} className="admin-loading">{t('admin_loading')}</td></tr>
             ) : users.length === 0 ? (
-              <tr><td colSpan={7} className="admin-empty">{t('admin_no_users')}</td></tr>
+              <tr><td colSpan={8} className="admin-empty">{t('admin_no_users')}</td></tr>
             ) : users.map(u => (
               <tr key={u.id}>
                 <td>
@@ -728,6 +739,16 @@ function UsersTab() {
                   >
                     {u.is_admin ? <Shield size={13} strokeWidth={1.5} /> : <ShieldOff size={13} strokeWidth={1.5} />}
                     {u.is_admin ? 'Admin' : '—'}
+                  </button>
+                </td>
+                <td className="admin-table__center">
+                  <button
+                    className={`admin-admin-toggle ${u.is_expert ? 'admin-admin-toggle--on' : ''}`}
+                    onClick={() => toggleExpert(u.id, u.is_expert)}
+                    disabled={busyId === u.id}
+                    title={u.is_expert ? t('admin_expert_revoke_title') : t('admin_expert_grant_title')}
+                  >
+                    {u.is_expert ? <Wrench size={13} strokeWidth={1.5} /> : '—'}
                   </button>
                 </td>
                 <td>
@@ -1030,6 +1051,199 @@ function CampaignsTab() {
   )
 }
 
+const TICKET_STATUS_FILTERS = ['', 'open', 'assigned', 'in_progress', 'submitted', 'verified', 'rejected']
+
+function TicketsAdminTab() {
+  const { t } = useLanguage()
+  const [statusFilter, setStatusFilter] = useState('')
+  const { data: tickets, error } = useAdminFetch(`/api/admin/tickets${statusFilter ? `?status=${statusFilter}` : ''}`)
+  const [local, setLocal] = useState(null)
+  const [experts, setExperts] = useState(null)
+  const [busyId, setBusyId] = useState(null)
+  const [rejectDrafts, setRejectDrafts] = useState({})
+
+  useEffect(() => { if (tickets) setLocal(tickets) }, [tickets])
+  useEffect(() => { authedFetch('/api/admin/experts').then(setExperts).catch(() => setExperts([])) }, [])
+
+  const assign = async (ticketId, expertId) => {
+    if (!expertId) return
+    setBusyId(ticketId)
+    try {
+      await authedFetch(`/api/admin/tickets/${ticketId}/assign`, { method: 'POST', body: JSON.stringify({ expert_id: expertId }) })
+      const res = await authedFetch(`/api/admin/tickets${statusFilter ? `?status=${statusFilter}` : ''}`)
+      setLocal(res)
+    } catch { /* kullanici tekrar deneyebilir */ }
+    setBusyId(null)
+  }
+
+  const verify = async (ticketId, approve) => {
+    setBusyId(ticketId)
+    try {
+      await authedFetch(`/api/admin/tickets/${ticketId}/verify`, {
+        method: 'POST',
+        body: JSON.stringify({ approve, reject_reason: approve ? '' : (rejectDrafts[ticketId] || '') }),
+      })
+      const res = await authedFetch(`/api/admin/tickets${statusFilter ? `?status=${statusFilter}` : ''}`)
+      setLocal(res)
+    } catch { /* kullanici tekrar deneyebilir */ }
+    setBusyId(null)
+  }
+
+  return (
+    <div className="admin-section">
+      <div className="admin-widget">
+        <h3 className="admin-section__title">{t('admin_tickets_title')}</h3>
+        <p className="admin-hint">{t('admin_tickets_hint')}</p>
+
+        <div className="admin-ticket-filters">
+          {TICKET_STATUS_FILTERS.map((s) => (
+            <button
+              key={s || 'all'}
+              className={`admin-ticket-filter ${statusFilter === s ? 'admin-ticket-filter--active' : ''}`}
+              onClick={() => setStatusFilter(s)}
+            >{s ? t(TICKET_STATUS_KEY_MAP[s]) : t('admin_tickets_filter_all')}</button>
+          ))}
+        </div>
+
+        {error && <div className="admin-error">{error}</div>}
+        {!local ? <div className="admin-loading admin-loading--widget">{t('admin_loading')}</div> : local.length === 0 ? (
+          <div className="admin-empty">{t('admin_tickets_empty')}</div>
+        ) : (
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>{t('admin_table_user')}</th>
+                  <th>{t('admin_campaigns_name')}</th>
+                  <th>{t('admin_tickets_target')}</th>
+                  <th>{t('admin_tickets_status')}</th>
+                  <th>{t('admin_tickets_expert')}</th>
+                  <th>{t('admin_tickets_evidence')}</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {local.map((tk) => (
+                  <tr key={tk.id}>
+                    <td>{tk.user_email || '—'}</td>
+                    <td>{tk.ticket_type_name}</td>
+                    <td>{tk.target || '—'}</td>
+                    <td><span className={`ticket-status ticket-status--${tk.status}`}>{t(TICKET_STATUS_KEY_MAP[tk.status] || tk.status)}</span></td>
+                    <td>
+                      {tk.status === 'open' || tk.status === 'assigned' || tk.status === 'in_progress' ? (
+                        <select disabled={busyId === tk.id} value={tk.assigned_expert_id || ''} onChange={(e) => assign(tk.id, e.target.value)}>
+                          <option value="">{t('admin_tickets_pick_expert')}</option>
+                          {(experts || []).map((ex) => <option key={ex.id} value={ex.id}>{ex.email || ex.full_name}</option>)}
+                        </select>
+                      ) : (tk.expert_email || '—')}
+                    </td>
+                    <td>
+                      {tk.evidence_url ? <a href={tk.evidence_url} target="_blank" rel="noopener noreferrer">{t('admin_tickets_view_evidence')}</a> : '—'}
+                      {tk.evidence_note && <div className="admin-user-cell__sub">{tk.evidence_note}</div>}
+                    </td>
+                    <td>
+                      {tk.status === 'submitted' && (
+                        <div className="admin-ticket-verify">
+                          <button disabled={busyId === tk.id} onClick={() => verify(tk.id, true)}>{t('admin_tickets_approve')}</button>
+                          <input
+                            type="text" placeholder={t('admin_tickets_reject_reason_ph')}
+                            value={rejectDrafts[tk.id] || ''}
+                            onChange={(e) => setRejectDrafts((d) => ({ ...d, [tk.id]: e.target.value }))}
+                          />
+                          <button disabled={busyId === tk.id} onClick={() => verify(tk.id, false)}>{t('admin_tickets_reject')}</button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      <TicketTypesWidget />
+    </div>
+  )
+}
+
+const TICKET_STATUS_KEY_MAP = {
+  open: 'ticket_status_open', assigned: 'ticket_status_assigned', in_progress: 'ticket_status_in_progress',
+  submitted: 'ticket_status_submitted', verified: 'ticket_status_verified', rejected: 'ticket_status_rejected',
+}
+
+function TicketTypesWidget() {
+  const { t } = useLanguage()
+  const { data: types, error } = useAdminFetch('/api/admin/ticket-types')
+  const [local, setLocal] = useState(null)
+  const [form, setForm] = useState({ key: '', name: '', description: '', token_cost: '', verification_type: 'manual' })
+  const [saving, setSaving] = useState(false)
+  const [formError, setFormError] = useState(null)
+
+  useEffect(() => { if (types) setLocal(types) }, [types])
+
+  const addType = async () => {
+    if (!form.key || !form.name || !form.token_cost) return
+    setSaving(true)
+    setFormError(null)
+    try {
+      await authedFetch('/api/admin/ticket-types', {
+        method: 'POST',
+        body: JSON.stringify({ ...form, token_cost: Number(form.token_cost) }),
+      })
+      const res = await authedFetch('/api/admin/ticket-types')
+      setLocal(res)
+      setForm({ key: '', name: '', description: '', token_cost: '', verification_type: 'manual' })
+    } catch (e) { setFormError(e.message) }
+    setSaving(false)
+  }
+
+  const toggleActive = async (id, current) => {
+    try {
+      await authedFetch(`/api/admin/ticket-types/${id}/active`, { method: 'POST', body: JSON.stringify({ is_active: !current }) })
+      setLocal((prev) => prev.map((tt) => tt.id === id ? { ...tt, is_active: !current } : tt))
+    } catch { /* kullanici tekrar deneyebilir */ }
+  }
+
+  if (error) return <div className="admin-error">{error}</div>
+  if (!local) return <div className="admin-loading admin-loading--widget">{t('admin_loading')}</div>
+
+  return (
+    <div className="admin-widget">
+      <h3 className="admin-section__title">{t('admin_ticket_types_title')}</h3>
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead>
+            <tr><th>{t('admin_campaigns_name')}</th><th className="admin-table__num">{t('admin_ticket_types_cost')}</th><th>{t('admin_ticket_types_verification')}</th><th></th></tr>
+          </thead>
+          <tbody>
+            {local.map((tt) => (
+              <tr key={tt.id}>
+                <td>{tt.name}</td>
+                <td className="admin-table__num">{tt.token_cost}</td>
+                <td>{tt.verification_type === 'auto' ? t('admin_ticket_types_auto') : t('admin_ticket_types_manual')}</td>
+                <td><button onClick={() => toggleActive(tt.id, tt.is_active)}>{tt.is_active ? t('admin_ticket_types_deactivate') : t('admin_ticket_types_activate')}</button></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="topup-form">
+        <input type="text" placeholder="key" value={form.key} onChange={(e) => setForm((f) => ({ ...f, key: e.target.value.trim() }))} />
+        <input type="text" placeholder={t('admin_campaigns_name')} value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
+        <input type="text" placeholder={t('admin_ticket_types_desc_ph')} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
+        <input type="number" placeholder={t('admin_ticket_types_cost')} value={form.token_cost} onChange={(e) => setForm((f) => ({ ...f, token_cost: e.target.value }))} />
+        <select value={form.verification_type} onChange={(e) => setForm((f) => ({ ...f, verification_type: e.target.value }))}>
+          <option value="manual">{t('admin_ticket_types_manual')}</option>
+          <option value="auto">{t('admin_ticket_types_auto')}</option>
+        </select>
+        <button disabled={saving || !form.key || !form.name || !form.token_cost} onClick={addType}>{t('admin_pricing_add')}</button>
+      </div>
+      {formError && <div className="admin-error">{formError}</div>}
+    </div>
+  )
+}
+
 function SalesTab() {
   const { t, language } = useLanguage()
   const [days, setDays] = useState(14)
@@ -1168,6 +1382,9 @@ export default function AdminPage({ onBack }) {
             <button className={`dash-nav__item ${tab === 'campaigns' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('campaigns')}>
               <Megaphone size={16} strokeWidth={1.5} /> {t('admin_nav_campaigns')}
             </button>
+            <button className={`dash-nav__item ${tab === 'tickets' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('tickets')}>
+              <Wrench size={16} strokeWidth={1.5} /> {t('admin_nav_tickets')}
+            </button>
           </nav>
         </aside>
 
@@ -1177,6 +1394,7 @@ export default function AdminPage({ onBack }) {
           {tab === 'audits' && <AuditsTab />}
           {tab === 'sales' && <SalesTab />}
           {tab === 'campaigns' && <CampaignsTab />}
+          {tab === 'tickets' && <TicketsAdminTab />}
         </main>
       </div>
     </div>

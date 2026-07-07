@@ -2455,13 +2455,33 @@ body {
   font-family: var(--display); font-size: .95rem; font-weight: 600;
   color: var(--text); margin: 24px 0 12px;
 }
-.ticket-type-desc { font-size: .8rem; color: var(--text-muted); line-height: 1.4; margin: 6px 0 10px; }
+.dash-service-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-top: 8px;
+}
+.dash-service-card {
+  display: flex; flex-direction: column; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 12px; padding: 18px;
+}
+.dash-service-card__icon {
+  width: 36px; height: 36px; border-radius: 9px; background: rgba(129,140,248,.12);
+  color: var(--accent); display: flex; align-items: center; justify-content: center; margin-bottom: 12px;
+}
+.dash-service-card__name { font-weight: 600; color: var(--text); font-size: .95rem; line-height: 1.35; }
+.dash-service-card__desc { font-size: .8rem; color: var(--text-muted); line-height: 1.5; margin: 8px 0 0; flex: 1; }
+.dash-service-card__footer {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 16px;
+}
+.dash-service-card__price { font-size: 1.1rem; font-weight: 700; font-family: var(--display); color: var(--text); }
 .ticket-list { display: flex; flex-direction: column; gap: 10px; }
 .ticket-row {
   display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
   padding: 14px 16px; background: var(--tint-weak); border: 1px solid var(--border); border-radius: 10px;
 }
 .ticket-row--expert { flex-direction: column; align-items: stretch; }
+.ticket-row__icon {
+  flex: 0 0 auto; width: 32px; height: 32px; border-radius: 8px; background: var(--tint);
+  color: var(--text-muted); display: flex; align-items: center; justify-content: center;
+}
 .ticket-row__info { flex: 1; min-width: 160px; }
 .ticket-row__name { font-weight: 600; color: var(--text); font-size: .92rem; }
 .ticket-row__meta { font-size: .78rem; color: var(--text-muted); margin-top: 2px; }

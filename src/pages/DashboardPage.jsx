@@ -11,7 +11,16 @@ import ConfirmDialog from '../components/ConfirmDialog'
 import {
   Gem, History, Bookmark, Settings, Globe, User, Building2, FileText,
   TrendingUp, TrendingDown, ChevronRight, X, RefreshCw, ShieldCheck, Wrench, ClipboardList,
+  Ticket, Braces, Bot, Landmark, Link2,
 } from 'lucide-react'
+
+const TICKET_TYPE_ICONS = {
+  schema_setup: Braces,
+  llms_robots: Bot,
+  wikidata_entity: Landmark,
+  content_package: FileText,
+  citation_placement: Link2,
+}
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.geoni.ai'
 
@@ -92,17 +101,14 @@ function TicketStatusBadge({ status, t }) {
   return <span className={`ticket-status ticket-status--${status}`}>{t(TICKET_STATUS_KEY[status] || status)}</span>
 }
 
-function TicketsSection({ t, profile }) {
+function ServiceCatalogSection({ t, profile }) {
   const [types, setTypes] = useState(null)
-  const [myTickets, setMyTickets] = useState(null)
   const [buyingId, setBuyingId] = useState(null)
   const [error, setError] = useState(null)
-
-  const loadTickets = () => authedFetch('/api/tickets').then(setMyTickets).catch(() => setMyTickets([]))
+  const [justBoughtId, setJustBoughtId] = useState(null)
 
   useEffect(() => {
     fetch(`${API_URL}/api/ticket-types`).then((r) => r.json()).then(setTypes).catch(() => setTypes([]))
-    loadTickets()
   }, [])
 
   const buy = async (ticketTypeId) => {
@@ -110,7 +116,8 @@ function TicketsSection({ t, profile }) {
     setError(null)
     try {
       await authedFetch('/api/tickets', { method: 'POST', body: JSON.stringify({ ticket_type_id: ticketTypeId }) })
-      loadTickets()
+      setJustBoughtId(ticketTypeId)
+      setTimeout(() => setJustBoughtId(null), 2500)
     } catch (e) {
       setError(e.message)
     }
@@ -125,36 +132,62 @@ function TicketsSection({ t, profile }) {
       {error && <div className="dash-buy-error">{error}</div>}
 
       {types === null ? <div className="dash-loading">{t('dash_loading')}</div> : (
-        <div className="dash-buy-credits__grid">
-          {types.map((tt) => (
-            <div key={tt.id} className="dash-buy-credits__card">
-              <div className="dash-buy-credits__name">{tt.name}</div>
-              <p className="ticket-type-desc">{tt.description}</p>
-              <div className="dash-buy-credits__credits">{tt.token_cost} <span className="dash-credit-unit">{t('dash_credit_unit')}</span></div>
-              <button
-                className="dash-buy-btn"
-                disabled={buyingId === tt.id || (profile?.credit_balance ?? 0) < tt.token_cost}
-                onClick={() => buy(tt.id)}
-              >{t('dash_tickets_buy')}</button>
-            </div>
-          ))}
+        <div className="dash-service-grid">
+          {types.map((tt) => {
+            const Icon = TICKET_TYPE_ICONS[tt.key] || Wrench
+            return (
+              <div key={tt.id} className="dash-service-card">
+                <div className="dash-service-card__icon"><Icon size={20} strokeWidth={1.5} /></div>
+                <div className="dash-service-card__name">{tt.name}</div>
+                <p className="dash-service-card__desc">{tt.description}</p>
+                <div className="dash-service-card__footer">
+                  <div className="dash-service-card__price">{tt.token_cost} <span className="dash-credit-unit">{t('dash_credit_unit')}</span></div>
+                  <button
+                    className="dash-buy-btn"
+                    disabled={buyingId === tt.id || (profile?.credit_balance ?? 0) < tt.token_cost}
+                    onClick={() => buy(tt.id)}
+                  >{justBoughtId === tt.id ? t('dash_tickets_bought') : t('dash_tickets_buy')}</button>
+                </div>
+              </div>
+            )
+          })}
         </div>
       )}
+    </div>
+  )
+}
 
-      <h3 className="dash-subsection__title">{t('dash_tickets_mine')}</h3>
+function MyTicketsSection({ t }) {
+  const [myTickets, setMyTickets] = useState(null)
+
+  useEffect(() => {
+    authedFetch('/api/tickets').then(setMyTickets).catch(() => setMyTickets([]))
+  }, [])
+
+  return (
+    <div className="dash-section">
+      <h2 className="dash-section__title">{t('dash_tickets_mine')}</h2>
+      <p className="dash-hint">{t('dash_tickets_mine_hint')}</p>
       {myTickets === null ? <div className="dash-loading">{t('dash_loading')}</div> : myTickets.length === 0 ? (
         <div className="dash-empty"><p>{t('dash_tickets_empty')}</p></div>
       ) : (
         <div className="ticket-list">
-          {myTickets.map((tk) => (
-            <div key={tk.id} className="ticket-row">
-              <div className="ticket-row__info">
-                <div className="ticket-row__name">{tk.ticket_type_name}</div>
-                <div className="ticket-row__meta">{new Date(tk.created_at).toLocaleDateString()} · {tk.token_cost} {t('dash_credit_unit')}</div>
+          {myTickets.map((tk) => {
+            const Icon = TICKET_TYPE_ICONS[tk.ticket_type_key] || Wrench
+            return (
+              <div key={tk.id} className="ticket-row">
+                <div className="ticket-row__icon"><Icon size={16} strokeWidth={1.5} /></div>
+                <div className="ticket-row__info">
+                  <div className="ticket-row__name">{tk.ticket_type_name}</div>
+                  <div className="ticket-row__meta">
+                    {tk.target && <>{tk.target} · </>}
+                    {new Date(tk.created_at).toLocaleDateString()} · {tk.token_cost} {t('dash_credit_unit')}
+                  </div>
+                </div>
+                <TicketStatusBadge status={tk.status} t={t} />
               </div>
-              <TicketStatusBadge status={tk.status} t={t} />
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>
@@ -191,8 +224,11 @@ function ExpertPanelSection({ t }) {
         <div className="dash-empty"><p>{t('dash_expert_empty')}</p></div>
       ) : (
         <div className="ticket-list">
-          {tickets.map((tk) => (
+          {tickets.map((tk) => {
+            const Icon = TICKET_TYPE_ICONS[tk.ticket_type_key] || Wrench
+            return (
             <div key={tk.id} className="ticket-row ticket-row--expert">
+              <div className="ticket-row__icon"><Icon size={16} strokeWidth={1.5} /></div>
               <div className="ticket-row__info">
                 <div className="ticket-row__name">{tk.ticket_type_name}</div>
                 <div className="ticket-row__meta">{tk.target || tk.user_email} · {new Date(tk.created_at).toLocaleDateString()}</div>
@@ -215,7 +251,8 @@ function ExpertPanelSection({ t }) {
               )}
               {tk.status === 'rejected' && tk.reject_reason && <div className="ticket-reject-reason">{tk.reject_reason}</div>}
             </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>
@@ -499,6 +536,9 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
             <button className={`dash-nav__item ${tab === 'tickets' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('tickets')}>
               <Wrench size={16} strokeWidth={1.5} /> {t('dash_nav_tickets')}
             </button>
+            <button className={`dash-nav__item ${tab === 'my_tickets' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('my_tickets')}>
+              <Ticket size={16} strokeWidth={1.5} /> {t('dash_nav_my_tickets')}
+            </button>
             {profile?.is_expert && (
               <button className={`dash-nav__item ${tab === 'expert' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('expert')}>
                 <ClipboardList size={16} strokeWidth={1.5} /> {t('dash_nav_expert')}
@@ -696,7 +736,8 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
             </div>
           )}
 
-          {tab === 'tickets' && <TicketsSection t={t} profile={profile} />}
+          {tab === 'tickets' && <ServiceCatalogSection t={t} profile={profile} />}
+          {tab === 'my_tickets' && <MyTicketsSection t={t} />}
           {tab === 'expert' && profile?.is_expert && <ExpertPanelSection t={t} />}
 
           {/* Settings tab */}

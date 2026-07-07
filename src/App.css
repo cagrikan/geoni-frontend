@@ -2079,6 +2079,7 @@ body {
 
 .admin-table__row--clickable { cursor: pointer; }
 .admin-table__row--clickable:hover { background: var(--tint); }
+.admin-table__row-chevron { vertical-align: middle; margin-left: 6px; color: var(--text-muted); }
 .admin-table__muted { color: var(--text-muted); font-size: .78rem; }
 
 .admin-user-cell { display: flex; align-items: center; gap: 10px; min-width: 0; }

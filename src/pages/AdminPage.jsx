@@ -1120,6 +1120,7 @@ function AuditsTab() {
   const [sortDir, setSortDir] = useState('desc')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [viewingAuditId, setViewingAuditId] = useState(null)
 
   useEffect(() => {
     setLoading(true)
@@ -1129,6 +1130,10 @@ function AuditsTab() {
       .catch(e => setError(e.message))
       .finally(() => setLoading(false))
   }, [search, sortBy, sortDir, page])
+
+  if (viewingAuditId) {
+    return <AuditDetailOverlay auditId={viewingAuditId} onBack={() => setViewingAuditId(null)} />
+  }
 
   const toggleSort = (field) => {
     setPage(0)
@@ -1183,13 +1188,20 @@ function AuditsTab() {
             ) : audits.length === 0 ? (
               <tr><td colSpan={6} className="admin-empty">{t('admin_no_records')}</td></tr>
             ) : audits.map(a => (
-              <tr key={a.id}>
+              <tr
+                key={a.id}
+                className={a.status === 'complete' ? 'admin-table__row--clickable' : ''}
+                onClick={() => a.status === 'complete' && setViewingAuditId(a.id)}
+              >
                 <td className="admin-table__left">{a.email || '—'}</td>
                 <td className="admin-table__left">{a.type}</td>
                 <td className="admin-table__left admin-table__ellipsis">{a.domain || a.name || '—'}</td>
                 <td className="admin-table__num">{a.score ?? '—'}</td>
                 <td className="admin-table__num">{a.credits_spent ?? 0}</td>
-                <td className="admin-table__num admin-table__muted">{formatDate(a.created_at)}</td>
+                <td className="admin-table__num admin-table__muted">
+                  {formatDate(a.created_at)}
+                  {a.status === 'complete' && <ChevronRight size={13} strokeWidth={1.5} className="admin-table__row-chevron" />}
+                </td>
               </tr>
             ))}
           </tbody>

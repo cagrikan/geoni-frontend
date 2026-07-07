@@ -511,9 +511,17 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                 <div className="dash-setting-row">
                   <div>
                     <div className="dash-setting-label">{t('dash_settings_membership')}</div>
-                    <div className="dash-setting-val">{t('dash_settings_free_plan')}</div>
+                    <div className="dash-setting-val">
+                      {profile?.is_admin
+                        ? t('dash_settings_admin_plan')
+                        : (profile?.total_credits_purchased > 0)
+                          ? t('dash_settings_pro_plan')
+                          : t('dash_settings_free_plan')}
+                    </div>
                   </div>
-                  <a href="https://geoni.ai#paketler" className="dash-upgrade-btn" target="_blank" rel="noopener">{t('dash_settings_upgrade')}</a>
+                  {!profile?.is_admin && !(profile?.total_credits_purchased > 0) && (
+                    <button type="button" className="dash-upgrade-btn" onClick={() => setTab('credits')}>{t('dash_settings_upgrade')}</button>
+                  )}
                 </div>
                 <button className="dash-signout-full" onClick={signOut}>{t('dash_settings_signout')}</button>
               </div>

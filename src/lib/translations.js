@@ -215,6 +215,8 @@ export const translations = {
     dash_settings_theme_light: 'Açık',
     dash_settings_membership: 'Üyelik',
     dash_settings_free_plan: 'Ücretsiz Plan',
+    dash_settings_pro_plan: 'Pro',
+    dash_settings_admin_plan: 'Admin',
     dash_settings_upgrade: "Pro'ya Geç",
     dash_settings_signout: 'Çıkış Yap',
 
@@ -587,6 +589,8 @@ export const translations = {
     dash_settings_theme_light: 'Light',
     dash_settings_membership: 'Membership',
     dash_settings_free_plan: 'Free Plan',
+    dash_settings_pro_plan: 'Pro',
+    dash_settings_admin_plan: 'Admin',
     dash_settings_upgrade: 'Upgrade to Pro',
     dash_settings_signout: 'Sign Out',
 

@@ -1140,8 +1140,8 @@ function AuditsTab() {
     }
   }
 
-  const SortHeader = ({ field, children }) => (
-    <th className="admin-table__sortable" onClick={() => toggleSort(field)}>
+  const SortHeader = ({ field, className, children }) => (
+    <th className={`admin-table__sortable ${className || ''}`} onClick={() => toggleSort(field)}>
       <span className="admin-table__sort-label">
         {children}
         {sortBy === field && (sortDir === 'asc' ? <ChevronUp size={12} strokeWidth={2} /> : <ChevronDown size={12} strokeWidth={2} />)}
@@ -1166,15 +1166,15 @@ function AuditsTab() {
 
       {error && <div className="admin-error">{error}</div>}
       <div className="admin-table-wrap">
-        <table className="admin-table">
+        <table className="admin-table admin-table--audits">
           <thead>
             <tr>
               <SortHeader field="email">{t('admin_table_user')}</SortHeader>
               <SortHeader field="type">{t('admin_table_type')}</SortHeader>
               <SortHeader field="target">{t('admin_table_target')}</SortHeader>
-              <SortHeader field="score">{t('admin_table_score')}</SortHeader>
-              <SortHeader field="credits_spent">{t('admin_table_credit')}</SortHeader>
-              <SortHeader field="created_at">{t('admin_table_date')}</SortHeader>
+              <SortHeader field="score" className="admin-table__num">{t('admin_table_score')}</SortHeader>
+              <SortHeader field="credits_spent" className="admin-table__num">{t('admin_table_credit')}</SortHeader>
+              <SortHeader field="created_at" className="admin-table__num">{t('admin_table_date')}</SortHeader>
             </tr>
           </thead>
           <tbody>
@@ -1186,10 +1186,10 @@ function AuditsTab() {
               <tr key={a.id}>
                 <td>{a.email || '—'}</td>
                 <td>{a.type}</td>
-                <td>{a.domain || a.name || '—'}</td>
+                <td className="admin-table__ellipsis">{a.domain || a.name || '—'}</td>
                 <td className="admin-table__num">{a.score ?? '—'}</td>
                 <td className="admin-table__num">{a.credits_spent ?? 0}</td>
-                <td>{formatDate(a.created_at)}</td>
+                <td className="admin-table__num admin-table__muted">{formatDate(a.created_at)}</td>
               </tr>
             ))}
           </tbody>

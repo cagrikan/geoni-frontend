@@ -2037,6 +2037,15 @@ body {
 .admin-table--users th:nth-child(4), .admin-table--users td:nth-child(4),
 .admin-table--users th:nth-child(5), .admin-table--users td:nth-child(5) { width: 12%; }
 .admin-table--users th:nth-child(6), .admin-table--users td:nth-child(6) { width: 18%; }
+
+.admin-table--audits { table-layout: fixed; }
+.admin-table--audits th:nth-child(1), .admin-table--audits td:nth-child(1) { width: 18%; }
+.admin-table--audits th:nth-child(2), .admin-table--audits td:nth-child(2) { width: 8%; }
+.admin-table--audits th:nth-child(3), .admin-table--audits td:nth-child(3) { width: 44%; }
+.admin-table--audits th:nth-child(4), .admin-table--audits td:nth-child(4) { width: 8%; }
+.admin-table--audits th:nth-child(5), .admin-table--audits td:nth-child(5) { width: 8%; }
+.admin-table--audits th:nth-child(6), .admin-table--audits td:nth-child(6) { width: 14%; }
+.admin-table__ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .admin-table__sortable { cursor: pointer; user-select: none; }
 .admin-table__sortable:hover { color: var(--text); }
 .admin-table__sort-label { display: inline-flex; align-items: center; gap: 3px; }

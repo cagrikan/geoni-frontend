@@ -1169,9 +1169,9 @@ function AuditsTab() {
         <table className="admin-table admin-table--audits">
           <thead>
             <tr>
-              <SortHeader field="email">{t('admin_table_user')}</SortHeader>
-              <SortHeader field="type">{t('admin_table_type')}</SortHeader>
-              <SortHeader field="target">{t('admin_table_target')}</SortHeader>
+              <SortHeader field="email" className="admin-table__left">{t('admin_table_user')}</SortHeader>
+              <SortHeader field="type" className="admin-table__left">{t('admin_table_type')}</SortHeader>
+              <SortHeader field="target" className="admin-table__left">{t('admin_table_target')}</SortHeader>
               <SortHeader field="score" className="admin-table__num">{t('admin_table_score')}</SortHeader>
               <SortHeader field="credits_spent" className="admin-table__num">{t('admin_table_credit')}</SortHeader>
               <SortHeader field="created_at" className="admin-table__num">{t('admin_table_date')}</SortHeader>
@@ -1184,9 +1184,9 @@ function AuditsTab() {
               <tr><td colSpan={6} className="admin-empty">{t('admin_no_records')}</td></tr>
             ) : audits.map(a => (
               <tr key={a.id}>
-                <td>{a.email || '—'}</td>
-                <td>{a.type}</td>
-                <td className="admin-table__ellipsis">{a.domain || a.name || '—'}</td>
+                <td className="admin-table__left">{a.email || '—'}</td>
+                <td className="admin-table__left">{a.type}</td>
+                <td className="admin-table__left admin-table__ellipsis">{a.domain || a.name || '—'}</td>
                 <td className="admin-table__num">{a.score ?? '—'}</td>
                 <td className="admin-table__num">{a.credits_spent ?? 0}</td>
                 <td className="admin-table__num admin-table__muted">{formatDate(a.created_at)}</td>

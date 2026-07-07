@@ -699,7 +699,7 @@ function UsersTab() {
         <table className="admin-table">
           <thead>
             <tr>
-              <th>{t('admin_table_user')}</th><th>{t('admin_table_credit')}</th><th>{t('admin_table_received')}</th><th>{t('admin_stat_spent')}</th><th>{t('admin_table_gifted')}</th><th>{t('admin_table_admin')}</th><th>{t('admin_table_credit_fix')}</th>
+              <th>{t('admin_table_user')}</th><th className="admin-table__num">{t('admin_table_credit')}</th><th className="admin-table__num">{t('admin_table_received')}</th><th className="admin-table__num">{t('admin_stat_spent')}</th><th className="admin-table__num">{t('admin_table_gifted')}</th><th className="admin-table__center">{t('admin_table_admin')}</th><th>{t('admin_table_credit_fix')}</th>
             </tr>
           </thead>
           <tbody>
@@ -715,11 +715,11 @@ function UsersTab() {
                     {u.full_name && <span className="admin-user-cell__sub">{u.full_name}</span>}
                   </div>
                 </td>
-                <td>{u.credit_balance ?? 0}</td>
-                <td>{u.total_credits_purchased ?? 0}</td>
-                <td>{u.total_credits_spent ?? 0}</td>
-                <td>{u.total_credits_gifted ?? 0}</td>
-                <td>
+                <td className="admin-table__num">{u.credit_balance ?? 0}</td>
+                <td className="admin-table__num">{u.total_credits_purchased ?? 0}</td>
+                <td className="admin-table__num">{u.total_credits_spent ?? 0}</td>
+                <td className="admin-table__num">{u.total_credits_gifted ?? 0}</td>
+                <td className="admin-table__center">
                   <button
                     className={`admin-admin-toggle ${u.is_admin ? 'admin-admin-toggle--on' : ''}`}
                     onClick={() => toggleAdmin(u.id, u.is_admin)}

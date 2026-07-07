@@ -7,6 +7,7 @@ import GeoniMark from '../GeoniMark'
 import Sparkline from '../components/Sparkline'
 import LanguageSwitcher from '../components/LanguageSwitcher'
 import ThemeSwitcher from '../components/ThemeSwitcher'
+import ConfirmDialog from '../components/ConfirmDialog'
 import {
   Gem, History, Bookmark, Settings, Globe, User, Building2, FileText,
   TrendingUp, TrendingDown, ChevronRight, X, RefreshCw, ShieldCheck,
@@ -137,6 +138,8 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
   const [loading, setLoading] = useState(true)
   const [watchlist, setWatchlist] = useState([])
   const [watchlistLoading, setWatchlistLoading] = useState(true)
+  const [selectedIds, setSelectedIds] = useState(new Set())
+  const [confirmState, setConfirmState] = useState(null)
   const [tab, setTab] = useState(() => {
     try {
       const pending = localStorage.getItem('geoni_pending_tab')
@@ -237,11 +240,60 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
     ? overallTrend[overallTrend.length - 1].score - overallTrend[overallTrend.length - 2].score
     : null
 
-  const deleteAudit = async (e, auditId) => {
+  const deleteAudit = (e, auditId) => {
     e.stopPropagation()
-    if (!window.confirm(t('dash_delete_confirm'))) return
-    await supabase.from('audits').delete().eq('id', auditId)
-    setAudits(prev => prev.filter(a => a.id !== auditId))
+    setConfirmState({
+      message: t('dash_delete_confirm'),
+      onConfirm: async () => {
+        setConfirmState(null)
+        await supabase.from('audits').delete().eq('id', auditId)
+        setAudits(prev => prev.filter(a => a.id !== auditId))
+        setSelectedIds(prev => { const next = new Set(prev); next.delete(auditId); return next })
+      },
+    })
+  }
+
+  const toggleSelect = (e, auditId) => {
+    e.stopPropagation()
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(auditId)) next.delete(auditId)
+      else next.add(auditId)
+      return next
+    })
+  }
+
+  const toggleSelectAll = () => {
+    setSelectedIds(prev => prev.size === audits.length ? new Set() : new Set(audits.map(a => a.id)))
+  }
+
+  const clearSelection = () => setSelectedIds(new Set())
+
+  const bulkDelete = () => {
+    const ids = Array.from(selectedIds)
+    if (ids.length === 0) return
+    setConfirmState({
+      message: t('dash_bulk_delete_confirm', { count: ids.length }),
+      onConfirm: async () => {
+        setConfirmState(null)
+        await supabase.from('audits').delete().in('id', ids)
+        setAudits(prev => prev.filter(a => !selectedIds.has(a.id)))
+        clearSelection()
+      },
+    })
+  }
+
+  const bulkAddToWatchlist = async () => {
+    const targets = audits.filter(a => selectedIds.has(a.id))
+    for (const a of targets) {
+      const label = a.type === 'web' ? a.domain : a.name
+      if (!label) continue
+      const target = a.type === 'web' ? { domain: a.domain } : { name: a.name, topic: a.topic }
+      const { error } = await supabase.from('watchlist').insert({ user_id: user.id, type: a.type, label, target })
+      if (error && error.code !== '23505') console.error('Bulk watchlist insert failed:', error)
+    }
+    fetchWatchlist()
+    clearSelection()
   }
 
   const locale = language === 'en' ? 'en-US' : 'tr-TR'
@@ -364,9 +416,27 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                   <button className="dash-new-scan" onClick={onNewScan}>{t('dash_history_start_first')}</button>
                 </div>
               ) : (
+                <>
+                  {selectedIds.size > 0 && (
+                    <div className="dash-bulk-bar">
+                      <input type="checkbox" className="dash-audit-checkbox" checked={selectedIds.size === audits.length} onChange={toggleSelectAll} title={t('dash_select_all')} />
+                      <span className="dash-bulk-bar__count">{t('dash_bulk_selected', { count: selectedIds.size })}</span>
+                      <span className="dash-bulk-bar__spacer" />
+                      <button type="button" onClick={bulkAddToWatchlist}><Bookmark size={13} strokeWidth={1.5} /> {t('watchlist_add')}</button>
+                      <button type="button" className="dash-bulk-bar__delete" onClick={bulkDelete}><X size={13} strokeWidth={1.5} /> {t('dash_delete_title')}</button>
+                      <button type="button" onClick={clearSelection}>{t('confirm_cancel')}</button>
+                    </div>
+                  )}
                 <div className="dash-audit-list">
                   {audits.map(audit => (
                     <div key={audit.id} className={`dash-audit-row ${audit.result_json ? 'dash-audit-row--clickable' : ''}`} onClick={() => audit.result_json && onViewAudit && onViewAudit(audit)} style={{ cursor: audit.result_json ? 'pointer' : 'default' }}>
+                      <input
+                        type="checkbox"
+                        className="dash-audit-checkbox"
+                        checked={selectedIds.has(audit.id)}
+                        onChange={(e) => toggleSelect(e, audit.id)}
+                        onClick={(e) => e.stopPropagation()}
+                      />
                       {(() => {
                         const TypeIcon = typeIcon[audit.type] || FileText
                         return <TypeIcon size={18} strokeWidth={1.5} className="dash-audit-icon" />
@@ -395,6 +465,7 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                     </div>
                   ))}
                 </div>
+                </>
               )}
             </div>
           )}
@@ -529,6 +600,13 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
           )}
         </main>
       </div>
+      <ConfirmDialog
+        open={!!confirmState}
+        message={confirmState?.message}
+        confirmLabel={t('dash_delete_title')}
+        onConfirm={() => confirmState?.onConfirm()}
+        onCancel={() => setConfirmState(null)}
+      />
     </div>
   )
 }

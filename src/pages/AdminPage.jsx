@@ -11,7 +11,7 @@ import {
   LayoutDashboard, Users, ScrollText, Search, Shield, ShieldOff,
   Plus, Minus, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ArrowLeft,
   UserPlus, RotateCcw, Globe, User, Tag, ShoppingCart, TrendingDown, TrendingUp, Gift, ShieldAlert,
-  CalendarDays, CalendarRange, Calendar, History, Wallet, PiggyBank, Database, Megaphone, Copy, Check, Wrench,
+  CalendarDays, CalendarRange, Calendar, History, Wallet, PiggyBank, Database, Megaphone, Copy, Check, Wrench, X,
 } from 'lucide-react'
 
 const COST_TILE_ICONS = { today: CalendarDays, week: CalendarRange, month: Calendar, allTime: History }
@@ -644,6 +644,7 @@ function UsersTab() {
   const [error, setError] = useState(null)
   const [busyId, setBusyId] = useState(null)
   const [creditInputs, setCreditInputs] = useState({})
+  const [selectedUserId, setSelectedUserId] = useState(null)
 
   const load = useCallback(() => {
     setLoading(true)
@@ -719,10 +720,10 @@ function UsersTab() {
             ) : users.length === 0 ? (
               <tr><td colSpan={8} className="admin-empty">{t('admin_no_users')}</td></tr>
             ) : users.map(u => (
-              <tr key={u.id}>
+              <tr key={u.id} className={u.is_suspended ? 'admin-table__row--suspended' : ''}>
                 <td>
-                  <div className="admin-user-cell">
-                    <span>{u.email || '—'}</span>
+                  <div className="admin-user-cell admin-user-cell--clickable" onClick={() => setSelectedUserId(u.id)}>
+                    <span>{u.email || '—'}{u.is_suspended && <span className="admin-suspended-badge">{t('admin_suspended_badge')}</span>}</span>
                     {u.full_name && <span className="admin-user-cell__sub">{u.full_name}</span>}
                   </div>
                 </td>
@@ -781,6 +782,197 @@ function UsersTab() {
         <button disabled={page === 0} onClick={() => setPage(p => p - 1)}><ChevronLeft size={14} /></button>
         <span>{page + 1} / {totalPages}</span>
         <button disabled={page >= totalPages - 1} onClick={() => setPage(p => p + 1)}><ChevronRight size={14} /></button>
+      </div>
+
+      {selectedUserId && (
+        <UserDetailModal userId={selectedUserId} onClose={() => setSelectedUserId(null)} onChanged={load} />
+      )}
+    </div>
+  )
+}
+
+const ADMIN_SCOPE_FIELDS = ['users', 'tickets', 'campaigns']
+
+function UserDetailModal({ userId, onClose, onChanged }) {
+  const { t, language } = useLanguage()
+  const [detail, setDetail] = useState(null)
+  const [error, setError] = useState(null)
+  const [busy, setBusy] = useState(false)
+  const [notesDraft, setNotesDraft] = useState('')
+
+  const load = useCallback(() => {
+    authedFetch(`/api/admin/users/${userId}/detail`)
+      .then((res) => { setDetail(res); setNotesDraft(res.profile.admin_notes || ''); setError(null) })
+      .catch((e) => setError(e.message))
+  }, [userId])
+
+  useEffect(() => { load() }, [load])
+
+  const locale = language === 'en' ? 'en-US' : 'tr-TR'
+  const formatDate = (d) => d ? new Date(d).toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'
+
+  const toggleAdmin = async () => {
+    setBusy(true)
+    try {
+      await authedFetch(`/api/admin/users/${userId}/admin-flag`, { method: 'POST', body: JSON.stringify({ is_admin: !detail.profile.is_admin }) })
+      load(); onChanged?.()
+    } catch (e) { setError(e.message) }
+    setBusy(false)
+  }
+
+  const toggleExpert = async () => {
+    setBusy(true)
+    try {
+      await authedFetch(`/api/admin/users/${userId}/expert-flag`, { method: 'POST', body: JSON.stringify({ is_expert: !detail.profile.is_expert }) })
+      load(); onChanged?.()
+    } catch (e) { setError(e.message) }
+    setBusy(false)
+  }
+
+  const toggleSuspended = async () => {
+    setBusy(true)
+    try {
+      await authedFetch(`/api/admin/users/${userId}/suspend`, { method: 'POST', body: JSON.stringify({ suspended: !detail.profile.is_suspended }) })
+      load(); onChanged?.()
+    } catch (e) { setError(e.message) }
+    setBusy(false)
+  }
+
+  const toggleScope = async (field) => {
+    setBusy(true)
+    try {
+      await authedFetch(`/api/admin/users/${userId}/admin-scopes`, {
+        method: 'POST',
+        body: JSON.stringify({ [field]: !detail.profile[`admin_scope_${field}`] }),
+      })
+      load()
+    } catch (e) { setError(e.message) }
+    setBusy(false)
+  }
+
+  const saveNotes = async () => {
+    setBusy(true)
+    try {
+      await authedFetch(`/api/admin/users/${userId}/notes`, { method: 'POST', body: JSON.stringify({ notes: notesDraft }) })
+      load()
+    } catch (e) { setError(e.message) }
+    setBusy(false)
+  }
+
+  return (
+    <div className="admin-modal-overlay" onClick={onClose}>
+      <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
+        <button className="admin-modal__close" onClick={onClose}><X size={16} strokeWidth={1.5} /></button>
+        {error && <div className="admin-error">{error}</div>}
+        {!detail ? <div className="admin-loading admin-loading--widget">{t('admin_loading')}</div> : (() => {
+          const p = detail.profile
+          return (
+            <>
+              <div className="admin-modal__header">
+                <div className="admin-modal__title">{p.email || '—'}</div>
+                {p.full_name && <div className="admin-user-cell__sub">{p.full_name}</div>}
+                <div className="admin-modal__meta">
+                  {t('admin_user_joined')}: {formatDate(p.created_at)} · {t('admin_user_last_seen')}: {formatDate(p.last_sign_in_at)}
+                  {p.utm_source && <> · {t('admin_user_source')}: {p.utm_source}</>}
+                </div>
+              </div>
+
+              <div className="admin-stats-grid admin-stats-grid--compact">
+                <StatTile icon={Gift} label={t('admin_table_credit')} range="" value={p.credit_balance ?? 0} />
+                <StatTile icon={ShoppingCart} label={t('admin_table_received')} range="" value={p.total_credits_purchased ?? 0} />
+                <StatTile icon={TrendingDown} label={t('admin_stat_spent')} range="" value={p.total_credits_spent ?? 0} />
+                <StatTile icon={Tag} label={t('admin_table_gifted')} range="" value={p.total_credits_gifted ?? 0} />
+              </div>
+
+              <div className="admin-modal__section">
+                <div className="admin-subtitle">{t('admin_user_status')}</div>
+                <div className="admin-modal__toggles">
+                  <button className={`admin-admin-toggle ${p.is_suspended ? 'admin-admin-toggle--danger' : ''}`} disabled={busy} onClick={toggleSuspended}>
+                    {p.is_suspended ? t('admin_user_unsuspend') : t('admin_user_suspend')}
+                  </button>
+                </div>
+              </div>
+
+              <div className="admin-modal__section">
+                <div className="admin-subtitle">{t('admin_table_admin')}</div>
+                <div className="admin-modal__toggles">
+                  <button className={`admin-admin-toggle ${p.is_admin ? 'admin-admin-toggle--on' : ''}`} disabled={busy} onClick={toggleAdmin}>
+                    {p.is_admin ? <Shield size={13} strokeWidth={1.5} /> : <ShieldOff size={13} strokeWidth={1.5} />} {p.is_admin ? t('admin_admin_revoke_title') : t('admin_admin_grant_title')}
+                  </button>
+                </div>
+                {p.is_admin && (
+                  <div className="admin-modal__scopes">
+                    {ADMIN_SCOPE_FIELDS.map((field) => (
+                      <label key={field} className="admin-modal__scope-checkbox">
+                        <input type="checkbox" checked={!!p[`admin_scope_${field}`]} disabled={busy} onChange={() => toggleScope(field)} />
+                        {t(`admin_scope_${field}`)}
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="admin-modal__section">
+                <div className="admin-subtitle">{t('admin_table_expert')}</div>
+                <div className="admin-modal__toggles">
+                  <button className={`admin-admin-toggle ${p.is_expert ? 'admin-admin-toggle--on' : ''}`} disabled={busy} onClick={toggleExpert}>
+                    {p.is_expert ? <Wrench size={13} strokeWidth={1.5} /> : '—'} {p.is_expert ? t('admin_expert_revoke_title') : t('admin_expert_grant_title')}
+                  </button>
+                  {p.is_expert && detail.expert_stats && (
+                    <span className="admin-modal__expert-stats">
+                      {t('admin_user_expert_verified')}: {detail.expert_stats.verified} · {t('admin_user_expert_rejected')}: {detail.expert_stats.rejected}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="admin-modal__section">
+                <div className="admin-subtitle">{t('admin_user_notes')}</div>
+                <textarea
+                  className="admin-modal__notes"
+                  value={notesDraft}
+                  onChange={(e) => setNotesDraft(e.target.value)}
+                  placeholder={t('admin_user_notes_ph')}
+                  rows={3}
+                />
+                <button disabled={busy} onClick={saveNotes}>{t('admin_user_notes_save')}</button>
+              </div>
+
+              <div className="admin-modal__section">
+                <div className="admin-subtitle">{t('admin_user_recent_audits')}</div>
+                {detail.audits.length === 0 ? <div className="admin-empty">{t('admin_no_records')}</div> : (
+                  <ul className="admin-modal__list">
+                    {detail.audits.map((a) => (
+                      <li key={a.id}><span>{a.domain || a.name || '—'}</span><span>{a.score ?? '—'}</span><span>{formatDate(a.created_at)}</span></li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              <div className="admin-modal__section">
+                <div className="admin-subtitle">{t('admin_user_recent_transactions')}</div>
+                {detail.transactions.length === 0 ? <div className="admin-empty">{t('admin_no_records')}</div> : (
+                  <ul className="admin-modal__list">
+                    {detail.transactions.map((tx) => (
+                      <li key={tx.id}><span>{tx.description || tx.type}</span><span>{tx.amount > 0 ? '+' : ''}{tx.amount}</span><span>{formatDate(tx.created_at)}</span></li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              <div className="admin-modal__section">
+                <div className="admin-subtitle">{t('admin_user_recent_tickets')}</div>
+                {detail.tickets.length === 0 ? <div className="admin-empty">{t('admin_no_records')}</div> : (
+                  <ul className="admin-modal__list">
+                    {detail.tickets.map((tk) => (
+                      <li key={tk.id}><span>{tk.ticket_type_name}</span><span className={`ticket-status ticket-status--${tk.status}`}>{t(TICKET_STATUS_KEY_MAP[tk.status] || tk.status)}</span><span>{formatDate(tk.created_at)}</span></li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </>
+          )
+        })()}
       </div>
     </div>
   )

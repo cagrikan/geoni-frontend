@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, Fragment } from 'react'
 import { useAuth } from '../lib/AuthContext'
 import { useLanguage } from '../lib/LanguageContext'
 import { supabase } from '../lib/supabase'
@@ -9,11 +9,13 @@ import BarChart from '../components/BarChart'
 import HBarList from '../components/HBarList'
 import ResultsPage from '../ResultsPage'
 import BrandCheckResultsPage from '../BrandCheckResultsPage'
+import TicketThread from '../components/TicketThread'
 import {
   LayoutDashboard, Users, ScrollText, Search, Shield, ShieldOff,
   Plus, Minus, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ArrowLeft,
   UserPlus, RotateCcw, Globe, User, Tag, ShoppingCart, TrendingDown, TrendingUp, Gift, ShieldAlert,
   CalendarDays, CalendarRange, Calendar, History, Wallet, PiggyBank, Database, Megaphone, Copy, Check, Wrench,
+  MessageSquare,
 } from 'lucide-react'
 
 const COST_TILE_ICONS = { today: CalendarDays, week: CalendarRange, month: Calendar, allTime: History }
@@ -1391,12 +1393,14 @@ const TICKET_STATUS_FILTERS = ['', 'open', 'assigned', 'in_progress', 'submitted
 
 function TicketsAdminTab() {
   const { t } = useLanguage()
+  const { user } = useAuth()
   const [statusFilter, setStatusFilter] = useState('')
   const { data: tickets, error } = useAdminFetch(`/api/admin/tickets${statusFilter ? `?status=${statusFilter}` : ''}`)
   const [local, setLocal] = useState(null)
   const [experts, setExperts] = useState(null)
   const [busyId, setBusyId] = useState(null)
   const [rejectDrafts, setRejectDrafts] = useState({})
+  const [openId, setOpenId] = useState(null)
 
   useEffect(() => { if (tickets) setLocal(tickets) }, [tickets])
   useEffect(() => { authedFetch('/api/admin/experts').then(setExperts).catch(() => setExperts([])) }, [])
@@ -1456,11 +1460,13 @@ function TicketsAdminTab() {
                   <th>{t('admin_tickets_expert')}</th>
                   <th>{t('admin_tickets_evidence')}</th>
                   <th></th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
                 {local.map((tk) => (
-                  <tr key={tk.id}>
+                  <Fragment key={tk.id}>
+                  <tr>
                     <td>{tk.user_email || '—'}</td>
                     <td>{tk.ticket_type_name}</td>
                     <td>{tk.target || '—'}</td>
@@ -1490,7 +1496,20 @@ function TicketsAdminTab() {
                         </div>
                       )}
                     </td>
+                    <td>
+                      <button className="admin-icon-btn" title={t('admin_tickets_messages')} onClick={() => setOpenId(openId === tk.id ? null : tk.id)}>
+                        <MessageSquare size={14} strokeWidth={1.5} />
+                      </button>
+                    </td>
                   </tr>
+                  {openId === tk.id && (
+                    <tr>
+                      <td colSpan={8} className="admin-table__thread-cell">
+                        <TicketThread ticketId={tk.id} currentUserId={user?.id} authedFetch={authedFetch} t={t} />
+                      </td>
+                    </tr>
+                  )}
+                  </Fragment>
                 ))}
               </tbody>
             </table>

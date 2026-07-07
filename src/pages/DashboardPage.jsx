@@ -8,6 +8,7 @@ import Sparkline from '../components/Sparkline'
 import LanguageSwitcher from '../components/LanguageSwitcher'
 import ThemeSwitcher from '../components/ThemeSwitcher'
 import ConfirmDialog from '../components/ConfirmDialog'
+import TicketThread from '../components/TicketThread'
 import {
   Gem, History, Bookmark, Settings, Globe, User, Building2, FileText,
   TrendingUp, TrendingDown, ChevronRight, X, RefreshCw, ShieldCheck, Wrench, ClipboardList,
@@ -157,8 +158,9 @@ function ServiceCatalogSection({ t, profile }) {
   )
 }
 
-function MyTicketsSection({ t }) {
+function MyTicketsSection({ t, userId }) {
   const [myTickets, setMyTickets] = useState(null)
+  const [openId, setOpenId] = useState(null)
 
   useEffect(() => {
     authedFetch('/api/tickets').then(setMyTickets).catch(() => setMyTickets([]))
@@ -174,17 +176,22 @@ function MyTicketsSection({ t }) {
         <div className="ticket-list">
           {myTickets.map((tk) => {
             const Icon = TICKET_TYPE_ICONS[tk.ticket_type_key] || Wrench
+            const isOpen = openId === tk.id
             return (
-              <div key={tk.id} className="ticket-row">
-                <div className="ticket-row__icon"><Icon size={16} strokeWidth={1.5} /></div>
-                <div className="ticket-row__info">
-                  <div className="ticket-row__name">{tk.ticket_type_name}</div>
-                  <div className="ticket-row__meta">
-                    {tk.target && <>{tk.target} · </>}
-                    {new Date(tk.created_at).toLocaleDateString()} · {tk.token_cost} {t('dash_credit_unit')}
+              <div key={tk.id} className="ticket-row-wrap">
+                <div className="ticket-row ticket-row--clickable" onClick={() => setOpenId(isOpen ? null : tk.id)}>
+                  <div className="ticket-row__icon"><Icon size={16} strokeWidth={1.5} /></div>
+                  <div className="ticket-row__info">
+                    <div className="ticket-row__name">{tk.ticket_type_name}</div>
+                    <div className="ticket-row__meta">
+                      {tk.target && <>{tk.target} · </>}
+                      {new Date(tk.created_at).toLocaleDateString()} · {tk.token_cost} {t('dash_credit_unit')}
+                    </div>
                   </div>
+                  <TicketStatusBadge status={tk.status} t={t} />
+                  <ChevronRight size={15} strokeWidth={1.5} className={`ticket-row__chevron ${isOpen ? 'ticket-row__chevron--open' : ''}`} />
                 </div>
-                <TicketStatusBadge status={tk.status} t={t} />
+                {isOpen && <TicketThread ticketId={tk.id} currentUserId={userId} authedFetch={authedFetch} t={t} />}
               </div>
             )
           })}
@@ -194,10 +201,11 @@ function MyTicketsSection({ t }) {
   )
 }
 
-function ExpertPanelSection({ t }) {
+function ExpertPanelSection({ t, userId }) {
   const [tickets, setTickets] = useState(null)
   const [forms, setForms] = useState({})
   const [submittingId, setSubmittingId] = useState(null)
+  const [openId, setOpenId] = useState(null)
 
   const load = () => authedFetch('/api/expert/tickets').then(setTickets).catch(() => setTickets([]))
   useEffect(() => { load() }, [])
@@ -226,14 +234,19 @@ function ExpertPanelSection({ t }) {
         <div className="ticket-list">
           {tickets.map((tk) => {
             const Icon = TICKET_TYPE_ICONS[tk.ticket_type_key] || Wrench
+            const isOpen = openId === tk.id
             return (
-            <div key={tk.id} className="ticket-row ticket-row--expert">
-              <div className="ticket-row__icon"><Icon size={16} strokeWidth={1.5} /></div>
-              <div className="ticket-row__info">
-                <div className="ticket-row__name">{tk.ticket_type_name}</div>
-                <div className="ticket-row__meta">{tk.target || tk.user_email} · {new Date(tk.created_at).toLocaleDateString()}</div>
+            <div key={tk.id} className="ticket-row-wrap">
+            <div className="ticket-row ticket-row--expert">
+              <div className="ticket-row__top ticket-row__top--clickable" onClick={() => setOpenId(isOpen ? null : tk.id)}>
+                <div className="ticket-row__icon"><Icon size={16} strokeWidth={1.5} /></div>
+                <div className="ticket-row__info">
+                  <div className="ticket-row__name">{tk.ticket_type_name}</div>
+                  <div className="ticket-row__meta">{tk.target || tk.user_email} · {new Date(tk.created_at).toLocaleDateString()}</div>
+                </div>
+                <TicketStatusBadge status={tk.status} t={t} />
+                <ChevronRight size={15} strokeWidth={1.5} className={`ticket-row__chevron ${isOpen ? 'ticket-row__chevron--open' : ''}`} />
               </div>
-              <TicketStatusBadge status={tk.status} t={t} />
               {(tk.status === 'assigned' || tk.status === 'in_progress') && (
                 <div className="ticket-submit-form">
                   <input
@@ -250,6 +263,8 @@ function ExpertPanelSection({ t }) {
                 </div>
               )}
               {tk.status === 'rejected' && tk.reject_reason && <div className="ticket-reject-reason">{tk.reject_reason}</div>}
+            </div>
+            {isOpen && <TicketThread ticketId={tk.id} currentUserId={userId} authedFetch={authedFetch} t={t} />}
             </div>
             )
           })}
@@ -737,8 +752,8 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
           )}
 
           {tab === 'tickets' && <ServiceCatalogSection t={t} profile={profile} />}
-          {tab === 'my_tickets' && <MyTicketsSection t={t} />}
-          {tab === 'expert' && profile?.is_expert && <ExpertPanelSection t={t} />}
+          {tab === 'my_tickets' && <MyTicketsSection t={t} userId={user?.id} />}
+          {tab === 'expert' && profile?.is_expert && <ExpertPanelSection t={t} userId={user?.id} />}
 
           {/* Settings tab */}
           {tab === 'settings' && (

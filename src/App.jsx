@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense, lazy } from 'react'
 import { AuthProvider, useAuth } from './lib/AuthContext'
 import { LanguageProvider, useLanguage } from './lib/LanguageContext'
 import { ThemeProvider } from './lib/ThemeContext'
@@ -7,11 +7,24 @@ import ScanningScreen from './components/ScanningScreen'
 import ResultsPage from './ResultsPage'
 import BrandCheckResultsPage from './BrandCheckResultsPage'
 import IdentityMismatchPage from './IdentityMismatchPage'
-import LoginPage from './pages/LoginPage'
-import AuthCallback from './pages/AuthCallback'
-import DashboardPage from './pages/DashboardPage'
-import AdminPage from './pages/AdminPage'
 import './App.css'
+
+// Giris/panel sayfalari sadece giris yapmis kullanicilar (ve AdminPage
+// sadece adminler) tarafindan ziyaret ediliyor - anonim bir ziyaretcinin
+// ilk yuklemede bunlarin kodunu indirmesine gerek yok. Lazy-load ile ana
+// bundle kuculuyor, bu sayfalar sadece gerektiginde ayri parca olarak cekiliyor.
+const LoginPage = lazy(() => import('./pages/LoginPage'))
+const AuthCallback = lazy(() => import('./pages/AuthCallback'))
+const DashboardPage = lazy(() => import('./pages/DashboardPage'))
+const AdminPage = lazy(() => import('./pages/AdminPage'))
+
+function PageFallback() {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--bg)' }}>
+      <div className="spinner" />
+    </div>
+  )
+}
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.geoni.ai'
 
@@ -296,10 +309,12 @@ function AppInner() {
 
   return (
     <div className="app-shell">
-      {view === 'auth_callback' && <AuthCallback onDone={navigateTo} />}
-      {view === 'login' && <LoginPage onSuccess={() => navigateTo('dashboard')} onHome={() => navigateTo('landing')} />}
-      {view === 'dashboard' && <DashboardPage onReset={handleReset} onNewScan={() => navigateTo('landing')} onViewAudit={handleViewAudit} onRescanWeb={handleAudit} onRescanBrand={handleBrandCheck} onAdmin={profile?.is_admin ? () => navigateTo('admin') : null} />}
-      {view === 'admin' && <AdminPage onBack={() => navigateTo('dashboard')} />}
+      <Suspense fallback={<PageFallback />}>
+        {view === 'auth_callback' && <AuthCallback onDone={navigateTo} />}
+        {view === 'login' && <LoginPage onSuccess={() => navigateTo('dashboard')} onHome={() => navigateTo('landing')} />}
+        {view === 'dashboard' && <DashboardPage onReset={handleReset} onNewScan={() => navigateTo('landing')} onViewAudit={handleViewAudit} onRescanWeb={handleAudit} onRescanBrand={handleBrandCheck} onAdmin={profile?.is_admin ? () => navigateTo('admin') : null} />}
+        {view === 'admin' && <AdminPage onBack={() => navigateTo('dashboard')} />}
+      </Suspense>
       {view === 'landing' && (
         <LandingPage
           onSubmitAudit={handleAudit}

@@ -869,8 +869,8 @@ function UserDetailView({ userId, onBack, onChanged }) {
 
             <div className="admin-userpage__grid">
               <div className="admin-userpage__col">
-                <div className="admin-modal__section">
-                  <div className="admin-subtitle">{t('admin_user_adjust_credit')}</div>
+                <div className="admin-card">
+                  <div className="admin-card__title">{t('admin_user_adjust_credit')}</div>
                   <div className="admin-modal__credit-edit">
                     <input
                       type="number" placeholder="0"
@@ -886,50 +886,52 @@ function UserDetailView({ userId, onBack, onChanged }) {
                   </div>
                 </div>
 
-                <div className="admin-modal__section">
-                  <div className="admin-subtitle">{t('admin_user_status')}</div>
-                  <div className="admin-modal__toggles">
+                <div className="admin-card">
+                  <div className="admin-card__title">{t('admin_user_permissions_title')}</div>
+
+                  <div className="admin-card__row">
+                    <span className="admin-card__row-label">{t('admin_user_status')}</span>
                     <button className={`admin-admin-toggle ${p.is_suspended ? 'admin-admin-toggle--danger' : ''}`} disabled={busy} onClick={toggleSuspended}>
                       {p.is_suspended ? t('admin_user_unsuspend') : t('admin_user_suspend')}
                     </button>
                   </div>
-                </div>
 
-                <div className="admin-modal__section">
-                  <div className="admin-subtitle">{t('admin_table_admin')}</div>
-                  <div className="admin-modal__toggles">
-                    <button className={`admin-admin-toggle ${p.is_admin ? 'admin-admin-toggle--on' : ''}`} disabled={busy} onClick={toggleAdmin}>
-                      {p.is_admin ? <Shield size={13} strokeWidth={1.5} /> : <ShieldOff size={13} strokeWidth={1.5} />} {p.is_admin ? t('admin_admin_revoke_title') : t('admin_admin_grant_title')}
-                    </button>
-                  </div>
-                  {p.is_admin && (
-                    <div className="admin-modal__scopes">
-                      {ADMIN_SCOPE_FIELDS.map((field) => (
-                        <label key={field} className="admin-modal__scope-checkbox">
-                          <input type="checkbox" checked={!!p[`admin_scope_${field}`]} disabled={busy} onChange={() => toggleScope(field)} />
-                          {t(`admin_scope_${field}`)}
-                        </label>
-                      ))}
+                  <div className="admin-card__row admin-card__row--top">
+                    <span className="admin-card__row-label">{t('admin_table_admin')}</span>
+                    <div className="admin-card__row-content">
+                      <button className={`admin-admin-toggle ${p.is_admin ? 'admin-admin-toggle--on' : ''}`} disabled={busy} onClick={toggleAdmin}>
+                        {p.is_admin ? <Shield size={13} strokeWidth={1.5} /> : <ShieldOff size={13} strokeWidth={1.5} />} {p.is_admin ? t('admin_admin_revoke_title') : t('admin_admin_grant_title')}
+                      </button>
+                      {p.is_admin && (
+                        <div className="admin-modal__scopes">
+                          {ADMIN_SCOPE_FIELDS.map((field) => (
+                            <label key={field} className="admin-modal__scope-checkbox">
+                              <input type="checkbox" checked={!!p[`admin_scope_${field}`]} disabled={busy} onChange={() => toggleScope(field)} />
+                              {t(`admin_scope_${field}`)}
+                            </label>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
+                  </div>
 
-                <div className="admin-modal__section">
-                  <div className="admin-subtitle">{t('admin_table_expert')}</div>
-                  <div className="admin-modal__toggles">
-                    <button className={`admin-admin-toggle ${p.is_expert ? 'admin-admin-toggle--on' : ''}`} disabled={busy} onClick={toggleExpert}>
-                      {p.is_expert ? <Wrench size={13} strokeWidth={1.5} /> : '—'} {p.is_expert ? t('admin_expert_revoke_title') : t('admin_expert_grant_title')}
-                    </button>
-                    {p.is_expert && detail.expert_stats && (
-                      <span className="admin-modal__expert-stats">
-                        {t('admin_user_expert_verified')}: {detail.expert_stats.verified} · {t('admin_user_expert_rejected')}: {detail.expert_stats.rejected}
-                      </span>
-                    )}
+                  <div className="admin-card__row admin-card__row--top">
+                    <span className="admin-card__row-label">{t('admin_table_expert')}</span>
+                    <div className="admin-card__row-content">
+                      <button className={`admin-admin-toggle ${p.is_expert ? 'admin-admin-toggle--on' : ''}`} disabled={busy} onClick={toggleExpert}>
+                        {p.is_expert ? <Wrench size={13} strokeWidth={1.5} /> : '—'} {p.is_expert ? t('admin_expert_revoke_title') : t('admin_expert_grant_title')}
+                      </button>
+                      {p.is_expert && detail.expert_stats && (
+                        <span className="admin-modal__expert-stats">
+                          {t('admin_user_expert_verified')}: {detail.expert_stats.verified} · {t('admin_user_expert_rejected')}: {detail.expert_stats.rejected}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                <div className="admin-modal__section">
-                  <div className="admin-subtitle">{t('admin_user_notes')}</div>
+                <div className="admin-card">
+                  <div className="admin-card__title">{t('admin_user_notes')}</div>
                   <textarea
                     className="admin-modal__notes"
                     value={notesDraft}
@@ -937,13 +939,13 @@ function UserDetailView({ userId, onBack, onChanged }) {
                     placeholder={t('admin_user_notes_ph')}
                     rows={3}
                   />
-                  <button disabled={busy} onClick={saveNotes}>{t('admin_user_notes_save')}</button>
+                  <button className="admin-card__save-btn" disabled={busy} onClick={saveNotes}>{t('admin_user_notes_save')}</button>
                 </div>
               </div>
 
               <div className="admin-userpage__col">
-                <div className="admin-modal__section">
-                  <div className="admin-subtitle">{t('admin_user_recent_audits')}</div>
+                <div className="admin-card">
+                  <div className="admin-card__title">{t('admin_user_recent_audits')}</div>
                   {detail.audits.length === 0 ? <div className="admin-empty">{t('admin_no_records')}</div> : (
                     <ul className="admin-modal__list">
                       {detail.audits.map((a) => (
@@ -958,8 +960,8 @@ function UserDetailView({ userId, onBack, onChanged }) {
                   )}
                 </div>
 
-                <div className="admin-modal__section">
-                  <div className="admin-subtitle">{t('admin_user_recent_transactions')}</div>
+                <div className="admin-card">
+                  <div className="admin-card__title">{t('admin_user_recent_transactions')}</div>
                   {detail.transactions.length === 0 ? <div className="admin-empty">{t('admin_no_records')}</div> : (
                     <ul className="admin-modal__list">
                       {detail.transactions.map((tx) => (
@@ -969,8 +971,8 @@ function UserDetailView({ userId, onBack, onChanged }) {
                   )}
                 </div>
 
-                <div className="admin-modal__section">
-                  <div className="admin-subtitle">{t('admin_user_recent_tickets')}</div>
+                <div className="admin-card">
+                  <div className="admin-card__title">{t('admin_user_recent_tickets')}</div>
                   {detail.tickets.length === 0 ? <div className="admin-empty">{t('admin_no_records')}</div> : (
                     <ul className="admin-modal__list">
                       {detail.tickets.map((tk) => (

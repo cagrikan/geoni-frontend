@@ -868,15 +868,13 @@ function PricingTiersWidget() {
         <table className="admin-table">
           <thead>
             <tr>
-              <th>{t('admin_pricing_platform')}</th><th>{t('admin_pricing_min')}</th><th>{t('admin_pricing_max')}</th><th>{t('admin_pricing_price')}</th><th></th>
+              <th>{t('admin_pricing_range')}</th><th>{t('admin_pricing_price')}</th><th></th>
             </tr>
           </thead>
           <tbody>
             {local.map((tier) => (
               <tr key={tier.id}>
-                <td>{tier.platform}</td>
-                <td>{tier.min_credits}</td>
-                <td>{tier.max_credits ?? t('admin_pricing_none')}</td>
+                <td>{tier.min_credits} - {tier.max_credits ?? t('admin_pricing_none')}</td>
                 <td>{tier.price_per_credit} {tier.currency}</td>
                 <td><button onClick={() => deleteTier(tier.id)}>{t('admin_pricing_delete')}</button></td>
               </tr>
@@ -885,11 +883,6 @@ function PricingTiersWidget() {
         </table>
       </div>
       <div className="topup-form">
-        <select value={form.platform} onChange={(e) => setForm((f) => ({ ...f, platform: e.target.value }))}>
-          <option value="web">Web</option>
-          <option value="ios">iOS</option>
-          <option value="android">Android</option>
-        </select>
         <input type="number" placeholder={t('admin_pricing_min')} value={form.min_credits} onChange={(e) => setForm((f) => ({ ...f, min_credits: e.target.value }))} />
         <input type="number" placeholder={t('admin_pricing_max')} value={form.max_credits} onChange={(e) => setForm((f) => ({ ...f, max_credits: e.target.value }))} />
         <input type="number" step="0.01" placeholder={t('admin_pricing_price')} value={form.price_per_credit} onChange={(e) => setForm((f) => ({ ...f, price_per_credit: e.target.value }))} />

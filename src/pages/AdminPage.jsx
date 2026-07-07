@@ -635,15 +635,13 @@ function OverviewTab() {
 }
 
 function UsersTab() {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [users, setUsers] = useState([])
   const [total, setTotal] = useState(0)
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [busyId, setBusyId] = useState(null)
-  const [creditInputs, setCreditInputs] = useState({})
   const [selectedUserId, setSelectedUserId] = useState(null)
 
   const load = useCallback(() => {
@@ -657,42 +655,9 @@ function UsersTab() {
 
   useEffect(() => { load() }, [load])
 
-  const adjustCredits = async (userId, delta) => {
-    if (!delta) return
-    setBusyId(userId)
-    try {
-      await authedFetch(`/api/admin/users/${userId}/credits`, {
-        method: 'POST',
-        body: JSON.stringify({ delta, reason: t('admin_credit_manual_note') }),
-      })
-      setCreditInputs(prev => ({ ...prev, [userId]: '' }))
-      load()
-    } catch (e) { setError(e.message) } finally { setBusyId(null) }
-  }
-
-  const toggleAdmin = async (userId, current) => {
-    setBusyId(userId)
-    try {
-      await authedFetch(`/api/admin/users/${userId}/admin-flag`, {
-        method: 'POST',
-        body: JSON.stringify({ is_admin: !current }),
-      })
-      load()
-    } catch (e) { setError(e.message) } finally { setBusyId(null) }
-  }
-
-  const toggleExpert = async (userId, current) => {
-    setBusyId(userId)
-    try {
-      await authedFetch(`/api/admin/users/${userId}/expert-flag`, {
-        method: 'POST',
-        body: JSON.stringify({ is_expert: !current }),
-      })
-      load()
-    } catch (e) { setError(e.message) } finally { setBusyId(null) }
-  }
-
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
+  const locale = language === 'en' ? 'en-US' : 'tr-TR'
+  const formatDate = (d) => new Date(d).toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' })
 
   return (
     <div className="admin-section">
@@ -708,70 +673,43 @@ function UsersTab() {
       {error && <div className="admin-error">{error}</div>}
 
       <div className="admin-table-wrap">
-        <table className="admin-table">
+        <table className="admin-table admin-table--users">
           <thead>
             <tr>
-              <th>{t('admin_table_user')}</th><th className="admin-table__num">{t('admin_table_credit')}</th><th className="admin-table__num">{t('admin_table_received')}</th><th className="admin-table__num">{t('admin_stat_spent')}</th><th className="admin-table__num">{t('admin_table_gifted')}</th><th className="admin-table__center">{t('admin_table_admin')}</th><th className="admin-table__center">{t('admin_table_expert')}</th><th>{t('admin_table_credit_fix')}</th>
+              <th>{t('admin_table_user')}</th>
+              <th className="admin-table__num">{t('admin_table_credit')}</th>
+              <th className="admin-table__num">{t('admin_table_received')}</th>
+              <th className="admin-table__num">{t('admin_stat_spent')}</th>
+              <th className="admin-table__num">{t('admin_table_gifted')}</th>
+              <th>{t('admin_user_joined')}</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={8} className="admin-loading">{t('admin_loading')}</td></tr>
+              <tr><td colSpan={6} className="admin-loading">{t('admin_loading')}</td></tr>
             ) : users.length === 0 ? (
-              <tr><td colSpan={8} className="admin-empty">{t('admin_no_users')}</td></tr>
+              <tr><td colSpan={6} className="admin-empty">{t('admin_no_users')}</td></tr>
             ) : users.map(u => (
-              <tr key={u.id} className={u.is_suspended ? 'admin-table__row--suspended' : ''}>
+              <tr key={u.id} className="admin-table__row--clickable" onClick={() => setSelectedUserId(u.id)}>
                 <td>
-                  <div className="admin-user-cell admin-user-cell--clickable" onClick={() => setSelectedUserId(u.id)}>
-                    <span>{u.email || '—'}{u.is_suspended && <span className="admin-suspended-badge">{t('admin_suspended_badge')}</span>}</span>
-                    {u.full_name && <span className="admin-user-cell__sub">{u.full_name}</span>}
+                  <div className="admin-user-cell">
+                    <div className="admin-user-avatar">{(u.full_name || u.email || '?')[0]?.toUpperCase()}</div>
+                    <div>
+                      <div className="admin-user-cell__name">
+                        {u.email || '—'}
+                        {u.is_admin && <span className="admin-badge admin-badge--admin">Admin</span>}
+                        {u.is_expert && <span className="admin-badge admin-badge--expert">{t('admin_table_expert')}</span>}
+                        {u.is_suspended && <span className="admin-badge admin-badge--suspended">{t('admin_suspended_badge')}</span>}
+                      </div>
+                      {u.full_name && <span className="admin-user-cell__sub">{u.full_name}</span>}
+                    </div>
                   </div>
                 </td>
                 <td className="admin-table__num">{u.credit_balance ?? 0}</td>
                 <td className="admin-table__num">{u.total_credits_purchased ?? 0}</td>
                 <td className="admin-table__num">{u.total_credits_spent ?? 0}</td>
                 <td className="admin-table__num">{u.total_credits_gifted ?? 0}</td>
-                <td className="admin-table__center">
-                  <button
-                    className={`admin-admin-toggle ${u.is_admin ? 'admin-admin-toggle--on' : ''}`}
-                    onClick={() => toggleAdmin(u.id, u.is_admin)}
-                    disabled={busyId === u.id}
-                    title={u.is_admin ? t('admin_admin_revoke_title') : t('admin_admin_grant_title')}
-                  >
-                    {u.is_admin ? <Shield size={13} strokeWidth={1.5} /> : <ShieldOff size={13} strokeWidth={1.5} />}
-                    {u.is_admin ? 'Admin' : '—'}
-                  </button>
-                </td>
-                <td className="admin-table__center">
-                  <button
-                    className={`admin-admin-toggle ${u.is_expert ? 'admin-admin-toggle--on' : ''}`}
-                    onClick={() => toggleExpert(u.id, u.is_expert)}
-                    disabled={busyId === u.id}
-                    title={u.is_expert ? t('admin_expert_revoke_title') : t('admin_expert_grant_title')}
-                  >
-                    {u.is_expert ? <Wrench size={13} strokeWidth={1.5} /> : '—'}
-                  </button>
-                </td>
-                <td>
-                  <div className="admin-credit-edit">
-                    <input
-                      type="number"
-                      value={creditInputs[u.id] ?? ''}
-                      onChange={e => setCreditInputs(prev => ({ ...prev, [u.id]: e.target.value }))}
-                      placeholder="0"
-                    />
-                    <button
-                      disabled={busyId === u.id || !creditInputs[u.id]}
-                      onClick={() => adjustCredits(u.id, Math.abs(Number(creditInputs[u.id] || 0)))}
-                      title={t('admin_credit_add_title')}
-                    ><Plus size={13} strokeWidth={2} /></button>
-                    <button
-                      disabled={busyId === u.id || !creditInputs[u.id]}
-                      onClick={() => adjustCredits(u.id, -Math.abs(Number(creditInputs[u.id] || 0)))}
-                      title={t('admin_credit_remove_title')}
-                    ><Minus size={13} strokeWidth={2} /></button>
-                  </div>
-                </td>
+                <td className="admin-user-cell__sub">{formatDate(u.created_at)}</td>
               </tr>
             ))}
           </tbody>
@@ -799,6 +737,7 @@ function UserDetailModal({ userId, onClose, onChanged }) {
   const [error, setError] = useState(null)
   const [busy, setBusy] = useState(false)
   const [notesDraft, setNotesDraft] = useState('')
+  const [creditDraft, setCreditDraft] = useState('')
 
   const load = useCallback(() => {
     authedFetch(`/api/admin/users/${userId}/detail`)
@@ -810,6 +749,20 @@ function UserDetailModal({ userId, onClose, onChanged }) {
 
   const locale = language === 'en' ? 'en-US' : 'tr-TR'
   const formatDate = (d) => d ? new Date(d).toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'
+
+  const adjustCredits = async (delta) => {
+    if (!delta) return
+    setBusy(true)
+    try {
+      await authedFetch(`/api/admin/users/${userId}/credits`, {
+        method: 'POST',
+        body: JSON.stringify({ delta, reason: t('admin_credit_manual_note') }),
+      })
+      setCreditDraft('')
+      load(); onChanged?.()
+    } catch (e) { setError(e.message) }
+    setBusy(false)
+  }
 
   const toggleAdmin = async () => {
     setBusy(true)
@@ -882,6 +835,23 @@ function UserDetailModal({ userId, onClose, onChanged }) {
                 <StatTile icon={ShoppingCart} label={t('admin_table_received')} range="" value={p.total_credits_purchased ?? 0} />
                 <StatTile icon={TrendingDown} label={t('admin_stat_spent')} range="" value={p.total_credits_spent ?? 0} />
                 <StatTile icon={Tag} label={t('admin_table_gifted')} range="" value={p.total_credits_gifted ?? 0} />
+              </div>
+
+              <div className="admin-modal__section">
+                <div className="admin-subtitle">{t('admin_user_adjust_credit')}</div>
+                <div className="admin-modal__credit-edit">
+                  <input
+                    type="number" placeholder="0"
+                    value={creditDraft}
+                    onChange={(e) => setCreditDraft(e.target.value)}
+                  />
+                  <button disabled={busy || !creditDraft} onClick={() => adjustCredits(Math.abs(Number(creditDraft || 0)))}>
+                    <Plus size={13} strokeWidth={2} /> {t('admin_credit_add_title')}
+                  </button>
+                  <button disabled={busy || !creditDraft} onClick={() => adjustCredits(-Math.abs(Number(creditDraft || 0)))}>
+                    <Minus size={13} strokeWidth={2} /> {t('admin_credit_remove_title')}
+                  </button>
+                </div>
               </div>
 
               <div className="admin-modal__section">
@@ -1528,10 +1498,19 @@ function SalesTab() {
   )
 }
 
+const ADMIN_TABS = ['overview', 'users', 'audits', 'sales', 'campaigns', 'tickets']
+
 export default function AdminPage({ onBack }) {
   const { t } = useLanguage()
   const { profile } = useAuth()
-  const [tab, setTab] = useState('overview')
+  const [tab, setTabState] = useState(() => {
+    const fromHash = window.location.hash.slice(1)
+    return ADMIN_TABS.includes(fromHash) ? fromHash : 'overview'
+  })
+  const setTab = (next) => {
+    setTabState(next)
+    window.location.hash = next
+  }
 
   if (!profile?.is_admin) {
     return (

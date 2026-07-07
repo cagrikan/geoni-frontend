@@ -2059,14 +2059,34 @@ body {
 }
 .admin-ticket-verify button:hover { border-color: var(--accent); color: var(--accent); }
 
-.admin-user-cell--clickable { cursor: pointer; }
-.admin-user-cell--clickable:hover span:first-child { color: var(--accent); }
-.admin-table__row--suspended { opacity: .55; }
-.admin-suspended-badge {
-  display: inline-block; margin-left: 8px; padding: 2px 7px; border-radius: 5px;
-  background: rgba(248,113,113,.12); color: #f87171; font-size: .68rem; font-weight: 700;
-  text-transform: uppercase; vertical-align: middle;
+.admin-table__row--clickable { cursor: pointer; }
+.admin-table__row--clickable:hover { background: var(--tint); }
+.admin-table--users .admin-user-cell { display: flex; align-items: center; gap: 10px; }
+.admin-user-avatar {
+  flex: 0 0 auto; width: 30px; height: 30px; border-radius: 50%;
+  background: var(--accent); color: #FFFFFF; font-weight: 700; font-size: .82rem;
+  display: flex; align-items: center; justify-content: center;
 }
+.admin-user-cell__name { display: flex; align-items: center; gap: 6px; font-weight: 500; color: var(--text); flex-wrap: wrap; }
+.admin-badge {
+  display: inline-block; padding: 2px 7px; border-radius: 5px;
+  font-size: .66rem; font-weight: 700; text-transform: uppercase; letter-spacing: .02em;
+}
+.admin-badge--admin { background: rgba(129,140,248,.14); color: var(--accent); }
+.admin-badge--expert { background: rgba(74,222,128,.12); color: var(--good); }
+.admin-badge--suspended { background: rgba(248,113,113,.12); color: #f87171; }
+.admin-modal__credit-edit { display: flex; gap: 8px; flex-wrap: wrap; }
+.admin-modal__credit-edit input {
+  background: var(--tint); border: 1px solid var(--border); border-radius: 6px;
+  padding: 7px 9px; color: var(--text); font-size: .82rem; width: 100px;
+}
+.admin-modal__credit-edit button {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--tint); border: 1px solid var(--border); border-radius: 6px;
+  padding: 7px 12px; font-size: .82rem; color: var(--text-sub); cursor: pointer;
+}
+.admin-modal__credit-edit button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.admin-modal__credit-edit button:disabled { opacity: .4; cursor: default; }
 
 .admin-modal-overlay {
   position: fixed; inset: 0; z-index: 200; background: rgba(13,13,26,.5);

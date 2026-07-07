@@ -804,6 +804,8 @@ function UserDetailView({ userId, onBack, onChanged }) {
   const [busy, setBusy] = useState(false)
   const [notesDraft, setNotesDraft] = useState('')
   const [creditDraft, setCreditDraft] = useState('')
+  const [pendingCreditDelta, setPendingCreditDelta] = useState(null)
+  const [creditComment, setCreditComment] = useState('')
   const [viewingAuditId, setViewingAuditId] = useState(null)
 
   const load = useCallback(() => {
@@ -817,15 +819,17 @@ function UserDetailView({ userId, onBack, onChanged }) {
   const locale = language === 'en' ? 'en-US' : 'tr-TR'
   const formatDate = (d) => d ? new Date(d).toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'
 
-  const adjustCredits = async (delta) => {
-    if (!delta) return
+  const confirmAdjustCredits = async () => {
+    if (!pendingCreditDelta) return
     setBusy(true)
     try {
       await authedFetch(`/api/admin/users/${userId}/credits`, {
         method: 'POST',
-        body: JSON.stringify({ delta, reason: t('admin_credit_manual_note') }),
+        body: JSON.stringify({ delta: pendingCreditDelta, reason: creditComment || t('admin_credit_manual_note') }),
       })
       setCreditDraft('')
+      setPendingCreditDelta(null)
+      setCreditComment('')
       load(); onChanged?.()
     } catch (e) { setError(e.message) }
     setBusy(false)
@@ -915,10 +919,10 @@ function UserDetailView({ userId, onBack, onChanged }) {
                       value={creditDraft}
                       onChange={(e) => setCreditDraft(e.target.value)}
                     />
-                    <button disabled={busy || !creditDraft} onClick={() => adjustCredits(Math.abs(Number(creditDraft || 0)))} title={t('admin_credit_add_title')}>
+                    <button disabled={busy || !creditDraft} onClick={() => setPendingCreditDelta(Math.abs(Number(creditDraft || 0)))} title={t('admin_credit_add_title')}>
                       <Plus size={13} strokeWidth={2} />
                     </button>
-                    <button disabled={busy || !creditDraft} onClick={() => adjustCredits(-Math.abs(Number(creditDraft || 0)))} title={t('admin_credit_remove_title')}>
+                    <button disabled={busy || !creditDraft} onClick={() => setPendingCreditDelta(-Math.abs(Number(creditDraft || 0)))} title={t('admin_credit_remove_title')}>
                       <Minus size={13} strokeWidth={2} />
                     </button>
                   </div>
@@ -1039,6 +1043,31 @@ function UserDetailView({ userId, onBack, onChanged }) {
           </>
         )
       })()}
+
+      {pendingCreditDelta !== null && (
+        <div className="confirm-overlay" onClick={() => !busy && setPendingCreditDelta(null)}>
+          <div className="confirm-dialog admin-credit-confirm" onClick={(e) => e.stopPropagation()}>
+            <div className="confirm-dialog__title">
+              {pendingCreditDelta > 0
+                ? t('admin_credit_confirm_add_title', { amount: pendingCreditDelta })
+                : t('admin_credit_confirm_remove_title', { amount: Math.abs(pendingCreditDelta) })}
+            </div>
+            <div className="confirm-dialog__message">{t('admin_credit_confirm_message')}</div>
+            <textarea
+              className="admin-modal__notes admin-credit-confirm__input"
+              value={creditComment}
+              onChange={(e) => setCreditComment(e.target.value)}
+              placeholder={t('admin_credit_confirm_ph')}
+              rows={3}
+              autoFocus
+            />
+            <div className="confirm-dialog__actions">
+              <button type="button" className="confirm-dialog__cancel" disabled={busy} onClick={() => { setPendingCreditDelta(null); setCreditComment('') }}>{t('confirm_cancel')}</button>
+              <button type="button" className="confirm-dialog__confirm" disabled={busy} onClick={confirmAdjustCredits}>{t('admin_credit_confirm_submit')}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

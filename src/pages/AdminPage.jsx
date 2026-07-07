@@ -754,6 +754,49 @@ function UsersTab() {
 
 const ADMIN_SCOPE_FIELDS = ['users', 'tickets', 'campaigns']
 
+const SUBLIST_PAGE_SIZE = 8
+
+function PaginatedSubList({ title, fetchPath, columns, renderRow, emptyLabel }) {
+  const { t } = useLanguage()
+  const [page, setPage] = useState(0)
+  const [data, setData] = useState(null)
+
+  useEffect(() => {
+    setData(null)
+    authedFetch(`${fetchPath}?limit=${SUBLIST_PAGE_SIZE}&offset=${page * SUBLIST_PAGE_SIZE}`)
+      .then(setData)
+      .catch(() => setData({ items: [], total: 0 }))
+  }, [fetchPath, page])
+
+  const totalPages = Math.max(1, Math.ceil((data?.total || 0) / SUBLIST_PAGE_SIZE))
+
+  return (
+    <div className="admin-card">
+      <div className="admin-card__title">{title}</div>
+      {!data ? <div className="admin-loading admin-loading--widget">{t('admin_loading')}</div> : data.items.length === 0 ? (
+        <div className="admin-empty">{emptyLabel}</div>
+      ) : (
+        <>
+          <div className="admin-sublist">
+            <div className="admin-sublist__head">
+              {columns.map((c) => <span key={c}>{c}</span>)}
+              <span className="admin-sublist__head-spacer" />
+            </div>
+            {data.items.map(renderRow)}
+          </div>
+          {totalPages > 1 && (
+            <div className="admin-pagination admin-pagination--compact">
+              <button disabled={page === 0} onClick={() => setPage((p) => p - 1)}><ChevronLeft size={13} /></button>
+              <span>{page + 1} / {totalPages}</span>
+              <button disabled={page >= totalPages - 1} onClick={() => setPage((p) => p + 1)}><ChevronRight size={13} /></button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
+
 function UserDetailView({ userId, onBack, onChanged }) {
   const { t, language } = useLanguage()
   const [detail, setDetail] = useState(null)
@@ -860,38 +903,37 @@ function UserDetailView({ userId, onBack, onChanged }) {
                 </div>
               </div>
               <div className="admin-userpage__stats">
-                <div><span>{p.credit_balance ?? 0}</span>{t('admin_table_credit')}</div>
-                <div><span>{p.total_credits_purchased ?? 0}</span>{t('admin_table_received')}</div>
-                <div><span>{p.total_credits_spent ?? 0}</span>{t('admin_stat_spent')}</div>
-                <div><span>{p.total_credits_gifted ?? 0}</span>{t('admin_table_gifted')}</div>
-              </div>
-            </div>
-
-            <div className="admin-userpage__grid">
-              <div className="admin-userpage__col">
-                <div className="admin-card">
-                  <div className="admin-card__title">{t('admin_user_adjust_credit')}</div>
+                <div className="admin-stat-box"><span>{p.credit_balance ?? 0}</span>{t('admin_table_credit')}</div>
+                <div className="admin-stat-box"><span>{p.total_credits_purchased ?? 0}</span>{t('admin_table_received')}</div>
+                <div className="admin-stat-box"><span>{p.total_credits_spent ?? 0}</span>{t('admin_stat_spent')}</div>
+                <div className="admin-stat-box"><span>{p.total_credits_gifted ?? 0}</span>{t('admin_table_gifted')}</div>
+                <div className="admin-stat-box admin-stat-box--edit">
+                  <span className="admin-stat-box__label">{t('admin_user_adjust_credit')}</span>
                   <div className="admin-modal__credit-edit">
                     <input
                       type="number" placeholder="0"
                       value={creditDraft}
                       onChange={(e) => setCreditDraft(e.target.value)}
                     />
-                    <button disabled={busy || !creditDraft} onClick={() => adjustCredits(Math.abs(Number(creditDraft || 0)))}>
-                      <Plus size={13} strokeWidth={2} /> {t('admin_credit_add_title')}
+                    <button disabled={busy || !creditDraft} onClick={() => adjustCredits(Math.abs(Number(creditDraft || 0)))} title={t('admin_credit_add_title')}>
+                      <Plus size={13} strokeWidth={2} />
                     </button>
-                    <button disabled={busy || !creditDraft} onClick={() => adjustCredits(-Math.abs(Number(creditDraft || 0)))}>
-                      <Minus size={13} strokeWidth={2} /> {t('admin_credit_remove_title')}
+                    <button disabled={busy || !creditDraft} onClick={() => adjustCredits(-Math.abs(Number(creditDraft || 0)))} title={t('admin_credit_remove_title')}>
+                      <Minus size={13} strokeWidth={2} />
                     </button>
                   </div>
                 </div>
+              </div>
+            </div>
 
+            <div className="admin-userpage__grid">
+              <div className="admin-userpage__col">
                 <div className="admin-card">
                   <div className="admin-card__title">{t('admin_user_permissions_title')}</div>
 
                   <div className="admin-card__row">
                     <span className="admin-card__row-label">{t('admin_user_status')}</span>
-                    <button className={`admin-admin-toggle ${p.is_suspended ? 'admin-admin-toggle--danger' : ''}`} disabled={busy} onClick={toggleSuspended}>
+                    <button className={`admin-admin-toggle admin-admin-toggle--right ${p.is_suspended ? 'admin-admin-toggle--danger' : ''}`} disabled={busy} onClick={toggleSuspended}>
                       {p.is_suspended ? t('admin_user_unsuspend') : t('admin_user_suspend')}
                     </button>
                   </div>
@@ -899,7 +941,7 @@ function UserDetailView({ userId, onBack, onChanged }) {
                   <div className="admin-card__row admin-card__row--top">
                     <span className="admin-card__row-label">{t('admin_table_admin')}</span>
                     <div className="admin-card__row-content">
-                      <button className={`admin-admin-toggle ${p.is_admin ? 'admin-admin-toggle--on' : ''}`} disabled={busy} onClick={toggleAdmin}>
+                      <button className={`admin-admin-toggle admin-admin-toggle--right ${p.is_admin ? 'admin-admin-toggle--on' : ''}`} disabled={busy} onClick={toggleAdmin}>
                         {p.is_admin ? <Shield size={13} strokeWidth={1.5} /> : <ShieldOff size={13} strokeWidth={1.5} />} {p.is_admin ? t('admin_admin_revoke_title') : t('admin_admin_grant_title')}
                       </button>
                       {p.is_admin && (
@@ -918,7 +960,7 @@ function UserDetailView({ userId, onBack, onChanged }) {
                   <div className="admin-card__row admin-card__row--top">
                     <span className="admin-card__row-label">{t('admin_table_expert')}</span>
                     <div className="admin-card__row-content">
-                      <button className={`admin-admin-toggle ${p.is_expert ? 'admin-admin-toggle--on' : ''}`} disabled={busy} onClick={toggleExpert}>
+                      <button className={`admin-admin-toggle admin-admin-toggle--right ${p.is_expert ? 'admin-admin-toggle--on' : ''}`} disabled={busy} onClick={toggleExpert}>
                         {p.is_expert ? <Wrench size={13} strokeWidth={1.5} /> : '—'} {p.is_expert ? t('admin_expert_revoke_title') : t('admin_expert_grant_title')}
                       </button>
                       {p.is_expert && detail.expert_stats && (
@@ -930,6 +972,20 @@ function UserDetailView({ userId, onBack, onChanged }) {
                   </div>
                 </div>
 
+                <PaginatedSubList
+                  title={t('admin_user_recent_tickets')}
+                  fetchPath={`/api/admin/users/${userId}/tickets`}
+                  columns={[t('admin_sublist_col_type'), t('admin_sublist_col_status'), t('admin_sublist_col_date')]}
+                  emptyLabel={t('admin_no_records')}
+                  renderRow={(tk) => (
+                    <div className="admin-sublist__row" key={tk.id}>
+                      <span>{tk.ticket_type_name}</span>
+                      <span><span className={`ticket-status ticket-status--${tk.status}`}>{t(TICKET_STATUS_KEY_MAP[tk.status] || tk.status)}</span></span>
+                      <span>{formatDate(tk.created_at)}</span>
+                    </div>
+                  )}
+                />
+
                 <div className="admin-card">
                   <div className="admin-card__title">{t('admin_user_notes')}</div>
                   <textarea
@@ -939,48 +995,45 @@ function UserDetailView({ userId, onBack, onChanged }) {
                     placeholder={t('admin_user_notes_ph')}
                     rows={3}
                   />
-                  <button className="admin-card__save-btn" disabled={busy} onClick={saveNotes}>{t('admin_user_notes_save')}</button>
+                  <div className="admin-card__actions-right">
+                    <button className="admin-card__save-btn" disabled={busy} onClick={saveNotes}>{t('admin_user_notes_save')}</button>
+                  </div>
                 </div>
               </div>
 
               <div className="admin-userpage__col">
-                <div className="admin-card">
-                  <div className="admin-card__title">{t('admin_user_recent_audits')}</div>
-                  {detail.audits.length === 0 ? <div className="admin-empty">{t('admin_no_records')}</div> : (
-                    <ul className="admin-modal__list">
-                      {detail.audits.map((a) => (
-                        <li key={a.id} className={a.status === 'complete' ? 'admin-modal__list-item--clickable' : ''} onClick={() => a.status === 'complete' && setViewingAuditId(a.id)}>
-                          <span>{a.domain || a.name || '—'}</span>
-                          <span>{a.score ?? '—'}</span>
-                          <span>{formatDate(a.created_at)}</span>
-                          {a.status === 'complete' && <ChevronRight size={13} strokeWidth={1.5} />}
-                        </li>
-                      ))}
-                    </ul>
+                <PaginatedSubList
+                  title={t('admin_user_recent_audits')}
+                  fetchPath={`/api/admin/users/${userId}/audits`}
+                  columns={[t('admin_sublist_col_target'), t('admin_sublist_col_score'), t('admin_sublist_col_date')]}
+                  emptyLabel={t('admin_no_records')}
+                  renderRow={(a) => (
+                    <div
+                      key={a.id}
+                      className={`admin-sublist__row ${a.status === 'complete' ? 'admin-sublist__row--clickable' : ''}`}
+                      onClick={() => a.status === 'complete' && setViewingAuditId(a.id)}
+                    >
+                      <span>{a.domain || a.name || '—'}</span>
+                      <span>{a.score ?? '—'}</span>
+                      <span>{formatDate(a.created_at)}</span>
+                      {a.status === 'complete' && <ChevronRight size={13} strokeWidth={1.5} />}
+                    </div>
                   )}
-                </div>
+                />
 
-                <div className="admin-card">
-                  <div className="admin-card__title">{t('admin_user_recent_transactions')}</div>
-                  {detail.transactions.length === 0 ? <div className="admin-empty">{t('admin_no_records')}</div> : (
-                    <ul className="admin-modal__list">
-                      {detail.transactions.map((tx) => (
-                        <li key={tx.id}><span>{tx.description || tx.type}</span><span>{tx.amount > 0 ? '+' : ''}{tx.amount}</span><span>{formatDate(tx.created_at)}</span></li>
-                      ))}
-                    </ul>
+                <PaginatedSubList
+                  title={t('admin_user_recent_transactions')}
+                  fetchPath={`/api/admin/users/${userId}/transactions`}
+                  columns={[t('admin_sublist_col_desc'), t('admin_sublist_col_amount'), t('admin_sublist_col_date')]}
+                  emptyLabel={t('admin_no_records')}
+                  renderRow={(tx) => (
+                    <div className="admin-sublist__row" key={tx.id}>
+                      <span>{tx.description || tx.type}</span>
+                      <span>{tx.amount > 0 ? '+' : ''}{tx.amount}</span>
+                      <span>{formatDate(tx.created_at)}</span>
+                    </div>
                   )}
-                </div>
-
-                <div className="admin-card">
-                  <div className="admin-card__title">{t('admin_user_recent_tickets')}</div>
-                  {detail.tickets.length === 0 ? <div className="admin-empty">{t('admin_no_records')}</div> : (
-                    <ul className="admin-modal__list">
-                      {detail.tickets.map((tk) => (
-                        <li key={tk.id}><span>{tk.ticket_type_name}</span><span className={`ticket-status ticket-status--${tk.status}`}>{t(TICKET_STATUS_KEY_MAP[tk.status] || tk.status)}</span><span>{formatDate(tk.created_at)}</span></li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
+                />
               </div>
             </div>
           </>

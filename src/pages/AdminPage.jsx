@@ -278,8 +278,9 @@ function SupabaseCostWidget() {
 }
 
 function TotalCostWidget() {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const { data, error } = useAdminFetch('/api/admin/stats/total-cost')
+  const monthLabel = new Date().toLocaleDateString(language === 'en' ? 'en-US' : 'tr-TR', { month: 'long', year: 'numeric' })
 
   if (error) return <div className="admin-widget"><h3 className="admin-section__title">{t('admin_title_total_cost')}</h3><div className="admin-error">{error}</div></div>
   if (!data) return <div className="admin-widget"><h3 className="admin-section__title">{t('admin_title_total_cost')}</h3><div className="admin-loading admin-loading--widget">{t('admin_loading')}</div></div>
@@ -301,7 +302,7 @@ function TotalCostWidget() {
       </div>
       {byProviderItems.length > 0 && (
         <>
-          <div className="admin-subtitle">{t('admin_subtitle_service')}</div>
+          <div className="admin-subtitle">{t('admin_subtitle_service_month', { month: monthLabel })}</div>
           <HBarList items={byProviderItems} valueFormatter={(v) => `$${v.toFixed(2)}`} />
         </>
       )}

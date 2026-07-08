@@ -8,7 +8,7 @@ import Sparkline from '../components/Sparkline'
 import LanguageSwitcher from '../components/LanguageSwitcher'
 import ThemeSwitcher from '../components/ThemeSwitcher'
 import ConfirmDialog from '../components/ConfirmDialog'
-import TicketThread from '../components/TicketThread'
+import TicketJobCard from '../components/TicketJobCard'
 import {
   Gem, History, Bookmark, Settings, Globe, User, Building2, FileText,
   TrendingUp, TrendingDown, ChevronRight, X, RefreshCw, ShieldCheck, Wrench, ClipboardList,
@@ -107,17 +107,21 @@ function ServiceCatalogSection({ t, profile }) {
   const [buyingId, setBuyingId] = useState(null)
   const [error, setError] = useState(null)
   const [justBoughtId, setJustBoughtId] = useState(null)
+  const [targets, setTargets] = useState({})
 
   useEffect(() => {
     fetch(`${API_URL}/api/ticket-types`).then((r) => r.json()).then(setTypes).catch(() => setTypes([]))
   }, [])
 
   const buy = async (ticketTypeId) => {
+    const target = (targets[ticketTypeId] || '').trim()
+    if (!target) return
     setBuyingId(ticketTypeId)
     setError(null)
     try {
-      await authedFetch('/api/tickets', { method: 'POST', body: JSON.stringify({ ticket_type_id: ticketTypeId }) })
+      await authedFetch('/api/tickets', { method: 'POST', body: JSON.stringify({ ticket_type_id: ticketTypeId, target }) })
       setJustBoughtId(ticketTypeId)
+      setTargets((d) => ({ ...d, [ticketTypeId]: '' }))
       setTimeout(() => setJustBoughtId(null), 2500)
     } catch (e) {
       setError(e.message)
@@ -141,11 +145,18 @@ function ServiceCatalogSection({ t, profile }) {
                 <div className="dash-service-card__icon"><Icon size={20} strokeWidth={1.5} /></div>
                 <div className="dash-service-card__name">{tt.name}</div>
                 <p className="dash-service-card__desc">{tt.description}</p>
+                <input
+                  type="text"
+                  className="dash-service-card__target"
+                  placeholder={t('dash_service_target_ph')}
+                  value={targets[tt.id] || ''}
+                  onChange={(e) => setTargets((d) => ({ ...d, [tt.id]: e.target.value }))}
+                />
                 <div className="dash-service-card__footer">
                   <div className="dash-service-card__price">{tt.token_cost} <span className="dash-credit-unit">{t('dash_credit_unit')}</span></div>
                   <button
                     className="dash-buy-btn"
-                    disabled={buyingId === tt.id || (profile?.credit_balance ?? 0) < tt.token_cost}
+                    disabled={buyingId === tt.id || !(targets[tt.id] || '').trim() || (profile?.credit_balance ?? 0) < tt.token_cost}
                     onClick={() => buy(tt.id)}
                   >{justBoughtId === tt.id ? t('dash_tickets_bought') : t('dash_tickets_buy')}</button>
                 </div>
@@ -158,7 +169,7 @@ function ServiceCatalogSection({ t, profile }) {
   )
 }
 
-function MyTicketsSection({ t, userId }) {
+function MyTicketsSection({ t, userId, language }) {
   const [myTickets, setMyTickets] = useState(null)
   const [openId, setOpenId] = useState(null)
 
@@ -199,7 +210,7 @@ function MyTicketsSection({ t, userId }) {
                   <TicketStatusBadge status={tk.status} t={t} />
                   <ChevronRight size={15} strokeWidth={1.5} className={`ticket-row__chevron ${isOpen ? 'ticket-row__chevron--open' : ''}`} />
                 </div>
-                {isOpen && <TicketThread ticketId={tk.id} currentUserId={userId} authedFetch={authedFetch} t={t} />}
+                {isOpen && <TicketJobCard ticket={tk} canEdit={false} currentUserId={userId} authedFetch={authedFetch} t={t} language={language} />}
               </div>
             )
           })}
@@ -209,7 +220,7 @@ function MyTicketsSection({ t, userId }) {
   )
 }
 
-function ExpertPanelSection({ t, userId }) {
+function ExpertPanelSection({ t, userId, language }) {
   const [tickets, setTickets] = useState(null)
   const [forms, setForms] = useState({})
   const [submittingId, setSubmittingId] = useState(null)
@@ -233,6 +244,15 @@ function ExpertPanelSection({ t, userId }) {
         method: 'POST',
         body: JSON.stringify({ evidence_url: form.evidence_url, evidence_note: form.evidence_note || '' }),
       })
+      load()
+    } catch { /* kullanici tekrar deneyebilir */ }
+    setSubmittingId(null)
+  }
+
+  const start = async (ticketId) => {
+    setSubmittingId(ticketId)
+    try {
+      await authedFetch(`/api/expert/tickets/${ticketId}/start`, { method: 'POST' })
       load()
     } catch { /* kullanici tekrar deneyebilir */ }
     setSubmittingId(null)
@@ -273,7 +293,12 @@ function ExpertPanelSection({ t, userId }) {
                 <TicketStatusBadge status={tk.status} t={t} />
                 <ChevronRight size={15} strokeWidth={1.5} className={`ticket-row__chevron ${isOpen ? 'ticket-row__chevron--open' : ''}`} />
               </div>
-              {(tk.status === 'assigned' || tk.status === 'in_progress') && (
+              {tk.status === 'assigned' && (
+                <div className="ticket-submit-form">
+                  <button disabled={submittingId === tk.id} onClick={() => start(tk.id)}>{t('dash_expert_start')}</button>
+                </div>
+              )}
+              {tk.status === 'in_progress' && (
                 <div className="ticket-submit-form">
                   <input
                     type="text" placeholder={t('dash_expert_evidence_url_ph')}
@@ -290,7 +315,7 @@ function ExpertPanelSection({ t, userId }) {
               )}
               {tk.status === 'rejected' && tk.reject_reason && <div className="ticket-reject-reason">{tk.reject_reason}</div>}
             </div>
-            {isOpen && <TicketThread ticketId={tk.id} currentUserId={userId} authedFetch={authedFetch} t={t} />}
+            {isOpen && <TicketJobCard ticket={tk} canEdit={true} currentUserId={userId} authedFetch={authedFetch} t={t} language={language} />}
             </div>
             )
           })}
@@ -778,8 +803,8 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
           )}
 
           {tab === 'tickets' && <ServiceCatalogSection t={t} profile={profile} />}
-          {tab === 'my_tickets' && <MyTicketsSection t={t} userId={user?.id} />}
-          {tab === 'expert' && profile?.is_expert && <ExpertPanelSection t={t} userId={user?.id} />}
+          {tab === 'my_tickets' && <MyTicketsSection t={t} userId={user?.id} language={language} />}
+          {tab === 'expert' && profile?.is_expert && <ExpertPanelSection t={t} userId={user?.id} language={language} />}
 
           {/* Settings tab */}
           {tab === 'settings' && (

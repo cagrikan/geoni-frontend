@@ -2113,6 +2113,7 @@ body {
 .admin-badge--admin { background: rgba(129,140,248,.14); color: var(--accent); }
 .admin-badge--expert { background: rgba(74,222,128,.12); color: var(--good); }
 .admin-badge--suspended { background: rgba(248,113,113,.12); color: #f87171; }
+.admin-badge--auto { background: rgba(234,179,8,.14); color: #eab308; }
 
 .admin-back-link {
   display: inline-flex; align-items: center; gap: 6px; align-self: flex-start;
@@ -2476,6 +2477,11 @@ body {
 }
 .dash-service-card__name { font-weight: 600; color: var(--text); font-size: .95rem; line-height: 1.35; }
 .dash-service-card__desc { font-size: .8rem; color: var(--text-muted); line-height: 1.5; margin: 8px 0 0; flex: 1; }
+.dash-service-card__target {
+  width: 100%; box-sizing: border-box; margin-top: 12px; background: var(--tint-weak);
+  border: 1px solid var(--border); border-radius: 7px; padding: 7px 10px;
+  font-size: .82rem; color: var(--text);
+}
 .dash-service-card__footer {
   display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 16px;
 }
@@ -2546,6 +2552,8 @@ body {
 .ticket-thread__role--customer { background: rgba(129,140,248,.14); color: var(--accent); }
 .ticket-thread__role--expert { background: rgba(74,222,128,.12); color: var(--good); }
 .ticket-thread__role--admin { background: rgba(248,113,113,.12); color: #f87171; }
+.ticket-thread__role--system { background: rgba(234,179,8,.14); color: #eab308; }
+.ticket-thread__msg--system { border-style: dashed; }
 .ticket-thread__time { font-size: .7rem; color: var(--text-muted); }
 .ticket-thread__body { font-size: .85rem; color: var(--text); line-height: 1.5; white-space: pre-wrap; }
 .ticket-thread__image { max-width: 220px; max-height: 160px; border-radius: 8px; margin-top: 6px; display: block; }
@@ -2576,3 +2584,48 @@ body {
   padding: 7px 14px; font-size: .82rem; font-weight: 600; cursor: pointer;
 }
 .ticket-thread__send-btn:disabled { opacity: .4; cursor: default; }
+
+/* ===== Bilet is kirilimi (TicketChecklist) + is karti (TicketJobCard) ===== */
+.ticket-job-card { margin-top: 12px; }
+.ticket-job-card__meta {
+  display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: .78rem; color: var(--text-muted);
+  margin-bottom: 10px;
+}
+.ticket-checklist {
+  background: var(--tint-weak); border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px; margin-bottom: 10px;
+}
+.ticket-checklist__head {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: .82rem; font-weight: 600; color: var(--text); margin-bottom: 8px;
+}
+.ticket-checklist__progress { color: var(--text-muted); font-weight: 500; font-variant-numeric: tabular-nums; }
+.ticket-checklist__bar { height: 5px; border-radius: 3px; background: var(--tint); overflow: hidden; margin-bottom: 12px; }
+.ticket-checklist__bar-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width .25s ease; }
+.ticket-checklist__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.ticket-checklist__item { display: flex; align-items: center; gap: 9px; position: relative; }
+.ticket-checklist__check {
+  flex: 0 0 auto; background: none; border: none; padding: 0; cursor: pointer;
+  color: var(--text-muted); display: flex; align-items: center;
+}
+.ticket-checklist__check:disabled { cursor: default; }
+.ticket-checklist__item--done .ticket-checklist__check { color: var(--good, #4ade80); }
+.ticket-checklist__title { font-size: .85rem; color: var(--text); }
+.ticket-checklist__item--done .ticket-checklist__title { color: var(--text-muted); text-decoration: line-through; }
+.ticket-checklist__howto-btn {
+  flex: 0 0 auto; background: none; border: none; padding: 0; cursor: pointer;
+  color: var(--text-muted); display: flex; align-items: center;
+}
+.ticket-checklist__howto-btn:hover { color: var(--accent); }
+.ticket-job-card__template-btn {
+  display: inline-flex; align-items: center; gap: 6px; margin-bottom: 10px;
+  background: var(--tint); border: 1px solid var(--border); border-radius: 7px;
+  padding: 7px 13px; font-size: .82rem; font-weight: 600; color: var(--accent); cursor: pointer;
+}
+.ticket-job-card__template-btn:hover { border-color: var(--accent); }
+.ticket-checklist__howto-pop {
+  position: absolute; left: 0; top: 100%; margin-top: 4px; z-index: 5;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  padding: 10px 12px; font-size: .78rem; color: var(--text-sub); line-height: 1.5;
+  max-width: 380px; box-shadow: 0 8px 24px rgba(0,0,0,.15);
+}

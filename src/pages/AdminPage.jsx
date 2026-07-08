@@ -9,7 +9,7 @@ import BarChart from '../components/BarChart'
 import HBarList from '../components/HBarList'
 import ResultsPage from '../ResultsPage'
 import BrandCheckResultsPage from '../BrandCheckResultsPage'
-import TicketThread from '../components/TicketThread'
+import TicketJobCard from '../components/TicketJobCard'
 import {
   LayoutDashboard, Users, ScrollText, Search, Shield, ShieldOff,
   Plus, Minus, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ArrowLeft,
@@ -1392,7 +1392,7 @@ function CampaignsTab() {
 const TICKET_STATUS_FILTERS = ['', 'open', 'assigned', 'in_progress', 'submitted', 'verified', 'rejected']
 
 function TicketsAdminTab() {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const { user } = useAuth()
   const [statusFilter, setStatusFilter] = useState('')
   const { data: tickets, error } = useAdminFetch(`/api/admin/tickets${statusFilter ? `?status=${statusFilter}` : ''}`)
@@ -1474,7 +1474,9 @@ function TicketsAdminTab() {
                     <td>{tk.target || '—'}</td>
                     <td><span className={`ticket-status ticket-status--${tk.status}`}>{t(TICKET_STATUS_KEY_MAP[tk.status] || tk.status)}</span></td>
                     <td>
-                      {tk.status === 'open' || tk.status === 'assigned' || tk.status === 'in_progress' ? (
+                      {tk.ticket_type_key === 'llms_robots' && !tk.assigned_expert_id ? (
+                        <span className="admin-badge admin-badge--auto">{t('admin_tickets_automated')}</span>
+                      ) : tk.status === 'open' || tk.status === 'assigned' || tk.status === 'in_progress' ? (
                         <select disabled={busyId === tk.id} value={tk.assigned_expert_id || ''} onChange={(e) => assign(tk.id, e.target.value)}>
                           <option value="">{t('admin_tickets_pick_expert')}</option>
                           {(experts || []).map((ex) => <option key={ex.id} value={ex.id}>{ex.email || ex.full_name}</option>)}
@@ -1515,7 +1517,7 @@ function TicketsAdminTab() {
                   {openId === tk.id && (
                     <tr>
                       <td colSpan={9} className="admin-table__thread-cell">
-                        <TicketThread ticketId={tk.id} currentUserId={user?.id} authedFetch={authedFetch} t={t} />
+                        <TicketJobCard ticket={tk} canEdit={true} currentUserId={user?.id} authedFetch={authedFetch} t={t} language={language} />
                       </td>
                     </tr>
                   )}

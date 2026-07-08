@@ -1,21 +1,23 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
 import { Paperclip, Send, FileText as FileIcon, Image as ImageIcon } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
-const ROLE_LABEL_KEY = { customer: 'ticket_thread_role_customer', expert: 'ticket_thread_role_expert', admin: 'ticket_thread_role_admin' }
+const ROLE_LABEL_KEY = { customer: 'ticket_thread_role_customer', expert: 'ticket_thread_role_expert', admin: 'ticket_thread_role_admin', system: 'ticket_thread_role_system' }
 
 function isImageUrl(url, name) {
   const s = (name || url || '').toLowerCase()
   return /\.(png|jpe?g|gif|webp|svg)$/.test(s)
 }
 
-export default function TicketThread({ ticketId, currentUserId, authedFetch, t }) {
+const TicketThread = forwardRef(function TicketThread({ ticketId, currentUserId, authedFetch, t }, ref) {
   const [messages, setMessages] = useState(null)
   const [body, setBody] = useState('')
   const [file, setFile] = useState(null)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState(null)
   const fileInputRef = useRef(null)
+
+  useImperativeHandle(ref, () => ({ setBody }), [])
 
   const load = () => authedFetch(`/api/tickets/${ticketId}/messages`).then(setMessages).catch(() => setMessages([]))
   useEffect(() => { load() }, [ticketId])
@@ -59,7 +61,7 @@ export default function TicketThread({ ticketId, currentUserId, authedFetch, t }
         ) : messages.length === 0 ? (
           <div className="ticket-thread__empty">{t('ticket_thread_empty')}</div>
         ) : messages.map((m) => (
-          <div key={m.id} className={`ticket-thread__msg ${m.author_id === currentUserId ? 'ticket-thread__msg--own' : ''}`}>
+          <div key={m.id} className={`ticket-thread__msg ${m.author_id === currentUserId ? 'ticket-thread__msg--own' : ''} ${m.author_role === 'system' ? 'ticket-thread__msg--system' : ''}`}>
             <div className="ticket-thread__msg-head">
               <span className={`ticket-thread__role ticket-thread__role--${m.author_role}`}>{t(ROLE_LABEL_KEY[m.author_role] || m.author_role)}</span>
               <span className="ticket-thread__time">{new Date(m.created_at).toLocaleString()}</span>
@@ -107,4 +109,6 @@ export default function TicketThread({ ticketId, currentUserId, authedFetch, t }
       </div>
     </div>
   )
-}
+})
+
+export default TicketThread

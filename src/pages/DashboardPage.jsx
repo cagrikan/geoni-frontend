@@ -8,7 +8,9 @@ import Sparkline from '../components/Sparkline'
 import LanguageSwitcher from '../components/LanguageSwitcher'
 import ThemeSwitcher from '../components/ThemeSwitcher'
 import ConfirmDialog from '../components/ConfirmDialog'
-import TicketJobCard from '../components/TicketJobCard'
+import { TICKET_STATUS_KEY } from '../components/TicketStatusBadge'
+import TicketBoard from '../components/TicketBoard'
+import TicketDetailOverlay from '../components/TicketDetailOverlay'
 import {
   Gem, History, Bookmark, Settings, Globe, User, Building2, FileText,
   TrendingUp, TrendingDown, ChevronRight, X, RefreshCw, ShieldCheck, Wrench, ClipboardList,
@@ -93,15 +95,6 @@ function BuyCreditsSection({ t }) {
   )
 }
 
-const TICKET_STATUS_KEY = {
-  open: 'ticket_status_open', assigned: 'ticket_status_assigned', in_progress: 'ticket_status_in_progress',
-  submitted: 'ticket_status_submitted', verified: 'ticket_status_verified', rejected: 'ticket_status_rejected',
-}
-
-function TicketStatusBadge({ status, t }) {
-  return <span className={`ticket-status ticket-status--${status}`}>{t(TICKET_STATUS_KEY[status] || status)}</span>
-}
-
 function ServiceCatalogSection({ t, profile }) {
   const [types, setTypes] = useState(null)
   const [buyingId, setBuyingId] = useState(null)
@@ -169,18 +162,31 @@ function ServiceCatalogSection({ t, profile }) {
   )
 }
 
+const CUSTOMER_TICKET_COLUMNS_KEY = ['open', 'assigned', 'in_progress', 'submitted', 'verified']
+
 function MyTicketsSection({ t, userId, language }) {
   const [myTickets, setMyTickets] = useState(null)
-  const [openId, setOpenId] = useState(null)
+  const [selected, setSelected] = useState(null)
 
   useEffect(() => {
     authedFetch('/api/tickets').then(setMyTickets).catch(() => setMyTickets([]))
   }, [])
 
-  const toggleOpen = (id) => {
-    setOpenId((cur) => (cur === id ? null : id))
-    setMyTickets((list) => list?.map((t) => (t.id === id ? { ...t, has_unread: false } : t)))
+  const openTicket = (tk) => {
+    setSelected(tk)
+    setMyTickets((list) => list?.map((t) => (t.id === tk.id ? { ...t, has_unread: false } : t)))
   }
+
+  if (selected) {
+    return (
+      <TicketDetailOverlay
+        ticket={selected} canEdit={false} currentUserId={userId} authedFetch={authedFetch} t={t} language={language}
+        onBack={() => setSelected(null)}
+      />
+    )
+  }
+
+  const columns = CUSTOMER_TICKET_COLUMNS_KEY.map((key) => ({ key, label: t(TICKET_STATUS_KEY[key]) }))
 
   return (
     <div className="dash-section">
@@ -189,50 +195,27 @@ function MyTicketsSection({ t, userId, language }) {
       {myTickets === null ? <div className="dash-loading">{t('dash_loading')}</div> : myTickets.length === 0 ? (
         <div className="dash-empty"><p>{t('dash_tickets_empty')}</p></div>
       ) : (
-        <div className="ticket-list">
-          {myTickets.map((tk) => {
-            const Icon = TICKET_TYPE_ICONS[tk.ticket_type_key] || Wrench
-            const isOpen = openId === tk.id
-            return (
-              <div key={tk.id} className="ticket-row-wrap">
-                <div className="ticket-row ticket-row--clickable" onClick={() => toggleOpen(tk.id)}>
-                  <div className="ticket-row__icon">
-                    <Icon size={16} strokeWidth={1.5} />
-                    {tk.has_unread && <span className="ticket-unread-dot" title={t('ticket_unread_hint')} />}
-                  </div>
-                  <div className="ticket-row__info">
-                    <div className="ticket-row__name">#{tk.id} · {tk.ticket_type_name}</div>
-                    <div className="ticket-row__meta">
-                      {tk.target && <>{tk.target} · </>}
-                      {new Date(tk.created_at).toLocaleDateString()} · {tk.token_cost} {t('dash_credit_unit')}
-                    </div>
-                  </div>
-                  <TicketStatusBadge status={tk.status} t={t} />
-                  <ChevronRight size={15} strokeWidth={1.5} className={`ticket-row__chevron ${isOpen ? 'ticket-row__chevron--open' : ''}`} />
-                </div>
-                {isOpen && <TicketJobCard ticket={tk} canEdit={false} currentUserId={userId} authedFetch={authedFetch} t={t} language={language} />}
-              </div>
-            )
-          })}
-        </div>
+        <TicketBoard tickets={myTickets} columns={columns} authedFetch={authedFetch} onCardClick={openTicket} />
       )}
     </div>
   )
 }
 
+const EXPERT_TICKET_COLUMNS_KEY = ['assigned', 'in_progress', 'submitted', 'verified']
+
 function ExpertPanelSection({ t, userId, language }) {
   const [tickets, setTickets] = useState(null)
   const [forms, setForms] = useState({})
   const [submittingId, setSubmittingId] = useState(null)
-  const [openId, setOpenId] = useState(null)
+  const [selected, setSelected] = useState(null)
   const [search, setSearch] = useState('')
 
   const load = () => authedFetch('/api/expert/tickets').then(setTickets).catch(() => setTickets([]))
   useEffect(() => { load() }, [])
 
-  const toggleOpen = (id) => {
-    setOpenId((cur) => (cur === id ? null : id))
-    setTickets((list) => list?.map((t) => (t.id === id ? { ...t, has_unread: false } : t)))
+  const openTicket = (tk) => {
+    setSelected(tk)
+    setTickets((list) => list?.map((t) => (t.id === tk.id ? { ...t, has_unread: false } : t)))
   }
 
   const submit = async (ticketId) => {
@@ -244,7 +227,8 @@ function ExpertPanelSection({ t, userId, language }) {
         method: 'POST',
         body: JSON.stringify({ evidence_url: form.evidence_url, evidence_note: form.evidence_note || '' }),
       })
-      load()
+      await load()
+      setSelected(null)
     } catch { /* kullanici tekrar deneyebilir */ }
     setSubmittingId(null)
   }
@@ -253,7 +237,8 @@ function ExpertPanelSection({ t, userId, language }) {
     setSubmittingId(ticketId)
     try {
       await authedFetch(`/api/expert/tickets/${ticketId}/start`, { method: 'POST' })
-      load()
+      await load()
+      setSelected(null)
     } catch { /* kullanici tekrar deneyebilir */ }
     setSubmittingId(null)
   }
@@ -262,6 +247,40 @@ function ExpertPanelSection({ t, userId, language }) {
   const visibleTickets = tickets?.filter((tk) => (
     !q || String(tk.id).includes(q) || (tk.target || '').toLowerCase().includes(q) || (tk.ticket_type_name || '').toLowerCase().includes(q)
   ))
+
+  if (selected) {
+    const extra = (
+      <div className="ticket-detail-overlay__actions">
+        {selected.status === 'assigned' && (
+          <button className="dash-buy-btn" disabled={submittingId === selected.id} onClick={() => start(selected.id)}>{t('dash_expert_start')}</button>
+        )}
+        {selected.status === 'in_progress' && (
+          <div className="ticket-submit-form">
+            <input
+              type="text" placeholder={t('dash_expert_evidence_url_ph')}
+              value={forms[selected.id]?.evidence_url || ''}
+              onChange={(e) => setForms((f) => ({ ...f, [selected.id]: { ...f[selected.id], evidence_url: e.target.value } }))}
+            />
+            <input
+              type="text" placeholder={t('dash_expert_evidence_note_ph')}
+              value={forms[selected.id]?.evidence_note || ''}
+              onChange={(e) => setForms((f) => ({ ...f, [selected.id]: { ...f[selected.id], evidence_note: e.target.value } }))}
+            />
+            <button disabled={submittingId === selected.id || !forms[selected.id]?.evidence_url} onClick={() => submit(selected.id)}>{t('dash_expert_submit')}</button>
+          </div>
+        )}
+        {selected.status === 'rejected' && selected.reject_reason && <div className="ticket-reject-reason">{selected.reject_reason}</div>}
+      </div>
+    )
+    return (
+      <TicketDetailOverlay
+        ticket={selected} canEdit={true} currentUserId={userId} authedFetch={authedFetch} t={t} language={language}
+        onBack={() => setSelected(null)} extraActions={extra}
+      />
+    )
+  }
+
+  const columns = EXPERT_TICKET_COLUMNS_KEY.map((key) => ({ key, label: t(TICKET_STATUS_KEY[key]) }))
 
   return (
     <div className="dash-section">
@@ -274,52 +293,7 @@ function ExpertPanelSection({ t, userId, language }) {
       {tickets === null ? <div className="dash-loading">{t('dash_loading')}</div> : visibleTickets.length === 0 ? (
         <div className="dash-empty"><p>{t('dash_expert_empty')}</p></div>
       ) : (
-        <div className="ticket-list">
-          {visibleTickets.map((tk) => {
-            const Icon = TICKET_TYPE_ICONS[tk.ticket_type_key] || Wrench
-            const isOpen = openId === tk.id
-            return (
-            <div key={tk.id} className="ticket-row-wrap">
-            <div className="ticket-row ticket-row--expert">
-              <div className="ticket-row__top ticket-row__top--clickable" onClick={() => toggleOpen(tk.id)}>
-                <div className="ticket-row__icon">
-                  <Icon size={16} strokeWidth={1.5} />
-                  {tk.has_unread && <span className="ticket-unread-dot" title={t('ticket_unread_hint')} />}
-                </div>
-                <div className="ticket-row__info">
-                  <div className="ticket-row__name">#{tk.id} · {tk.ticket_type_name}</div>
-                  <div className="ticket-row__meta">{tk.target || tk.user_email} · {new Date(tk.created_at).toLocaleDateString()}</div>
-                </div>
-                <TicketStatusBadge status={tk.status} t={t} />
-                <ChevronRight size={15} strokeWidth={1.5} className={`ticket-row__chevron ${isOpen ? 'ticket-row__chevron--open' : ''}`} />
-              </div>
-              {tk.status === 'assigned' && (
-                <div className="ticket-submit-form">
-                  <button disabled={submittingId === tk.id} onClick={() => start(tk.id)}>{t('dash_expert_start')}</button>
-                </div>
-              )}
-              {tk.status === 'in_progress' && (
-                <div className="ticket-submit-form">
-                  <input
-                    type="text" placeholder={t('dash_expert_evidence_url_ph')}
-                    value={forms[tk.id]?.evidence_url || ''}
-                    onChange={(e) => setForms((f) => ({ ...f, [tk.id]: { ...f[tk.id], evidence_url: e.target.value } }))}
-                  />
-                  <input
-                    type="text" placeholder={t('dash_expert_evidence_note_ph')}
-                    value={forms[tk.id]?.evidence_note || ''}
-                    onChange={(e) => setForms((f) => ({ ...f, [tk.id]: { ...f[tk.id], evidence_note: e.target.value } }))}
-                  />
-                  <button disabled={submittingId === tk.id || !forms[tk.id]?.evidence_url} onClick={() => submit(tk.id)}>{t('dash_expert_submit')}</button>
-                </div>
-              )}
-              {tk.status === 'rejected' && tk.reject_reason && <div className="ticket-reject-reason">{tk.reject_reason}</div>}
-            </div>
-            {isOpen && <TicketJobCard ticket={tk} canEdit={true} currentUserId={userId} authedFetch={authedFetch} t={t} language={language} />}
-            </div>
-            )
-          })}
-        </div>
+        <TicketBoard tickets={visibleTickets} columns={columns} authedFetch={authedFetch} onCardClick={openTicket} subtitleFor={(tk) => tk.target || tk.user_email} />
       )}
     </div>
   )

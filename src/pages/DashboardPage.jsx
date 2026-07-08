@@ -135,9 +135,15 @@ function ServiceCatalogSection({ t, profile }) {
             const Icon = TICKET_TYPE_ICONS[tt.key] || Wrench
             return (
               <div key={tt.id} className="dash-service-card">
-                <div className="dash-service-card__icon"><Icon size={20} strokeWidth={1.5} /></div>
+                <div className="dash-service-card__top">
+                  <div className="dash-service-card__icon"><Icon size={16} strokeWidth={1.5} /></div>
+                  <div className="dash-service-card__price">{tt.token_cost} <span className="dash-credit-unit">{t('dash_credit_unit')}</span></div>
+                </div>
                 <div className="dash-service-card__name">{tt.name}</div>
                 <p className="dash-service-card__desc">{tt.description}</p>
+                {tt.key === 'llms_robots' && (
+                  <span className="dash-service-card__auto">{t('dash_service_auto_note')}</span>
+                )}
                 <input
                   type="text"
                   className="dash-service-card__target"
@@ -145,14 +151,11 @@ function ServiceCatalogSection({ t, profile }) {
                   value={targets[tt.id] || ''}
                   onChange={(e) => setTargets((d) => ({ ...d, [tt.id]: e.target.value }))}
                 />
-                <div className="dash-service-card__footer">
-                  <div className="dash-service-card__price">{tt.token_cost} <span className="dash-credit-unit">{t('dash_credit_unit')}</span></div>
-                  <button
-                    className="dash-buy-btn"
-                    disabled={buyingId === tt.id || !(targets[tt.id] || '').trim() || (profile?.credit_balance ?? 0) < tt.token_cost}
-                    onClick={() => buy(tt.id)}
-                  >{justBoughtId === tt.id ? t('dash_tickets_bought') : t('dash_tickets_buy')}</button>
-                </div>
+                <button
+                  className="dash-buy-btn dash-buy-btn--full"
+                  disabled={buyingId === tt.id || !(targets[tt.id] || '').trim() || (profile?.credit_balance ?? 0) < tt.token_cost}
+                  onClick={() => buy(tt.id)}
+                >{justBoughtId === tt.id ? t('dash_tickets_bought') : t('dash_tickets_buy')}</button>
               </div>
             )
           })}
@@ -322,9 +325,10 @@ function StatCard({ label, value, sub }) {
   )
 }
 
+/* Skor rakamı eşik rengiyle: >=65 iyi, >=40 orta, altı zayıf */
 function ScoreBadge({ score }) {
   const color = score >= 65 ? 'var(--good)' : score >= 40 ? 'var(--warn)' : 'var(--bad)'
-  return <span className="dash-score-badge" style={{ color, borderColor: color }}>{score}</span>
+  return <b style={{ color }}>{score}</b>
 }
 
 function DeltaBadge({ delta }) {
@@ -655,7 +659,18 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                     </div>
                   )}
                 <div className="dash-audit-list">
-                  {audits.map(audit => (
+                  <div className="dash-audit-head">
+                    <span />
+                    <span>{t('dash_col_target')}</span>
+                    <span>{t('dash_col_type')}</span>
+                    <span>{t('dash_col_score')}</span>
+                    <span className="dash-audit-head__date">{t('dash_col_date')}</span>
+                    <span />
+                  </div>
+                  {audits.map(audit => {
+                    const TypeIcon = typeIcon[audit.type] || FileText
+                    const pages = audit.result_json?.total_pages
+                    return (
                     <div key={audit.id} className={`dash-audit-row ${audit.result_json ? 'dash-audit-row--clickable' : ''}`} onClick={() => audit.result_json && onViewAudit && onViewAudit(audit)} style={{ cursor: audit.result_json ? 'pointer' : 'default' }}>
                       <input
                         type="checkbox"
@@ -664,25 +679,24 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                         onChange={(e) => toggleSelect(e, audit.id)}
                         onClick={(e) => e.stopPropagation()}
                       />
-                      {(() => {
-                        const TypeIcon = typeIcon[audit.type] || FileText
-                        return <TypeIcon size={18} strokeWidth={1.5} className="dash-audit-icon" />
-                      })()}
-                      <div className="dash-audit-info">
-                        <div className="dash-audit-name">{audit.domain || (audit.name?.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')) || '—'}</div>
-                        <div className="dash-audit-meta">
-                          {typeLabel[audit.type]} · {formatDate(audit.created_at)}
+                      <div className="dash-audit-target">
+                        <span className="dash-audit-ico"><TypeIcon size={14} strokeWidth={1.5} /></span>
+                        <div className="dash-audit-info">
+                          <div className="dash-audit-name">{audit.domain || (audit.name?.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')) || '—'}</div>
+                          <div className="dash-audit-meta">
+                            {pages ? `${pages} ${t('dash_meta_pages')} · ` : ''}−{audit.credits_spent} {t('dash_credit_unit')}
+                          </div>
                         </div>
                       </div>
-                      <div className="dash-audit-right">
+                      <span className="dash-audit-tag">{typeLabel[audit.type]}</span>
+                      <div className="dash-audit-score">
                         {audit.score != null ? (
-                          <>
-                            <DeltaBadge delta={deltaFor(audit)} />
-                            <ScoreBadge score={audit.score} />
-                          </>
+                          <><ScoreBadge score={audit.score} /><DeltaBadge delta={deltaFor(audit)} /></>
                         ) : <span className="dash-audit-pending">{t('dash_processing')}</span>}
-                        <span className="dash-audit-credits">-{audit.credits_spent} <Gem size={11} strokeWidth={1.5} /></span>
-                        {audit.result_json && <ChevronRight size={14} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />}
+                      </div>
+                      <span className="dash-audit-date">{formatDate(audit.created_at)}</span>
+                      <div className="dash-audit-actions">
+                        {audit.result_json && <ChevronRight size={14} strokeWidth={1.5} className="dash-audit-chev" />}
                         <button
                           onClick={(e) => deleteAudit(e, audit.id)}
                           className="dash-audit-delete"
@@ -690,7 +704,8 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                         ><X size={13} strokeWidth={1.5} /></button>
                       </div>
                     </div>
-                  ))}
+                    )
+                  })}
                 </div>
                 </>
               )}
@@ -712,6 +727,12 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                 </div>
               ) : (
                 <div className="dash-audit-list">
+                  <div className="dash-audit-head dash-audit-head--watch">
+                    <span>{t('dash_col_target')}</span>
+                    <span>{t('dash_col_type')}</span>
+                    <span>{t('dash_col_score')}</span>
+                    <span />
+                  </div>
                   {watchlist.map(item => {
                     const key = item.label?.toLowerCase().trim()
                     const series = key ? trendsByTarget[key] : null
@@ -722,23 +743,24 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                     return (
                       <div
                         key={item.id}
-                        className={`dash-audit-row ${matchedAudit ? 'dash-audit-row--clickable' : ''}`}
+                        className={`dash-audit-row dash-audit-row--watch ${matchedAudit ? 'dash-audit-row--clickable' : ''}`}
                         onClick={() => matchedAudit && onViewAudit && onViewAudit(matchedAudit)}
                         style={{ cursor: matchedAudit ? 'pointer' : 'default' }}
                       >
-                        <TypeIcon size={18} strokeWidth={1.5} className="dash-audit-icon" />
-                        <div className="dash-audit-info">
-                          <div className="dash-audit-name">{item.label}</div>
-                          <div className="dash-audit-meta">{typeLabel[item.type]}</div>
+                        <div className="dash-audit-target">
+                          <span className="dash-audit-ico"><TypeIcon size={14} strokeWidth={1.5} /></span>
+                          <div className="dash-audit-info">
+                            <div className="dash-audit-name">{item.label}</div>
+                          </div>
                         </div>
-                        <div className="dash-audit-right">
+                        <span className="dash-audit-tag">{typeLabel[item.type]}</span>
+                        <div className="dash-audit-score">
                           {latest ? (
-                            <>
-                              <DeltaBadge delta={delta} />
-                              <ScoreBadge score={latest.score} />
-                            </>
+                            <><ScoreBadge score={latest.score} /><DeltaBadge delta={delta} /></>
                           ) : <span className="dash-audit-pending">{t('watchlist_not_scanned_yet')}</span>}
-                          {matchedAudit && <ChevronRight size={14} strokeWidth={1.5} style={{ color: 'var(--accent)' }} />}
+                        </div>
+                        <div className="dash-audit-actions">
+                          {matchedAudit && <ChevronRight size={14} strokeWidth={1.5} className="dash-audit-chev" />}
                           <button
                             onClick={(e) => { e.stopPropagation(); rescanItem(item) }}
                             className="dash-audit-delete"

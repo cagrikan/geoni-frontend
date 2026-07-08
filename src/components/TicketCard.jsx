@@ -21,21 +21,21 @@ export default function TicketCard({ ticket, authedFetch, onClick, subtitle }) {
 
   return (
     <div className="ticket-card" onClick={onClick}>
-      <div className="ticket-card__head">
-        <div className="ticket-card__icon">
-          <Icon size={15} strokeWidth={1.75} />
-          {ticket.has_unread && <span className="ticket-unread-dot" />}
-        </div>
-        <span className="ticket-card__id">#{ticket.id}</span>
+      <div className="ticket-card__icon">
+        <Icon size={15} strokeWidth={1.75} />
+        {ticket.has_unread && <span className="ticket-unread-dot" />}
       </div>
-      <div className="ticket-card__name">{ticket.ticket_type_name}</div>
-      <div className="ticket-card__sub">{subtitle || ticket.target || '—'}</div>
-      {progress && (
-        <div className="ticket-card__progress">
-          <div className="ticket-card__progress-bar"><div className="ticket-card__progress-fill" style={{ width: `${(progress.done / progress.total) * 100}%` }} /></div>
-          <span>{progress.done}/{progress.total}</span>
-        </div>
-      )}
+      <div className="ticket-card__body">
+        <span className="ticket-card__id">#{ticket.id}</span>
+        <div className="ticket-card__name">{ticket.ticket_type_name}</div>
+        <div className="ticket-card__sub">{subtitle || ticket.target || '—'}</div>
+        {progress && (
+          <div className="ticket-card__progress">
+            <div className="ticket-card__progress-bar"><div className="ticket-card__progress-fill" style={{ width: `${(progress.done / progress.total) * 100}%` }} /></div>
+            <span>{progress.done}/{progress.total}</span>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

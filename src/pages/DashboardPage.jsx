@@ -541,11 +541,14 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
             <span className="dash-credit-val">{profile?.credit_balance ?? '—'}</span>
             <span className="dash-credit-label">{t('dash_credit_unit')}</span>
           </div>
-          <div className="dash-avatar" title={user?.email}>
-            {profile?.avatar_url
-              ? <img src={profile.avatar_url} alt="" />
-              : <span>{(profile?.full_name || user?.email || '?')[0].toUpperCase()}</span>
-            }
+          <div className="dash-user-chip" title={profile?.full_name || ''}>
+            <span className="dash-user-chip__avatar">
+              {profile?.avatar_url
+                ? <img src={profile.avatar_url} alt="" />
+                : <span>{(profile?.full_name || user?.email || '?')[0].toUpperCase()}</span>
+              }
+            </span>
+            <span className="dash-user-chip__mail">{user?.email}</span>
           </div>
           <button className="dash-signout" onClick={signOut}>{t('dash_signout')}</button>
         </div>
@@ -554,19 +557,6 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
       <div className="dashboard__body">
         {/* Sidebar */}
         <aside className="dashboard__sidebar">
-          <div className="dash-user">
-            <div className="dash-user__avatar">
-              {profile?.avatar_url
-                ? <img src={profile.avatar_url} alt="" />
-                : <span>{(profile?.full_name || '?')[0]?.toUpperCase()}</span>
-              }
-            </div>
-            <div>
-              <div className="dash-user__name">{profile?.full_name || t('dash_default_user')}</div>
-              <div className="dash-user__email">{user?.email}</div>
-            </div>
-          </div>
-
           <nav className="dash-nav">
             <button className={`dash-nav__item ${tab === 'audits' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('audits')}>
               <History size={16} strokeWidth={1.5} /> {t('dash_nav_history')}

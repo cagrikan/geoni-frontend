@@ -1390,42 +1390,36 @@ body {
 .login-btn {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 12px;
-  padding: 14px 20px;
-  border-radius: 14px;
+  padding: 12px 16px;
+  border-radius: var(--r-md);
   border: 1px solid var(--border-mid);
-  background: var(--tint);
+  background: var(--surface);
   color: var(--text);
-  font-family: var(--display);
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background .2s, border-color .2s;
-}
-.login-btn:hover { background: var(--tint-strong); border-color: var(--tint-border); }
-.login-btn--apple { background: #fff; color: #000; }
-.login-btn--apple:hover { background: #f5f5f5; }
-.login-btn--disabled {
-  position: relative;
-  opacity: .5;
-  cursor: not-allowed;
-  filter: grayscale(.4);
-}
-.login-btn--disabled:hover { background: var(--tint); }
-.login-btn--apple.login-btn--disabled:hover { background: #fff; }
-.login-btn__badge {
-  position: absolute;
-  bottom: -8px;
-  right: 12px;
-  background: var(--accent);
-  color: #FFFFFF;
-  font-size: .75rem;
-  font-weight: 700;
-  letter-spacing: .02em;
-  padding: 2px 8px;
-  border-radius: 999px;
   font-family: var(--body);
+  font-size: .875rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.login-btn:hover { background: var(--surface-2); border-color: var(--accent); }
+.login-btn svg { flex-shrink: 0; }
+.login-btn--disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+.login-btn--disabled:hover { background: var(--surface); border-color: var(--border-mid); }
+.login-btn__badge {
+  margin-left: auto;
+  background: var(--tint);
+  color: var(--accent);
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+  padding: 2px 9px;
+  border-radius: var(--r-full);
+  white-space: nowrap;
 }
 .login-terms {
   font-size: .8125rem;

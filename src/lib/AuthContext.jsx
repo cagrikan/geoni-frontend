@@ -72,7 +72,11 @@ export function AuthProvider({ children }) {
     options: { redirectTo: `${window.location.origin}/auth/callback` }
   })
 
-  const signOut = () => supabase.auth.signOut()
+  // Cikis sonrasi login ekrani degil pazarlama sitesi acilir
+  const signOut = async () => {
+    try { await supabase.auth.signOut() } catch { /* oturum zaten dusmus olabilir */ }
+    window.location.href = 'https://geoni.ai'
+  }
 
   const refreshProfile = () => user && fetchProfile(user.id)
 

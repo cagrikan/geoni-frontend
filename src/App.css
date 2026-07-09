@@ -1740,11 +1740,31 @@ body {
 /* Dashboard/Admin ortak yan menu - dar ekranda yan yana degil ust uste,
    sekmeler dikey degil yatay kaydirilabilir bir satir olarak dizilir. */
 @media (max-width: 760px) {
-  .dashboard__body { flex-direction: column; padding: 20px 16px; gap: 20px; }
-  .dashboard__sidebar { width: 100%; gap: 16px; }
-  .dash-nav { flex-direction: row; flex-wrap: wrap; gap: 6px; }
-  .dash-nav__item { flex: 0 0 auto; padding: 8px 12px; }
-  .dash-new-scan { width: 100%; }
+  .dashboard__body { flex-direction: column; padding: 14px 14px 20px; gap: 14px; }
+  .dashboard__sidebar { width: 100%; gap: 10px; }
+  /* Sol menu mobilde karman corman sariyordu - yatay kaydirmali sekme
+     seridi (app'lerdeki standart desen); birincil aksiyon Yeni Tarama
+     seridin USTUNDE tam genislik. */
+  .dash-nav {
+    flex-direction: row; flex-wrap: nowrap; gap: 6px;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    padding-bottom: 6px; margin: 0 -14px; padding-left: 14px; padding-right: 14px;
+    scrollbar-width: none;
+  }
+  .dash-nav::-webkit-scrollbar { display: none; }
+  .dash-nav__item {
+    flex: 0 0 auto; padding: 8px 12px; font-size: .8125rem;
+    white-space: nowrap; border: 1px solid var(--border); border-radius: var(--r-full);
+  }
+  .dash-nav__item--active { border-color: transparent; }
+  .dash-new-scan { width: 100%; order: -1; }
+  /* Ust nav: e-posta gizlenir (avatar kalir), kontroller sikisir */
+  .landing__nav { padding: 10px 14px; gap: 8px; }
+  .dash-user-chip { padding: 3px; max-width: none; }
+  .dash-user-chip__mail { display: none; }
+  .dash-credit-badge { padding: 4px 9px; }
+  .dash-nav-right { gap: 6px; }
+  .dash-signout { padding: 6px 10px; font-size: .8125rem; }
   /* Dar ekranda tablo: Tur ve Tarih sutunlari gizlenir, Hedef + Skor kalir */
   .dash-audit-head,
   .dash-audit-row { grid-template-columns: 24px minmax(0, 1fr) 92px 52px; }

@@ -15,7 +15,7 @@ const TICKET_TYPE_ICONS = {
 /* Iki kolonlu bilet detayi (onaylanan v2 onizlemesi, Jira/Linear deseni):
    solda konusma, sagda surec zaman cizelgesi + is kirilimi + dosyalar +
    detaylar. Rol aksiyonlari (extraActions) Durum blogunun hemen altinda. */
-export default function TicketDetailOverlay({ ticket, canEdit, currentUserId, authedFetch, t, language, onBack, extraActions }) {
+export default function TicketDetailOverlay({ ticket, canEdit, currentUserId, authedFetch, t, language, onBack, extraActions, contextLabel }) {
   const locale = language === 'en' ? 'en-US' : 'tr-TR'
   const fmt = (d) => (d ? new Date(d).toLocaleDateString(locale, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : null)
   const [copied, setCopied] = useState(false)
@@ -57,7 +57,7 @@ export default function TicketDetailOverlay({ ticket, canEdit, currentUserId, au
     <div className="tdo">
       <div className="tdo__topbar">
         <button type="button" className="tdo__back" onClick={onBack}>
-          <ArrowLeft size={15} strokeWidth={1.75} /> {t('ticket_detail_back')}
+          <ArrowLeft size={15} strokeWidth={1.75} /> {contextLabel || t('ticket_detail_back')}
         </button>
         <span className="tdo__id">
           BILET-{ticket.id}

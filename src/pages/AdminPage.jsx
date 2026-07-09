@@ -1476,7 +1476,7 @@ function TicketsAdminTab() {
     return (
       <TicketDetailOverlay
         ticket={selected} canEdit={true} currentUserId={user?.id} authedFetch={authedFetch} t={t} language={language}
-        onBack={() => setSelected(null)} extraActions={extra}
+        onBack={() => setSelected(null)} extraActions={extra} contextLabel={`Admin · ${t('admin_tickets_title')}`}
       />
     )
   }

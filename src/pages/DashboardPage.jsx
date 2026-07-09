@@ -246,7 +246,7 @@ function MyTicketsSection({ t, userId, language }) {
     return (
       <TicketDetailOverlay
         ticket={selected} canEdit={false} currentUserId={userId} authedFetch={authedFetch} t={t} language={language}
-        onBack={() => setSelected(null)} extraActions={extra}
+        onBack={() => setSelected(null)} extraActions={extra} contextLabel={t('dash_tickets_mine')}
       />
     )
   }
@@ -345,7 +345,7 @@ function ExpertPanelSection({ t, userId, language }) {
     return (
       <TicketDetailOverlay
         ticket={selected} canEdit={true} currentUserId={userId} authedFetch={authedFetch} t={t} language={language}
-        onBack={() => setSelected(null)} extraActions={extra}
+        onBack={() => setSelected(null)} extraActions={extra} contextLabel={t('dash_expert_title')}
       />
     )
   }

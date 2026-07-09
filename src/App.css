@@ -2784,6 +2784,17 @@ body {
 .tdo__kv span:first-child { color: var(--text-muted); flex: 0 0 auto; }
 .tdo__kv span:last-child { color: var(--text-sub); font-variant-numeric: tabular-nums; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ticket-checklist--bare { background: none; border: 0; padding: 0; margin: 0; }
+/* Sag paneldeki kirilim: onizlemeyle ayni dil - ince bar, net satirlar,
+   tamamlanan yesil, how-to sagda ve panel sinirina tasip kaybolmadan */
+.ticket-checklist--bare .ticket-checklist__bar { height: 4px; margin-bottom: 10px; }
+.ticket-checklist--bare .ticket-checklist__list { gap: 8px; }
+.ticket-checklist--bare .ticket-checklist__item { align-items: flex-start; gap: 9px; }
+.ticket-checklist--bare .ticket-checklist__check { margin-top: 1px; }
+.ticket-checklist--bare .ticket-checklist__title { font-size: .8125rem; line-height: 1.45; flex: 1; min-width: 0; }
+.ticket-checklist--bare .ticket-checklist__howto-btn { margin-top: 2px; }
+.ticket-checklist--bare .ticket-checklist__howto-pop { left: auto; right: 0; max-width: 260px; }
+.ticket-checklist__check:not(:disabled):hover { color: var(--accent); }
+.ticket-checklist__item--done .ticket-checklist__check:not(:disabled):hover { color: var(--good); }
 @media (max-width: 760px) {
   .tdo__wrap { grid-template-columns: 1fr; }
   .tdo__side { border-left: 0; border-top: 1px solid var(--border); }

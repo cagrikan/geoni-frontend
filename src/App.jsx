@@ -340,7 +340,7 @@ function AppInner() {
           onCancel={handleReset}
         />
       )}
-      {view === 'results' && result && <ResultsPage result={result} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} isPro={!isSample && (profile?.is_admin || (profile?.credit_balance > 0 && profile?.total_credits_purchased > 0))} isSample={isSample} isPrivate={isPrivateResult} />}
+      {view === 'results' && result && <ResultsPage result={result} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} isPro={isSample || profile?.is_admin || (profile?.credit_balance > 0 && profile?.total_credits_purchased > 0)} isSample={isSample} isPrivate={isPrivateResult} />}
       {view === 'brand_results' && brandResult && !brandResult.identity_mismatch && (
         <BrandCheckResultsPage result={brandResult} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} isPro={profile?.is_admin || (profile?.credit_balance > 0 && profile?.total_credits_purchased > 0)} isPrivate={isPrivateResult} />
       )}

@@ -2984,3 +2984,10 @@ body {
   .hero-split::after { display: none; }
   .hero-split .landing__headline { font-size: 2rem; }
 }
+
+
+/* Bilet detayi sag panelindeki rol aksiyonlari: dar panelde dikey akis */
+.tdo__side .ticket-detail-overlay__actions { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.tdo__side .ticket-submit-form { flex-direction: column; align-items: stretch; }
+.tdo__side .ticket-submit-form input { min-width: 0; width: 100%; }
+.tdo__side .ticket-dispute { margin: 10px 0 0; }

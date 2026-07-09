@@ -1479,7 +1479,7 @@ body {
 
 .dashboard__body {
   display: flex;
-  max-width: 1320px;
+  max-width: min(1440px, 96vw);
   margin: 0 auto;
   padding: 32px 24px;
   gap: 28px;
@@ -2656,7 +2656,7 @@ body {
 .ticket-board { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; }
 /* Kolonlar esnek: alan yetiyorsa scrollsuz sigarlar (musteri/uzman 4 faz),
    yetmiyorsa (admin 6 kolon dar ekranda) yatay kaydirma devreye girer. */
-.ticket-board__col { flex: 1 1 0; min-width: 200px; }
+.ticket-board__col { flex: 1 1 0; min-width: 0; }
 .ticket-board__col-head {
   display: flex; align-items: center; gap: 8px;
   font-size: .75rem; font-weight: 500; text-transform: uppercase; letter-spacing: .05em;
@@ -2991,3 +2991,6 @@ body {
 .tdo__side .ticket-submit-form { flex-direction: column; align-items: stretch; }
 .tdo__side .ticket-submit-form input { min-width: 0; width: 100%; }
 .tdo__side .ticket-dispute { margin: 10px 0 0; }
+
+/* Uzman panelinin kendi istatistik seridi (musteri metrikleri yerine) */
+.dash-stats--expert { margin: 0 0 18px; }

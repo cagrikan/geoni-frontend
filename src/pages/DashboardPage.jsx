@@ -352,10 +352,20 @@ function ExpertPanelSection({ t, userId, language }) {
 
   const columns = EXPERT_TICKET_COLUMNS.map((c) => ({ ...c, label: t(c.labelKey) }))
 
+  const stat = (statuses) => (tickets || []).filter((tk) => statuses.includes(tk.status)).length
+
   return (
     <div className="dash-section">
       <h2 className="dash-section__title">{t('dash_expert_title')}</h2>
       <p className="dash-hint">{t('dash_expert_hint')}</p>
+      {tickets !== null && (
+        <div className="dash-stats dash-stats--expert">
+          <div className="dash-stat"><div className="dash-stat__value">{stat(['assigned'])}</div><div className="dash-stat__label">{t('expert_stat_waiting')}</div></div>
+          <div className="dash-stat"><div className="dash-stat__value">{stat(['in_progress'])}</div><div className="dash-stat__label">{t('expert_stat_active')}</div></div>
+          <div className="dash-stat"><div className="dash-stat__value">{stat(['submitted', 'disputed'])}</div><div className="dash-stat__label">{t('expert_stat_review')}</div></div>
+          <div className="dash-stat"><div className="dash-stat__value">{stat(['verified'])}</div><div className="dash-stat__label">{t('expert_stat_done')}</div></div>
+        </div>
+      )}
       <div className="admin-search dash-expert-search">
         <Search size={15} strokeWidth={1.5} />
         <input placeholder={t('dash_expert_search_ph')} value={search} onChange={(e) => setSearch(e.target.value)} />
@@ -662,7 +672,8 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
 
         {/* Main */}
         <main className="dashboard__main">
-          {/* Stats */}
+          {/* Stats (musteri metrikleri - uzman sekmesi kendi seridini gosterir) */}
+          {tab !== 'expert' && (
           <div className="dash-stats">
             <StatCard label={t('dash_stat_total_scans')} value={audits.length} />
             <StatCard label={t('dash_stat_credit_balance')} value={profile?.credit_balance ?? '—'} sub={t('dash_credit_unit')} />
@@ -675,6 +686,7 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
               value={audits[0] ? new Date(audits[0].created_at).toLocaleDateString(locale, { day: 'numeric', month: 'short' }) : '—'}
             />
           </div>
+          )}
 
           {/* Genel Skor Trendi */}
           {tab === 'audits' && overallTrend.length >= 2 && (

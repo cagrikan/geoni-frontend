@@ -45,7 +45,7 @@ export default function TicketBoard({ tickets, columns, authedFetch, onCardClick
           return list.length === 0 ? (
           <div className="ticket-board__empty">—</div>
         ) : list.map((tk) => (
-          <TicketCard key={tk.id} ticket={tk} authedFetch={authedFetch} onClick={() => onCardClick(tk)} subtitle={subtitleFor?.(tk)} />
+          <TicketCard key={tk.id} ticket={tk} onClick={() => onCardClick(tk)} subtitle={subtitleFor?.(tk)} />
         ))
         })()}
       </div>
@@ -67,7 +67,6 @@ export default function TicketBoard({ tickets, columns, authedFetch, onCardClick
                   <TicketCard
                     key={tk.id}
                     ticket={tk}
-                    authedFetch={authedFetch}
                     onClick={() => onCardClick(tk)}
                     subtitle={subtitleFor?.(tk)}
                   />

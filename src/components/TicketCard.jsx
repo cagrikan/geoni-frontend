@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 import { Wrench, Braces, Bot, Landmark, FileText, Link2 } from 'lucide-react'
 
 const TICKET_TYPE_ICONS = {
@@ -9,15 +8,13 @@ const TICKET_TYPE_ICONS = {
   citation_placement: Link2,
 }
 
-export default function TicketCard({ ticket, authedFetch, onClick, subtitle }) {
-  const [progress, setProgress] = useState(null)
+/* Ilerleme artik listeleme yanitindan geliyor (tasks_done/tasks_total) -
+   eskiden her kart kendi /tasks istegini atiyordu, pano N bilet icin N
+   yetki-kontrollu istek bekliyordu. */
+export default function TicketCard({ ticket, onClick, subtitle }) {
   const Icon = TICKET_TYPE_ICONS[ticket.ticket_type_key] || Wrench
-
-  useEffect(() => {
-    authedFetch(`/api/tickets/${ticket.id}/tasks`)
-      .then((tasks) => { if (tasks.length) setProgress({ done: tasks.filter((t) => t.is_done).length, total: tasks.length }) })
-      .catch(() => {})
-  }, [ticket.id])
+  const total = ticket.tasks_total || 0
+  const done = ticket.tasks_done || 0
 
   return (
     <div className="ticket-card" onClick={onClick}>
@@ -28,11 +25,11 @@ export default function TicketCard({ ticket, authedFetch, onClick, subtitle }) {
       <div className="ticket-card__body">
         <span className="ticket-card__id">#{ticket.id}</span>
         <div className="ticket-card__name">{ticket.ticket_type_name}</div>
-        <div className="ticket-card__sub">{subtitle || ticket.target || '—'}</div>
-        {progress && (
-          <div className={`ticket-card__progress ${progress.done === progress.total ? 'ticket-card__progress--done' : ''}`}>
-            <div className="ticket-card__progress-bar"><div className="ticket-card__progress-fill" style={{ width: `${(progress.done / progress.total) * 100}%` }} /></div>
-            <span>{progress.done}/{progress.total}</span>
+        <div className="ticket-card__sub">{subtitle || ticket.target || '\u2014'}</div>
+        {total > 0 && (
+          <div className={`ticket-card__progress ${done === total ? 'ticket-card__progress--done' : ''}`}>
+            <div className="ticket-card__progress-bar"><div className="ticket-card__progress-fill" style={{ width: `${(done / total) * 100}%` }} /></div>
+            <span>{done}/{total}</span>
           </div>
         )}
       </div>

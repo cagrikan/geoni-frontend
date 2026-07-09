@@ -55,8 +55,13 @@ function captureAcquisition() {
 function capturePendingTab() {
   try {
     if (window.location.pathname !== '/dashboard') return
-    const tab = new URLSearchParams(window.location.search).get('tab')
+    const params = new URLSearchParams(window.location.search)
+    const tab = params.get('tab')
     if (tab) localStorage.setItem('geoni_pending_tab', tab)
+    // Rapor sayfasindaki "bu eksigi giderin" koprusu hedefi de tasir -
+    // Hizmetler sekmesi acilinca kartlarin hedef alani on-dolu gelir.
+    const target = params.get('target')
+    if (target) localStorage.setItem('geoni_pending_target', target)
   } catch { /* ignore */ }
 }
 

@@ -103,7 +103,17 @@ function ServiceCatalogSection({ t, profile }) {
   const [targets, setTargets] = useState({})
 
   useEffect(() => {
-    fetch(`${API_URL}/api/ticket-types`).then((r) => r.json()).then(setTypes).catch(() => setTypes([]))
+    fetch(`${API_URL}/api/ticket-types`).then((r) => r.json()).then((list) => {
+      setTypes(list)
+      // Rapor sayfasindan "bu eksigi giderin" ile gelindiyse hedef on-dolu
+      try {
+        const pending = localStorage.getItem('geoni_pending_target')
+        if (pending && Array.isArray(list)) {
+          localStorage.removeItem('geoni_pending_target')
+          setTargets(Object.fromEntries(list.map((tt) => [tt.id, pending])))
+        }
+      } catch { /* ignore */ }
+    }).catch(() => setTypes([]))
   }, [])
 
   const buy = async (ticketTypeId) => {

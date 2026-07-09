@@ -1,4 +1,4 @@
-import { CircleCheck, TrendingUp, EyeOff } from 'lucide-react'
+import { CircleCheck, TrendingUp, EyeOff, Wrench, ArrowRight } from 'lucide-react'
 import GeoniMark from './GeoniMark'
 import ProBlur from './ProBlur'
 import LanguageSwitcher from './components/LanguageSwitcher'
@@ -78,6 +78,52 @@ function TopicCard({ topic, isOpportunity }) {
         ))}
         {isOpportunity && (topic.competitors || []).slice(0, 3).map((c) => (
           <span className="topic-badge topic-badge--competitor" key={c}>{c}</span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/* Tarama -> hizmet koprusu: raporun kendi verisinden somut eksikleri
+   cikarir ve her birini app'teki ilgili hizmete baglar (hedef on-dolu).
+   Urunun ana hunisi bu: "tara, eksigi gor, duzelttir". */
+function FixSuggestions({ result, t }) {
+  const { domain, platforms = {}, llms_txt, score_breakdown = {} } = result
+  const fixes = []
+  const blockedEngines = [
+    !platforms.chatgpt && 'ChatGPT',
+    !platforms.anthropic && 'Claude',
+    !platforms.google && 'Gemini',
+  ].filter(Boolean)
+  if (blockedEngines.length > 0 || llms_txt === false) {
+    fixes.push({
+      key: 'bots',
+      title: t('fix_bots_title'),
+      why: blockedEngines.length > 0
+        ? `${blockedEngines.join(', ')} ${t('fix_bots_why_blocked')}`
+        : t('fix_bots_why_llms'),
+    })
+  }
+  if ((score_breakdown.schema ?? 100) < 60) {
+    fixes.push({ key: 'schema', title: t('fix_schema_title'), why: `${t('fix_schema_why')} ${score_breakdown.schema}/100` })
+  }
+  if ((score_breakdown.brand_recall ?? 100) < 40) {
+    fixes.push({ key: 'entity', title: t('fix_entity_title'), why: `${t('fix_entity_why')} ${score_breakdown.brand_recall}/100` })
+  }
+  if (fixes.length === 0) return null
+  const href = `https://app.geoni.ai/dashboard?tab=tickets&target=${encodeURIComponent(domain || '')}`
+  return (
+    <div className="fixes">
+      <h3 className="fixes__title"><Wrench size={15} strokeWidth={1.5} /> {t('fix_section_title')}</h3>
+      <div className="fixes__list">
+        {fixes.map((f) => (
+          <a key={f.key} className="fixes__item" href={href}>
+            <div className="fixes__item-body">
+              <div className="fixes__item-title">{f.title}</div>
+              <div className="fixes__item-why">{f.why}</div>
+            </div>
+            <span className="fixes__item-cta">{t('fix_cta')} <ArrowRight size={13} strokeWidth={1.75} /></span>
+          </a>
         ))}
       </div>
     </div>
@@ -196,6 +242,9 @@ export default function ResultsPage({ result, onReset, user, onLogin, onDashboar
             </ProBlur>
           </div>
         </div>
+
+        {/* Eksik -> hizmet koprusu (ornek raporda gosterilmez) */}
+        {!isSample && <FixSuggestions result={result} t={t} />}
 
         {/* Topics */}
         <div className="topics">

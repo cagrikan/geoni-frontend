@@ -30,7 +30,7 @@ export default function TicketCard({ ticket, authedFetch, onClick, subtitle }) {
         <div className="ticket-card__name">{ticket.ticket_type_name}</div>
         <div className="ticket-card__sub">{subtitle || ticket.target || '—'}</div>
         {progress && (
-          <div className="ticket-card__progress">
+          <div className={`ticket-card__progress ${progress.done === progress.total ? 'ticket-card__progress--done' : ''}`}>
             <div className="ticket-card__progress-bar"><div className="ticket-card__progress-fill" style={{ width: `${(progress.done / progress.total) * 100}%` }} /></div>
             <span>{progress.done}/{progress.total}</span>
           </div>

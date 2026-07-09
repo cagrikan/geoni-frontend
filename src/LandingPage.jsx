@@ -152,19 +152,34 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
         </div>
       </header>
 
-      {/* ══ HERO: tek sütun, ortalanmış, tek odak noktası ══ */}
-      <section className="hero-centered">
-        <p className="landing__eyebrow">{t('hero_eyebrow')}</p>
-        <h1 className="landing__headline landing__headline--center">
-          {t('hero_headline_1')}
-          <br />
-          <em>{t('hero_headline_2')}</em>
-        </h1>
-        <p className="hero-centered__subhead">
-          {t('hero_subhead')}
-        </p>
+      {/* ══ HERO: split — sol deger onerisi, sag yuzen tarama karti (onaylanan konsept) ══ */}
+      <section className="hero-split">
+        <div className="hero-split__left">
+          <div className="hero-eyeline">
+            <span className="hero-eyeline__pulse" />
+            <span>
+              {scanCount > 0 ? <><b>{scanCount.toLocaleString('tr-TR')}</b> {t('hero_eyeline_scans')}</> : t('hero_eyebrow')}
+            </span>
+          </div>
+          <h1 className="landing__headline">
+            {t('hero_headline_1')}
+            <br />
+            <em>{t('hero_headline_2')}</em>
+          </h1>
+          <p className="hero-split__subhead">{t('hero_subhead')}</p>
+          <div className="hero-proofs">
+            <div className="hero-proof" dangerouslySetInnerHTML={{ __html: '✓ ' + t('hero_proof1') }} />
+            <div className="hero-proof" dangerouslySetInnerHTML={{ __html: '✓ ' + t('hero_proof2') }} />
+            <div className="hero-proof" dangerouslySetInnerHTML={{ __html: '✓ ' + t('hero_proof3') }} />
+          </div>
+          {onViewSample && (
+            <button type="button" className="hero-sample-link" onClick={onViewSample}>{t('hero_sample_btn')}</button>
+          )}
+        </div>
 
-        <div className="scan-panel">
+        <div className="hero-split__right">
+        <div className="scan-card">
+          <h2 className="scan-card__title">{t('scan_card_title')} <span>{t('scan_card_eta')}</span></h2>
           <div className="mode-tabs">
             {MODE_TABS.map(({ key, icon: Icon, title }) => (
               <button
@@ -333,17 +348,11 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
 
           {error && <p className="landing__error">{error}</p>}
         </div>
-
-        <p className="landing__trust">
-          {scanCount > 0 && <>{scanCount.toLocaleString('tr-TR')}{t('hero_trust_scans')}{' '}</>}
-          {t('hero_trust')}
-          {onViewSample && (
-            <>
-              <span className="landing__trust-dot">·</span>
-              <button type="button" className="landing__trust-sample" onClick={onViewSample}>{t('hero_sample_btn')}</button>
-            </>
-          )}
-        </p>
+        <div className="scan-peek">
+          <span className="scan-peek__ring"><i>68</i></span>
+          <p dangerouslySetInnerHTML={{ __html: t('scan_peek_text') }} />
+        </div>
+        </div>
       </section>
 
       {/* ══ NASIL ÇALIŞIR: tam genişlik, 3 sütun ══ */}

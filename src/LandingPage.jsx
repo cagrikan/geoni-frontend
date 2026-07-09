@@ -393,6 +393,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
           <a href="https://geoni.ai" target="_blank" rel="noopener">geoni.ai</a>
           <a href="mailto:mail@geoni.ai">mail@geoni.ai</a>
           <a href="https://geoni.ai/privacy" target="_blank" rel="noopener">{t('login_terms_privacy')}</a>
+          <a href="https://geoni.ai/terms" target="_blank" rel="noopener">{t('login_terms_of_use')}</a>
         </span>
       </footer>
     </div>

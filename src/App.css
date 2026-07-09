@@ -2802,3 +2802,30 @@ body {
   display: inline-flex; align-items: center; gap: 6px; flex: 0 0 auto;
   font-size: .8125rem; font-weight: 500; color: var(--accent);
 }
+
+/* ===== Musteri itirazi (disputed) ===== */
+.ticket-status--disputed { background: var(--bad-soft); color: var(--bad); }
+.ticket-status-tab__dot--disputed { background: var(--bad); }
+.ticket-dispute { margin-bottom: 16px; }
+.ticket-dispute__open {
+  background: none; border: 1px solid var(--border); color: var(--text-muted);
+  border-radius: 6px; padding: 7px 14px; font-size: .8125rem; cursor: pointer;
+}
+.ticket-dispute__open:hover { border-color: var(--bad); color: var(--bad); }
+.ticket-dispute__form { display: flex; flex-direction: column; gap: 8px; }
+.ticket-dispute__form textarea {
+  width: 100%; box-sizing: border-box; background: var(--surface);
+  border: 1px solid var(--border-mid); border-radius: 6px; padding: 9px 11px;
+  color: var(--text); font-size: .875rem; font-family: inherit; resize: vertical;
+}
+.ticket-dispute__form textarea:focus { outline: 2px solid var(--bad); outline-offset: -1px; border-color: transparent; }
+.ticket-dispute__actions { display: flex; justify-content: flex-end; gap: 8px; }
+.ticket-dispute__cancel {
+  background: none; border: 1px solid var(--border); color: var(--text-muted);
+  border-radius: 6px; padding: 7px 14px; font-size: .8125rem; cursor: pointer;
+}
+.ticket-dispute__submit {
+  background: var(--bad); border: none; color: #fff;
+  border-radius: 6px; padding: 7px 14px; font-size: .8125rem; font-weight: 500; cursor: pointer;
+}
+.ticket-dispute__submit:disabled, .ticket-dispute__cancel:disabled { opacity: .5; cursor: default; }

@@ -175,26 +175,72 @@ function ServiceCatalogSection({ t, profile }) {
   )
 }
 
-const CUSTOMER_TICKET_COLUMNS_KEY = ['open', 'assigned', 'in_progress', 'submitted', 'verified']
+const CUSTOMER_TICKET_COLUMNS_KEY = ['open', 'assigned', 'in_progress', 'submitted', 'verified', 'disputed']
 
 function MyTicketsSection({ t, userId, language }) {
   const [myTickets, setMyTickets] = useState(null)
   const [selected, setSelected] = useState(null)
+  const [disputeOpen, setDisputeOpen] = useState(false)
+  const [disputeReason, setDisputeReason] = useState('')
+  const [disputeBusy, setDisputeBusy] = useState(false)
+  const [disputeError, setDisputeError] = useState(null)
 
-  useEffect(() => {
-    authedFetch('/api/tickets').then(setMyTickets).catch(() => setMyTickets([]))
-  }, [])
+  const load = () => authedFetch('/api/tickets').then(setMyTickets).catch(() => setMyTickets([]))
+  useEffect(() => { load() }, [])
 
   const openTicket = (tk) => {
     setSelected(tk)
+    setDisputeOpen(false); setDisputeReason(''); setDisputeError(null)
     setMyTickets((list) => list?.map((t) => (t.id === tk.id ? { ...t, has_unread: false } : t)))
   }
 
+  const submitDispute = async () => {
+    if (!disputeReason.trim()) return
+    setDisputeBusy(true)
+    setDisputeError(null)
+    try {
+      await authedFetch(`/api/tickets/${selected.id}/dispute`, {
+        method: 'POST',
+        body: JSON.stringify({ reason: disputeReason.trim() }),
+      })
+      setSelected((s) => ({ ...s, status: 'disputed' }))
+      setDisputeOpen(false)
+      setDisputeReason('')
+      load()
+    } catch (e) { setDisputeError(e.message) }
+    setDisputeBusy(false)
+  }
+
   if (selected) {
+    // Itiraz hakki: yalnizca onaylanmis iste - admin karari olmadan is
+    // kapanmis sayilmaz ama musteri memnuniyetsizligini kayda gecirebilir.
+    const extra = selected.status === 'verified' ? (
+      <div className="ticket-dispute">
+        {!disputeOpen ? (
+          <button type="button" className="ticket-dispute__open" onClick={() => setDisputeOpen(true)}>
+            {t('ticket_dispute_open')}
+          </button>
+        ) : (
+          <div className="ticket-dispute__form">
+            <textarea
+              rows={3}
+              placeholder={t('ticket_dispute_ph')}
+              value={disputeReason}
+              onChange={(e) => setDisputeReason(e.target.value)}
+            />
+            {disputeError && <div className="dash-buy-error">{disputeError}</div>}
+            <div className="ticket-dispute__actions">
+              <button type="button" className="ticket-dispute__cancel" disabled={disputeBusy} onClick={() => { setDisputeOpen(false); setDisputeReason('') }}>{t('confirm_cancel')}</button>
+              <button type="button" className="ticket-dispute__submit" disabled={disputeBusy || !disputeReason.trim()} onClick={submitDispute}>{t('ticket_dispute_submit')}</button>
+            </div>
+          </div>
+        )}
+      </div>
+    ) : null
     return (
       <TicketDetailOverlay
         ticket={selected} canEdit={false} currentUserId={userId} authedFetch={authedFetch} t={t} language={language}
-        onBack={() => setSelected(null)}
+        onBack={() => setSelected(null)} extraActions={extra}
       />
     )
   }
@@ -214,7 +260,7 @@ function MyTicketsSection({ t, userId, language }) {
   )
 }
 
-const EXPERT_TICKET_COLUMNS_KEY = ['assigned', 'in_progress', 'submitted', 'verified']
+const EXPERT_TICKET_COLUMNS_KEY = ['assigned', 'in_progress', 'submitted', 'verified', 'disputed']
 
 function ExpertPanelSection({ t, userId, language }) {
   const [tickets, setTickets] = useState(null)

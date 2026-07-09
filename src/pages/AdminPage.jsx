@@ -1390,7 +1390,7 @@ function CampaignsTab() {
 }
 
 
-const ADMIN_TICKET_COLUMNS_KEY = ['open', 'assigned', 'in_progress', 'submitted', 'verified']
+const ADMIN_TICKET_COLUMNS_KEY = ['open', 'assigned', 'in_progress', 'submitted', 'verified', 'disputed']
 
 function TicketsAdminTab() {
   const { t, language } = useLanguage()
@@ -1505,6 +1505,7 @@ function TicketsAdminTab() {
 const TICKET_STATUS_KEY_MAP = {
   open: 'ticket_status_open', assigned: 'ticket_status_assigned', in_progress: 'ticket_status_in_progress',
   submitted: 'ticket_status_submitted', verified: 'ticket_status_verified', rejected: 'ticket_status_rejected',
+  disputed: 'ticket_status_disputed',
 }
 
 function TicketTypesWidget() {

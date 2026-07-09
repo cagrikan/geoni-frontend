@@ -8,7 +8,6 @@ import Sparkline from '../components/Sparkline'
 import LanguageSwitcher from '../components/LanguageSwitcher'
 import ThemeSwitcher from '../components/ThemeSwitcher'
 import ConfirmDialog from '../components/ConfirmDialog'
-import { TICKET_STATUS_KEY } from '../components/TicketStatusBadge'
 import TicketBoard from '../components/TicketBoard'
 import TicketDetailOverlay from '../components/TicketDetailOverlay'
 import {
@@ -177,7 +176,12 @@ function ServiceCatalogSection({ t, profile }) {
   )
 }
 
-const CUSTOMER_TICKET_COLUMNS_KEY = ['open', 'assigned', 'in_progress', 'submitted', 'verified', 'disputed']
+const CUSTOMER_TICKET_COLUMNS = [
+  { key: 'queue', statuses: ['open', 'assigned'], labelKey: 'board_col_queue' },
+  { key: 'in_progress', statuses: ['in_progress'], labelKey: 'ticket_status_in_progress' },
+  { key: 'review', statuses: ['submitted', 'disputed'], labelKey: 'board_col_review' },
+  { key: 'verified', statuses: ['verified'], labelKey: 'ticket_status_verified' },
+]
 
 function MyTicketsSection({ t, userId, language }) {
   const [myTickets, setMyTickets] = useState(null)
@@ -247,7 +251,7 @@ function MyTicketsSection({ t, userId, language }) {
     )
   }
 
-  const columns = CUSTOMER_TICKET_COLUMNS_KEY.map((key) => ({ key, label: t(TICKET_STATUS_KEY[key]) }))
+  const columns = CUSTOMER_TICKET_COLUMNS.map((c) => ({ ...c, label: t(c.labelKey) }))
 
   return (
     <div className="dash-section">
@@ -262,7 +266,12 @@ function MyTicketsSection({ t, userId, language }) {
   )
 }
 
-const EXPERT_TICKET_COLUMNS_KEY = ['assigned', 'in_progress', 'submitted', 'verified', 'disputed']
+const EXPERT_TICKET_COLUMNS = [
+  { key: 'assigned', statuses: ['assigned'], labelKey: 'ticket_status_assigned' },
+  { key: 'in_progress', statuses: ['in_progress'], labelKey: 'ticket_status_in_progress' },
+  { key: 'review', statuses: ['submitted', 'disputed'], labelKey: 'board_col_review' },
+  { key: 'verified', statuses: ['verified'], labelKey: 'ticket_status_verified' },
+]
 
 function ExpertPanelSection({ t, userId, language }) {
   const [tickets, setTickets] = useState(null)
@@ -341,7 +350,7 @@ function ExpertPanelSection({ t, userId, language }) {
     )
   }
 
-  const columns = EXPERT_TICKET_COLUMNS_KEY.map((key) => ({ key, label: t(TICKET_STATUS_KEY[key]) }))
+  const columns = EXPERT_TICKET_COLUMNS.map((c) => ({ ...c, label: t(c.labelKey) }))
 
   return (
     <div className="dash-section">

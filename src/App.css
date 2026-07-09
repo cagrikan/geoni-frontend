@@ -2643,9 +2643,9 @@ body {
    Linear/Trello/Jira'nin hepsinin kullandigi kanban deseni).
    Mobil (<=760px): ust durum sekmeleri + tam genislik liste (.ticket-board
    gizlenir, .ticket-status-tabs + .ticket-mobile-list gorunur). */
-.ticket-status-tab__dot--open { background: var(--text-muted); }
+.ticket-status-tab__dot--open, .ticket-status-tab__dot--queue { background: var(--text-muted); }
 .ticket-status-tab__dot--assigned, .ticket-status-tab__dot--in_progress { background: var(--accent); }
-.ticket-status-tab__dot--submitted { background: var(--warn); }
+.ticket-status-tab__dot--submitted, .ticket-status-tab__dot--review { background: var(--warn); }
 .ticket-status-tab__dot--verified { background: var(--good); }
 
 .ticket-status-tabs { display: none; }
@@ -2654,7 +2654,9 @@ body {
 /* Onaylanan v2 onizlemesi: kolonlar kutusuz (yalnizca baslikta dot+ad+sayi),
    kartlar surface + hairline, ikon notr kutu, tamamlanan is cubugu yesil. */
 .ticket-board { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; }
-.ticket-board__col { flex: 0 0 244px; }
+/* Kolonlar esnek: alan yetiyorsa scrollsuz sigarlar (musteri/uzman 4 faz),
+   yetmiyorsa (admin 6 kolon dar ekranda) yatay kaydirma devreye girer. */
+.ticket-board__col { flex: 1 1 0; min-width: 200px; }
 .ticket-board__col-head {
   display: flex; align-items: center; gap: 8px;
   font-size: .75rem; font-weight: 500; text-transform: uppercase; letter-spacing: .05em;

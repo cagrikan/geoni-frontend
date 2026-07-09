@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import TicketCard from './TicketCard'
 
 // Surukle-birak yok - durum degisimi zaten mevcut buton eylemleriyle
@@ -13,7 +13,9 @@ import TicketCard from './TicketCard'
 // liste (Linear/Asana mobil deseni) - ikisi de ayni DOM'da, CSS ile
 // gosterilip gizleniyor.
 export default function TicketBoard({ tickets, columns, authedFetch, onCardClick, subtitleFor }) {
-  const firstNonEmpty = useMemo(() => columns.find((c) => tickets.some((tk) => tk.status === c.key))?.key || columns[0]?.key, [columns, tickets])
+  const colStatuses = (c) => c.statuses || [c.key]
+  const colTicketsOf = (c) => tickets.filter((tk) => colStatuses(c).includes(tk.status))
+  const firstNonEmpty = columns.find((c) => colTicketsOf(c).length > 0)?.key || columns[0]?.key
   const [activeTab, setActiveTab] = useState(firstNonEmpty)
   const tab = columns.some((c) => c.key === activeTab) ? activeTab : firstNonEmpty
 
@@ -21,7 +23,7 @@ export default function TicketBoard({ tickets, columns, authedFetch, onCardClick
     <div className="ticket-board-wrap">
       <div className="ticket-status-tabs">
         {columns.map((col) => {
-          const count = tickets.filter((tk) => tk.status === col.key).length
+          const count = colTicketsOf(col).length
           return (
             <button
               key={col.key}
@@ -37,16 +39,20 @@ export default function TicketBoard({ tickets, columns, authedFetch, onCardClick
         })}
       </div>
       <div className="ticket-mobile-list">
-        {tickets.filter((tk) => tk.status === tab).length === 0 ? (
+        {(() => {
+          const activeCol = columns.find((c) => c.key === tab)
+          const list = activeCol ? colTicketsOf(activeCol) : []
+          return list.length === 0 ? (
           <div className="ticket-board__empty">—</div>
-        ) : tickets.filter((tk) => tk.status === tab).map((tk) => (
+        ) : list.map((tk) => (
           <TicketCard key={tk.id} ticket={tk} authedFetch={authedFetch} onClick={() => onCardClick(tk)} subtitle={subtitleFor?.(tk)} />
-        ))}
+        ))
+        })()}
       </div>
 
       <div className="ticket-board">
         {columns.map((col) => {
-          const colTickets = tickets.filter((tk) => tk.status === col.key)
+          const colTickets = colTicketsOf(col)
           return (
             <div key={col.key} className="ticket-board__col">
               <div className="ticket-board__col-head">

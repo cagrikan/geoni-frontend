@@ -9,7 +9,7 @@ function isImageUrl(url, name) {
   return /\.(png|jpe?g|gif|webp|svg)$/.test(s)
 }
 
-const TicketThread = forwardRef(function TicketThread({ ticketId, currentUserId, authedFetch, t }, ref) {
+const TicketThread = forwardRef(function TicketThread({ ticketId, currentUserId, authedFetch, t, onMessages }, ref) {
   const [messages, setMessages] = useState(null)
   const [body, setBody] = useState('')
   const [file, setFile] = useState(null)
@@ -19,7 +19,7 @@ const TicketThread = forwardRef(function TicketThread({ ticketId, currentUserId,
 
   useImperativeHandle(ref, () => ({ setBody }), [])
 
-  const load = () => authedFetch(`/api/tickets/${ticketId}/messages`).then(setMessages).catch(() => setMessages([]))
+  const load = () => authedFetch(`/api/tickets/${ticketId}/messages`).then((m) => { setMessages(m); onMessages?.(m) }).catch(() => setMessages([]))
   useEffect(() => { load() }, [ticketId])
 
   const send = async () => {

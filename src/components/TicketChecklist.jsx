@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { CheckSquare, Square, HelpCircle } from 'lucide-react'
 
-export default function TicketChecklist({ ticketId, canEdit, authedFetch, t, onProgress }) {
+export default function TicketChecklist({ ticketId, canEdit, authedFetch, t, onProgress, bare = false }) {
   const [tasks, setTasks] = useState(null)
   const [openHowTo, setOpenHowTo] = useState(null)
   const [busyId, setBusyId] = useState(null)
@@ -35,11 +35,13 @@ export default function TicketChecklist({ ticketId, canEdit, authedFetch, t, onP
   const doneCount = tasks.filter((tk) => tk.is_done).length
 
   return (
-    <div className="ticket-checklist">
-      <div className="ticket-checklist__head">
-        <span>{t('ticket_checklist_title')}</span>
-        <span className="ticket-checklist__progress">{doneCount}/{tasks.length}</span>
-      </div>
+    <div className={`ticket-checklist ${bare ? 'ticket-checklist--bare' : ''}`}>
+      {!bare && (
+        <div className="ticket-checklist__head">
+          <span>{t('ticket_checklist_title')}</span>
+          <span className="ticket-checklist__progress">{doneCount}/{tasks.length}</span>
+        </div>
+      )}
       <div className="ticket-checklist__bar">
         <div className="ticket-checklist__bar-fill" style={{ width: `${(doneCount / tasks.length) * 100}%` }} />
       </div>

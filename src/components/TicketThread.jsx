@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
-import { Paperclip, Send, FileText as FileIcon, Image as ImageIcon } from 'lucide-react'
+import { Paperclip, Send, FileText as FileIcon, Image as ImageIcon, X } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
 const ROLE_LABEL_KEY = { customer: 'ticket_thread_role_customer', expert: 'ticket_thread_role_expert', admin: 'ticket_thread_role_admin', system: 'ticket_thread_role_system' }
@@ -15,6 +15,7 @@ const TicketThread = forwardRef(function TicketThread({ ticketId, currentUserId,
   const [file, setFile] = useState(null)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState(null)
+  const [lightbox, setLightbox] = useState(null)
   const fileInputRef = useRef(null)
 
   useImperativeHandle(ref, () => ({ setBody }), [])
@@ -69,9 +70,9 @@ const TicketThread = forwardRef(function TicketThread({ ticketId, currentUserId,
             {m.body && <div className="ticket-thread__body">{m.body}</div>}
             {m.attachment_url && (
               isImageUrl(m.attachment_url, m.attachment_name) ? (
-                <a href={m.attachment_url} target="_blank" rel="noopener noreferrer" className="ticket-thread__image-link">
+                <button type="button" className="ticket-thread__image-link" onClick={() => setLightbox(m.attachment_url)}>
                   <img src={m.attachment_url} alt={m.attachment_name || ''} className="ticket-thread__image" />
-                </a>
+                </button>
               ) : (
                 <a href={m.attachment_url} target="_blank" rel="noopener noreferrer" className="ticket-thread__file-link">
                   <FileIcon size={14} strokeWidth={1.5} /> {m.attachment_name || t('ticket_thread_attachment')}
@@ -107,6 +108,21 @@ const TicketThread = forwardRef(function TicketThread({ ticketId, currentUserId,
           </button>
         </div>
       </div>
+      {lightbox && (
+        <div
+          className="ticket-lightbox"
+          onClick={() => setLightbox(null)}
+          onKeyDown={(e) => e.key === 'Escape' && setLightbox(null)}
+          role="dialog"
+          tabIndex={-1}
+          ref={(el) => el?.focus()}
+        >
+          <button type="button" className="ticket-lightbox__close" onClick={() => setLightbox(null)} aria-label="Kapat">
+            <X size={18} strokeWidth={2} />
+          </button>
+          <img src={lightbox} alt="" onClick={(e) => e.stopPropagation()} />
+        </div>
+      )}
     </div>
   )
 })

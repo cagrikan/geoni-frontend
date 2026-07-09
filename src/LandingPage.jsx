@@ -88,8 +88,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
     } else if (mode === 'person') {
       if (step === 0 && !personName) return
       if (step < PERSON_LAST_STEP) { setStep(s => s + 1); return }
-      if (!user) { onLogin(); return }
-      onSubmitBrandCheck({
+      const personPayload = {
         type: 'person',
         name: personName,
         role: personRole,
@@ -99,12 +98,18 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
         linkedin_url: personLinkedin,
         email: personEmail || 'anonymous@geoni.ai',
         private: isPrivate,
-      })
+      }
+      if (!user) {
+        // Login'e gitmeden formu sakla - giris sonrasi tarama otomatik baslar,
+        // kullanici her seyi bastan doldurmak zorunda kalmaz.
+        try { localStorage.setItem('geoni_pending_scan', JSON.stringify(personPayload)) } catch { /* ignore */ }
+        onLogin(); return
+      }
+      onSubmitBrandCheck(personPayload)
     } else {
       if (step === 0 && !brandName) return
       if (step < BRAND_LAST_STEP) { setStep(s => s + 1); return }
-      if (!user) { onLogin(); return }
-      onSubmitBrandCheck({
+      const brandPayload = {
         type: 'brand',
         name: brandName,
         sector: brandSector,
@@ -112,7 +117,12 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
         website: brandWebsite,
         email: brandEmail || 'anonymous@geoni.ai',
         private: isPrivate,
-      })
+      }
+      if (!user) {
+        try { localStorage.setItem('geoni_pending_scan', JSON.stringify(brandPayload)) } catch { /* ignore */ }
+        onLogin(); return
+      }
+      onSubmitBrandCheck(brandPayload)
     }
   }
 

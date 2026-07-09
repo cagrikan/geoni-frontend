@@ -121,6 +121,21 @@ function AppInner() {
 
   useEffect(() => { captureAcquisition(); capturePendingTab() }, [])
 
+  // Login oncesi doldurulmus kisi/marka formu: giris tamamlaninca tarama
+  // otomatik baslar - kullanici login duvarindan sonra her seyi bastan
+  // doldurmak zorunda kalmaz (bkz. form-kaybi geri bildirimi).
+  useEffect(() => {
+    if (!user) return
+    try {
+      const raw = localStorage.getItem('geoni_pending_scan')
+      if (!raw) return
+      localStorage.removeItem('geoni_pending_scan')
+      const payload = JSON.parse(raw)
+      if (payload && payload.name) handleBrandCheck(payload)
+    } catch { /* bozuk kayit - sessizce yok say */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user])
+
   const [view, setView] = useState(() => {
     if (window.location.pathname === '/auth/callback') return 'auth_callback'
     if (window.location.pathname === '/dashboard') return 'dashboard'

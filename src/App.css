@@ -2716,11 +2716,13 @@ body {
   .ticket-mobile-list .ticket-card { align-items: center; }
 }
 
-/* ===== Bilet detayi v2: iki kolon (onaylanan onizleme) ===== */
-.tdo { position: fixed; inset: 0; z-index: 300; background: var(--bg); overflow-y: auto; }
+/* ===== Bilet detayi v2: iki kolon (onaylanan onizleme) =====
+   Tam-ekran overlay DEGIL: dashboard/admin akisinin icinde render edilir,
+   ust nav + kenar cubugu gorunur kalir (kullanici istegi). */
+.tdo { width: 100%; }
 .tdo__topbar {
-  position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 10px;
-  background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 20px;
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 2px 12px;
 }
 .tdo__back {
   display: inline-flex; align-items: center; gap: 6px; background: none; border: none;
@@ -2737,7 +2739,11 @@ body {
   display: inline-flex; align-items: center; justify-content: center;
 }
 .tdo__copy:hover { color: var(--accent); border-color: var(--border-mid); }
-.tdo__wrap { display: grid; grid-template-columns: minmax(0, 1fr) 300px; max-width: 1100px; margin: 0 auto; min-height: calc(100vh - 46px); }
+.tdo__wrap {
+  display: grid; grid-template-columns: minmax(0, 1fr) 300px;
+  border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+  background: var(--bg);
+}
 .tdo__main { padding: 24px; min-width: 0; }
 .tdo__head { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
 .tdo__ico {

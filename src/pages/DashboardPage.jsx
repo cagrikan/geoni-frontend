@@ -63,8 +63,10 @@ function BuyCreditsSection({ t }) {
         body: JSON.stringify({ package_id: packageId }),
       })
       window.location.href = checkout_url
-    } catch (e) {
-      setError(e.message)
+    } catch {
+      // Odeme saglayici henuz aktif degilken (Lemon Squeezy onayi bekleniyor)
+      // ham HTTP hatasi gostermek satisi oldurur - durust ve yol gosteren mesaj.
+      setError(t('dash_checkout_unavailable'))
       setBuyingId(null)
     }
   }

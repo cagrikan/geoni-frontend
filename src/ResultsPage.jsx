@@ -206,7 +206,7 @@ export default function ResultsPage({ result, onReset, user, onLogin, onDashboar
 
         <div className="results__cta-compact">
           <span className="results__cta-compact-text">{t('results_upgrade_question')}</span>
-          <a href="https://geoni.ai#paketler" className="results__cta-compact-btn" target="_blank" rel="noopener">
+          <a href={`https://app.geoni.ai/dashboard?tab=tickets&target=${encodeURIComponent(domain || '')}`} className="results__cta-compact-btn" target="_blank" rel="noopener">
             {t('results_view_packages')}
           </a>
         </div>
@@ -281,7 +281,7 @@ export default function ResultsPage({ result, onReset, user, onLogin, onDashboar
             <p className="results__cta-eyebrow">{t('results_next_step')}</p>
             <h2 className="results__cta-title">{t('results_upgrade_question')}</h2>
             <p className="results__cta-sub">{t('results_cta_sub_site')}</p>
-            <a href="https://geoni.ai#paketler" className="results__cta-btn" target="_blank" rel="noopener">
+            <a href={`https://app.geoni.ai/dashboard?tab=tickets&target=${encodeURIComponent(domain || '')}`} className="results__cta-btn" target="_blank" rel="noopener">
               {t('results_view_packages')}
             </a>
           </div>
@@ -290,7 +290,7 @@ export default function ResultsPage({ result, onReset, user, onLogin, onDashboar
 
       <div className="results__sticky-bar">
         <span className="results__sticky-text">{t('results_sticky_upgrade')}</span>
-        <a href="https://geoni.ai#paketler" className="results__sticky-btn" target="_blank" rel="noopener">
+        <a href={`https://app.geoni.ai/dashboard?tab=tickets&target=${encodeURIComponent(domain || '')}`} className="results__sticky-btn" target="_blank" rel="noopener">
           {t('results_view_packages')}
         </a>
       </div>

@@ -174,7 +174,7 @@ export default function BrandCheckResultsPage({ result, onReset, user, onLogin, 
 
         <div className="results__cta-compact">
           <span className="results__cta-compact-text">{t('results_upgrade_question')}</span>
-          <a href="https://geoni.ai#paketler" className="results__cta-compact-btn" target="_blank" rel="noopener">
+          <a href={`https://app.geoni.ai/dashboard?tab=tickets&target=${encodeURIComponent(result?.name || '')}`} className="results__cta-compact-btn" target="_blank" rel="noopener">
             {t('results_view_packages')}
           </a>
         </div>
@@ -250,7 +250,7 @@ export default function BrandCheckResultsPage({ result, onReset, user, onLogin, 
             <p className="results__cta-eyebrow">{t('results_next_step')}</p>
             <h2 className="results__cta-title">{t('results_upgrade_question')}</h2>
             <p className="results__cta-sub">{t('results_cta_sub_brand')}</p>
-            <a href="https://geoni.ai#paketler" className="results__cta-btn" target="_blank" rel="noopener">
+            <a href={`https://app.geoni.ai/dashboard?tab=tickets&target=${encodeURIComponent(result?.name || '')}`} className="results__cta-btn" target="_blank" rel="noopener">
               {t('results_view_packages')}
             </a>
           </div>
@@ -261,7 +261,7 @@ export default function BrandCheckResultsPage({ result, onReset, user, onLogin, 
         <span className="results__sticky-text">
           {recognition_count > 0 ? `${recognition_count}/${total} ${t('results_brand_sticky_recognized')}` : t('results_brand_sticky_none')}
         </span>
-        <a href="https://geoni.ai#paketler" className="results__sticky-btn" target="_blank" rel="noopener">
+        <a href={`https://app.geoni.ai/dashboard?tab=tickets&target=${encodeURIComponent(result?.name || '')}`} className="results__sticky-btn" target="_blank" rel="noopener">
           {t('results_view_packages')}
         </a>
       </div>

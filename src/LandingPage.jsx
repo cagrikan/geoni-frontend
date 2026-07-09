@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Globe, User, Building2, ScanSearch, GitCompareArrows, Award, Eye, EyeOff } from 'lucide-react'
+import { Globe, User, Building2, ScanSearch, GitCompareArrows, Award, Eye, EyeOff, Wrench } from 'lucide-react'
 import GeoniMark from './GeoniMark'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import ThemeSwitcher from './components/ThemeSwitcher'
@@ -40,6 +40,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
     { icon: ScanSearch, title: t('how_step1_title'), desc: t('how_step1_desc') },
     { icon: GitCompareArrows, title: t('how_step2_title'), desc: t('how_step2_desc') },
     { icon: Award, title: t('how_step3_title'), desc: t('how_step3_desc') },
+    { icon: Wrench, title: t('how_step4_title'), desc: t('how_step4_desc') },
   ]
 
   const OPT = <span style={{color:'var(--text-muted)',fontWeight:400,fontSize:'.8em'}}>{t('field_optional')}</span>

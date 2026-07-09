@@ -11,7 +11,7 @@ const SITE_LAST_STEP = 1
 const PERSON_LAST_STEP = 3
 const BRAND_LAST_STEP = 2
 
-export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading = false, statusText = '', error, user, onDashboard, onLogin }) {
+export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading = false, statusText = '', error, user, onDashboard, onLogin, onViewSample }) {
   const { t } = useLanguage()
   const [mode, setMode] = useState('site') // 'site' | 'person' | 'brand'
   const [step, setStep] = useState(0)
@@ -337,6 +337,12 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
         <p className="landing__trust">
           {scanCount > 0 && <>{scanCount.toLocaleString('tr-TR')}{t('hero_trust_scans')}{' '}</>}
           {t('hero_trust')}
+          {onViewSample && (
+            <>
+              <span className="landing__trust-dot">·</span>
+              <button type="button" className="landing__trust-sample" onClick={onViewSample}>{t('hero_sample_btn')}</button>
+            </>
+          )}
         </p>
       </section>
 
@@ -353,6 +359,23 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
           ))}
         </div>
       </section>
+
+      {/* Kapanis: sayfa "Nasil calisir"dan sonra aniden bitiyordu */}
+      <section className="landing-close">
+        <p dangerouslySetInnerHTML={{ __html: t('landing_close_text') }} />
+        <button type="button" className="landing__submit" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          {t('landing_close_btn')}
+        </button>
+      </section>
+
+      <footer className="landing-footer">
+        <span>© 2026 GEONI</span>
+        <span className="landing-footer__links">
+          <a href="https://geoni.ai" target="_blank" rel="noopener">geoni.ai</a>
+          <a href="mailto:mail@geoni.ai">mail@geoni.ai</a>
+          <a href="https://geoni.ai/privacy" target="_blank" rel="noopener">{t('login_terms_privacy')}</a>
+        </span>
+      </footer>
     </div>
   )
 }

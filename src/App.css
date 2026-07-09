@@ -137,16 +137,12 @@ body {
 .landing__eyebrow {
   display: inline-block;
   font-family: var(--mono);
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: .1em;
+  font-size: .75rem;
+  font-weight: 500;
+  letter-spacing: .08em;
   text-transform: uppercase;
   color: var(--accent);
-  background: rgba(124,134,245,.1);
-  border: 1px solid var(--border-mid);
-  border-radius: 999px;
-  padding: 6px 16px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 .landing__headline {
   font-family: var(--display);
@@ -159,17 +155,14 @@ body {
 .landing__headline--center { max-width: 640px; }
 .landing__headline em {
   font-style: normal;
-  background: linear-gradient(135deg, var(--accent) 20%, var(--accent-2) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--accent);
 }
 .hero-centered__subhead {
   color: var(--text-sub);
-  font-size: .875rem;
-  line-height: 1.5;
-  margin-bottom: 16px;
-  max-width: 480px;
+  font-size: 1rem;
+  line-height: 1.55;
+  margin-bottom: 24px;
+  max-width: 520px;
 }
 
 /* Tek odak paneli: mod secimi + form */
@@ -186,7 +179,7 @@ body {
   width: 100%;
   gap: 4px;
   background: var(--surface);
-  border: 1px solid var(--border-mid);
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 4px;
   box-sizing: border-box;
@@ -419,11 +412,12 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: rgba(124,134,245,.12);
-  color: var(--accent);
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-sub);
   margin-bottom: 12px;
 }
 .how-col__title {
@@ -2829,3 +2823,25 @@ body {
   border-radius: 6px; padding: 7px 14px; font-size: .8125rem; font-weight: 500; cursor: pointer;
 }
 .ticket-dispute__submit:disabled, .ticket-dispute__cancel:disabled { opacity: .5; cursor: default; }
+
+
+/* ===== App giris sayfasi: trust linki, kapanis bandi, footer (onaylanan onizleme) ===== */
+.landing__trust-dot { opacity: .5; margin: 0 8px; }
+.landing__trust-sample {
+  background: none; border: none; padding: 0; cursor: pointer;
+  font-family: var(--body); font-size: .8125rem; font-weight: 500; color: var(--accent);
+}
+.landing__trust-sample:hover { text-decoration: underline; text-underline-offset: 3px; }
+.landing-close {
+  border-top: 1px solid var(--border);
+  padding: 28px 24px 32px; text-align: center;
+}
+.landing-close p { font-size: .875rem; color: var(--text-sub); margin-bottom: 14px; }
+.landing-close p b { color: var(--text); }
+.landing-footer {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 16px 24px; border-top: 1px solid var(--border);
+  font-size: .8125rem; color: var(--text-muted);
+}
+.landing-footer__links a { color: var(--text-muted); text-decoration: none; margin-left: 16px; }
+.landing-footer__links a:hover { color: var(--text-sub); }

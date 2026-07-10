@@ -55,11 +55,12 @@ body {
 }
 
 #root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
+  /* geoni.ai ile ayni tam-genislik yerlesim: eski 1126px kolon + border-inline
+     tum uygulamayi ortali bir kutuya hapsedip kenarlarda boydan boya cizgi
+     olusturuyordu (kullanici ekran goruntusu). Bolum genislikleri artik her
+     sayfanin kendi kapsayicisinda. */
+  width: 100%;
   text-align: center;
-  border-inline: 1px solid var(--border);
   min-height: 100svh;
   display: flex;
   flex-direction: column;

@@ -2948,7 +2948,8 @@ body {
   border-radius: var(--r-lg);
   padding: 32px 36px;
   text-align: left;
-  box-shadow: 0 10px 34px rgba(20, 20, 45, .08);
+  /* geoni.ai .chat-win golgesiyle ayni dil: genis, dagilan yumusak golge */
+  box-shadow: 0 40px 100px rgba(0, 0, 0, .12);
 }
 .scan-app__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 24px; }
 .scan-app__title {

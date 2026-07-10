@@ -2,6 +2,7 @@ import { CircleCheck, TrendingUp, EyeOff, Wrench, ArrowRight } from 'lucide-reac
 import GeoniMark from './GeoniMark'
 import ProBlur from './ProBlur'
 import SovSection from './components/SovSection'
+import StabilityNote from './components/StabilityNote'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import WatchlistButton from './components/WatchlistButton'
 import { useLanguage } from './lib/LanguageContext'
@@ -204,7 +205,14 @@ export default function ResultsPage({ result, onReset, user, onLogin, onDashboar
 
         {/* Skor + Breakdown (breakdown blur) */}
         <div className="results__top">
-          <ScoreGauge score={score} label={t('results_score_label')} />
+          <div className="results__gauge-col">
+            <ScoreGauge score={score} label={t('results_score_label')} />
+            <StabilityNote
+              stability={result.stability}
+              driverLabel={(language === 'en' ? BREAKDOWN_LABELS_EN : BREAKDOWN_LABELS_TR)[result.stability?.driver]}
+              t={t}
+            />
+          </div>
           <ProBlur isPro={isPro} label={t('results_site_breakdown_label')}>
             <Breakdown breakdown={score_breakdown} language={language} />
           </ProBlur>

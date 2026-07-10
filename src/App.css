@@ -2896,6 +2896,19 @@ body {
   max-width: 380px; box-shadow: 0 8px 24px rgba(0,0,0,.15);
 }
 
+/* ===== Rapor: skor istikrari (yumusatilmis skor + oynaklik notu) ===== */
+.results__gauge-col { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.stability { text-align: center; max-width: 240px; }
+.stability__smoothed { font-size: .8125rem; color: var(--text-sub); }
+.stability__smoothed b { color: var(--text); }
+.stability__hint { color: var(--text-muted); font-size: .75rem; }
+.stability__note {
+  margin-top: 8px; font-size: .75rem; color: var(--text-muted); line-height: 1.55;
+  background: var(--tint); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 8px 10px; text-align: left;
+}
+.stability__note b { color: var(--text-sub); }
+
 /* ===== Rapor: Share of Voice (v3) ===== */
 .sov {
   margin: 24px 0;

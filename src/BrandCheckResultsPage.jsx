@@ -2,6 +2,7 @@ import { CircleCheck, TrendingUp, EyeOff } from 'lucide-react'
 import GeoniMark from './GeoniMark'
 import ProBlur from './ProBlur'
 import SovSection from './components/SovSection'
+import StabilityNote from './components/StabilityNote'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import WatchlistButton from './components/WatchlistButton'
 import { useLanguage } from './lib/LanguageContext'
@@ -186,7 +187,19 @@ export default function BrandCheckResultsPage({ result, onReset, user, onLogin, 
         </div>
 
         <div className="results__top">
-          <ScoreGauge score={score} label={t('results_brand_score_label')} />
+          <div className="results__gauge-col">
+            <ScoreGauge score={score} label={t('results_brand_score_label')} />
+            <StabilityNote
+              stability={result.stability}
+              driverLabel={{
+                claude: 'Claude', chatgpt: 'ChatGPT', gemini: 'Gemini', perplexity: 'Perplexity',
+                yanit_kalitesi: t('breakdown_yanit_kalitesi'),
+                konu_uyumu: t('breakdown_konu_uyumu'),
+                kategori_gorunurlugu: t('breakdown_kategori_gorunurlugu'),
+              }[result.stability?.driver]}
+              t={t}
+            />
+          </div>
           <ProBlur isPro={isPro} label={t('results_brand_breakdown_label')}>
             <Breakdown breakdown={score_breakdown} t={t} />
           </ProBlur>

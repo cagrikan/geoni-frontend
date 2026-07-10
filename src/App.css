@@ -1192,6 +1192,14 @@ body {
   grid-template-columns: repeat(6, 1fr);
 }
 
+/* Mobil: 5/6 sutunlu varyantlar 800px kuralindan SONRA tanimlandigi icin
+   onu eziyor ve rapor yataya tasiyordu — varyantlara ozel mobil kural. */
+@media (max-width: 800px) {
+  .results__stats,
+  .results__stats--five,
+  .results__stats--six { grid-template-columns: repeat(2, 1fr); }
+}
+
 /* ===== FORM ROW (2 columns) ===== */
 .landing__field-row {
   display: grid;

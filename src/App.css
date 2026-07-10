@@ -118,11 +118,12 @@ body {
   height: 36px;
 }
 .landing__logo {
+  /* geoni.ai .logo-text ile birebir ayni yazi markasi */
   font-family: var(--display);
-  font-weight: 300;
-  font-size: 1.25rem;
-  letter-spacing: 0.22em;
-  color: #64748B;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: .14em;
+  color: var(--text-sub);
   text-transform: lowercase;
 }
 

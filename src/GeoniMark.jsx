@@ -1,35 +1,29 @@
+/* GEONI logo isareti — geoni.ai nav'indaki SVG ile birebir ayni (tek kaynak).
+   Renkler currentColor yerine marka accent'i sabit: iki temada da ayni
+   gorunur (geoni.ai'daki davranisla tutarli). Boyut .geoni-mark ile disaridan. */
 export default function GeoniMark() {
   return (
-    <svg viewBox="80 40 280 280" className="geoni-mark">
-      <line x1="175" y1="95" x2="230" y2="130" stroke="currentColor" strokeWidth="1" opacity=".4"/>
-      <line x1="175" y1="95" x2="165" y2="155" stroke="currentColor" strokeWidth="1" opacity=".4"/>
-      <line x1="165" y1="155" x2="175" y2="225" stroke="currentColor" strokeWidth="1" opacity=".4"/>
-      <line x1="175" y1="225" x2="230" y2="255" stroke="currentColor" strokeWidth="1" opacity=".4"/>
-      <line x1="230" y1="255" x2="295" y2="248" stroke="currentColor" strokeWidth="1" opacity=".4"/>
-      <line x1="295" y1="248" x2="320" y2="220" stroke="currentColor" strokeWidth="1" opacity=".4"/>
-      <line x1="320" y1="220" x2="295" y2="155" stroke="currentColor" strokeWidth="1" opacity=".4"/>
-      <line x1="230" y1="130" x2="245" y2="72" stroke="currentColor" strokeWidth="1" opacity=".4"/>
-      <line x1="245" y1="72" x2="310" y2="88" stroke="currentColor" strokeWidth="1" opacity=".5"/>
-      <line x1="310" y1="88" x2="340" y2="120" stroke="currentColor" strokeWidth="1" opacity=".5"/>
-      <line x1="340" y1="120" x2="320" y2="155" stroke="currentColor" strokeWidth="1" opacity=".5"/>
-      <line x1="165" y1="155" x2="230" y2="130" stroke="currentColor" strokeWidth="1" opacity=".5"/>
-      <path d="M 220 60 A 100 100 0 1 0 220 260" fill="none" stroke="currentColor" strokeWidth="14" strokeLinecap="round"/>
-      <path d="M 270 155 L 320 155" fill="none" stroke="currentColor" strokeWidth="14" strokeLinecap="round"/>
-      <path d="M 320 155 L 320 220" fill="none" stroke="currentColor" strokeWidth="14" strokeLinecap="round"/>
-      <circle cx="165" cy="155" r="5" fill="currentColor"/>
-      <circle cx="175" cy="95" r="4" fill="currentColor"/>
-      <circle cx="175" cy="225" r="4" fill="currentColor"/>
-      <circle cx="230" cy="130" r="5" fill="currentColor"/>
-      <circle cx="230" cy="255" r="4" fill="currentColor"/>
-      <circle cx="295" cy="248" r="4" fill="currentColor"/>
-      <circle cx="295" cy="155" r="5" fill="currentColor"/>
-      <circle cx="320" cy="220" r="4" fill="currentColor"/>
-      <circle cx="245" cy="72" r="5" fill="currentColor"/>
-      <circle cx="310" cy="88" r="6" fill="currentColor"/>
-      <circle cx="340" cy="120" r="5" fill="currentColor"/>
-      <circle cx="320" cy="155" r="7" fill="#F59E0B"/>
-      <circle cx="320" cy="155" r="4" fill="#07070F"/>
-      <circle cx="320" cy="155" r="2" fill="#F59E0B"/>
+    <svg viewBox="0 0 80 80" className="geoni-mark" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
+      <line x1="38" y1="12" x2="25" y2="22" stroke="#7C86F5" strokeWidth="1" opacity=".4" />
+      <line x1="10" y1="40" x2="20" y2="25" stroke="#7C86F5" strokeWidth="1" opacity=".4" />
+      <line x1="10" y1="40" x2="18" y2="56" stroke="#7C86F5" strokeWidth="1" opacity=".4" />
+      <line x1="38" y1="68" x2="25" y2="58" stroke="#7C86F5" strokeWidth="1" opacity=".5" />
+      <line x1="60" y1="40" x2="70" y2="24" stroke="#7C86F5" strokeWidth="1" opacity=".5" />
+      <line x1="38" y1="12" x2="52" y2="8" stroke="#7C86F5" strokeWidth="1" opacity=".5" />
+      <line x1="52" y1="8" x2="70" y2="24" stroke="#7C86F5" strokeWidth="1" opacity=".5" />
+      <path d="M 38 12 A 30 30 0 1 0 38 68" fill="none" stroke="#7C86F5" strokeWidth="5.5" strokeLinecap="round" />
+      <path d="M 50 40 L 62 40" fill="none" stroke="#7C86F5" strokeWidth="5.5" strokeLinecap="round" />
+      <path d="M 62 40 L 62 58" fill="none" stroke="#7C86F5" strokeWidth="5.5" strokeLinecap="round" />
+      <circle cx="38" cy="12" r="2.5" fill="#7C86F5" />
+      <circle cx="10" cy="40" r="2" fill="#7C86F5" />
+      <circle cx="38" cy="68" r="2.5" fill="#7C86F5" />
+      <circle cx="62" cy="40" r="3.5" fill="#F59E0B" />
+      <circle cx="62" cy="40" r="1.8" fill="#07070F" />
+      <circle cx="62" cy="40" r="0.9" fill="#F59E0B" />
+      <circle cx="50" cy="40" r="2" fill="#7C86F5" />
+      <circle cx="62" cy="58" r="2" fill="#7C86F5" />
+      <circle cx="70" cy="24" r="2" fill="#7C86F5" />
+      <circle cx="52" cy="8" r="1.8" fill="#7C86F5" />
     </svg>
   )
 }

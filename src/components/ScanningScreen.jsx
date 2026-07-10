@@ -52,7 +52,7 @@ export default function ScanningScreen({ kind, target, statusKey, progressLog = 
     <div className="scan-screen">
       <button className="scan-screen__brand scan-screen__brand--clickable" onClick={onCancel} type="button">
         <GeoniMark />
-        <span className="landing__logo">GEONI</span>
+        <span className="landing__logo">geoni</span>
       </button>
 
       <div className="scan-screen__center">

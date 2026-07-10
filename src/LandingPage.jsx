@@ -154,7 +154,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
       <header className="landing__nav">
         <button className="landing__brand landing__brand--clickable" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} type="button">
           <GeoniMark />
-          <span className="landing__logo">GEONI</span>
+          <span className="landing__logo">geoni</span>
         </button>
         <div className="nav-auth">
           <ThemeSwitcher />

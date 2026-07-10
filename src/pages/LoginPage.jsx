@@ -22,7 +22,7 @@ export default function LoginPage({ onSuccess, onHome }) {
       <div className="login-card">
         <button className="login-logo login-logo--clickable" onClick={onHome} type="button">
           <GeoniMark />
-          <span className="landing__logo">GEONI</span>
+          <span className="landing__logo">geoni</span>
         </button>
         <h1 className="login-title">{t('login_title')}</h1>
         <p className="login-sub">{t('login_sub')}</p>

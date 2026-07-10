@@ -12,7 +12,7 @@ export default function IdentityMismatchPage({ result, onReset }) {
       <header className="landing__nav">
         <button className="landing__brand landing__brand--clickable" onClick={onReset}>
           <GeoniMark />
-          <span className="landing__logo">GEONI</span>
+          <span className="landing__logo">geoni</span>
         </button>
         <div className="nav-auth">
           <LanguageSwitcher />

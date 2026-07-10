@@ -686,7 +686,7 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
       <header className="landing__nav">
         <button className="landing__brand landing__brand--clickable" onClick={onReset}>
           <GeoniMark />
-          <span className="landing__logo">GEONI</span>
+          <span className="landing__logo">geoni</span>
         </button>
         <div className="dash-nav-right">
           <LanguageSwitcher />

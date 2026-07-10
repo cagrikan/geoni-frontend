@@ -1,6 +1,7 @@
 import { CircleCheck, TrendingUp, EyeOff, Wrench, ArrowRight } from 'lucide-react'
 import GeoniMark from './GeoniMark'
 import ProBlur from './ProBlur'
+import SovSection from './components/SovSection'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import WatchlistButton from './components/WatchlistButton'
 import { useLanguage } from './lib/LanguageContext'
@@ -36,6 +37,7 @@ const BREAKDOWN_LABELS_TR = {
   authority: 'Otorite',
   freshness: 'Tazelik',
   schema: 'Şema Bütünlüğü',
+  ai_access: 'AI Erişimi',
   engagement: 'Etkileşim',
   brand_recall: 'Marka Bilinirliği',
 }
@@ -45,6 +47,7 @@ const BREAKDOWN_LABELS_EN = {
   authority: 'Authority',
   freshness: 'Freshness',
   schema: 'Schema Integrity',
+  ai_access: 'AI Access',
   engagement: 'Engagement',
   brand_recall: 'Brand Recall',
 }
@@ -109,6 +112,9 @@ function FixSuggestions({ result, t }) {
   }
   if ((score_breakdown.brand_recall ?? 100) < 40) {
     fixes.push({ key: 'entity', title: t('fix_entity_title'), why: `${t('fix_entity_why')} ${score_breakdown.brand_recall}/100` })
+  }
+  if (result.sov?.checked && (result.sov.score ?? 100) < 50) {
+    fixes.push({ key: 'sov', title: t('fix_sov_title'), why: `${t('fix_sov_why')} ${result.sov.mention_count}/${result.sov.query_count}` })
   }
   if (fixes.length === 0) return null
   const href = `https://app.geoni.ai/dashboard?tab=tickets&target=${encodeURIComponent(domain || '')}`
@@ -242,6 +248,9 @@ export default function ResultsPage({ result, onReset, user, onLogin, onDashboar
             </ProBlur>
           </div>
         </div>
+
+        {/* Share of Voice: kategori sorgularinda gorunurluk (v3) */}
+        <SovSection sov={result.sov} t={t} isPro={isPro} />
 
         {/* Eksik -> hizmet koprusu (ornek raporda gosterilmez) */}
         {!isSample && <FixSuggestions result={result} t={t} />}

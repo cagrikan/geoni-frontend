@@ -1,0 +1,53 @@
+import { Radar, CheckCircle2, XCircle } from 'lucide-react'
+import ProBlur from '../ProBlur'
+
+/* Share of Voice (v3): markayi bilmeyen kullanicinin kategori sorgularinda
+   marka oneriliyor mu? Ozet satiri herkese acik (satisin kancasi), sorgu
+   detaylari ve rakip listesi Pro'ya. */
+export default function SovSection({ sov, t, isPro = false }) {
+  if (!sov || !sov.checked || sov.score === null || sov.score === undefined) return null
+
+  const color = sov.score >= 65 ? 'var(--good)' : sov.score >= 40 ? 'var(--warn)' : 'var(--bad)'
+
+  return (
+    <div className="sov">
+      <div className="sov__head">
+        <h3 className="sov__title"><Radar size={15} strokeWidth={1.5} /> {t('sov_title')}</h3>
+        <span className="sov__summary" style={{ color }}>
+          {sov.mention_count}/{sov.query_count} {t('sov_summary_suffix')}
+        </span>
+      </div>
+      <p className="sov__sub">{t('sov_subtitle')}</p>
+
+      <ProBlur isPro={isPro} label={t('sov_detail_label')}>
+        <div className="sov__queries">
+          {(sov.queries || []).map((q, i) => (
+            <div className="sov__query" key={i}>
+              {q.mentioned
+                ? <CheckCircle2 size={14} strokeWidth={1.75} style={{ color: 'var(--good)' }} />
+                : <XCircle size={14} strokeWidth={1.75} style={{ color: 'var(--bad)' }} />}
+              <span className="sov__query-text">{q.query}</span>
+              <span className={`sov__query-tag ${q.mentioned ? 'sov__query-tag--yes' : 'sov__query-tag--no'}`}>
+                {q.mentioned ? t('sov_mentioned') : t('sov_not_mentioned')}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {(sov.competitors || []).length > 0 && (
+          <div className="sov__competitors">
+            <span className="sov__competitors-label">{t('sov_competitors_title')}</span>
+            <div className="sov__competitors-list">
+              {sov.competitors.map((c, i) => (
+                <span className="sov__competitor" key={i}>
+                  {c.name}
+                  {c.mentions > 1 && <em>×{c.mentions}</em>}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </ProBlur>
+    </div>
+  )
+}

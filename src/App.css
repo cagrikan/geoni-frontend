@@ -2864,6 +2864,50 @@ body {
   max-width: 380px; box-shadow: 0 8px 24px rgba(0,0,0,.15);
 }
 
+/* ===== Rapor: Share of Voice (v3) ===== */
+.sov {
+  margin: 24px 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 18px 20px;
+}
+.sov__head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+}
+.sov__title {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 1rem; font-weight: 600; color: var(--text); margin: 0;
+}
+.sov__summary { font-size: .875rem; font-weight: 600; white-space: nowrap; }
+.sov__sub { font-size: .8125rem; color: var(--text-muted); margin: 6px 0 14px; line-height: 1.5; }
+.sov__queries { display: flex; flex-direction: column; gap: 8px; }
+.sov__query {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+.sov__query svg { flex-shrink: 0; }
+.sov__query-text { font-size: .8125rem; color: var(--text-sub); flex: 1; min-width: 0; }
+.sov__query-tag {
+  font-size: .75rem; font-weight: 600; padding: 2px 9px;
+  border-radius: var(--r-full); white-space: nowrap;
+}
+.sov__query-tag--yes { background: var(--good-soft); color: var(--good); }
+.sov__query-tag--no { background: var(--bad-soft); color: var(--bad); }
+.sov__competitors { margin-top: 14px; }
+.sov__competitors-label { font-size: .75rem; font-weight: 600; color: var(--text-muted); }
+.sov__competitors-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.sov__competitor {
+  font-size: .8125rem; color: var(--text-sub);
+  background: var(--bg); border: 1px solid var(--border-mid);
+  border-radius: var(--r-full); padding: 3px 12px;
+}
+.sov__competitor em { font-style: normal; color: var(--text-muted); margin-left: 5px; font-size: .75rem; }
+
 /* ===== Rapor: eksik -> hizmet koprusu (FixSuggestions) ===== */
 .fixes { margin: 24px 0; }
 .fixes__title {

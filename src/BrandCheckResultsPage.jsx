@@ -1,6 +1,7 @@
 import { CircleCheck, TrendingUp, EyeOff } from 'lucide-react'
 import GeoniMark from './GeoniMark'
 import ProBlur from './ProBlur'
+import SovSection from './components/SovSection'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import WatchlistButton from './components/WatchlistButton'
 import { useLanguage } from './lib/LanguageContext'
@@ -44,6 +45,7 @@ function Breakdown({ breakdown, t }) {
     perplexity: 'Perplexity',
     yanit_kalitesi: t('breakdown_yanit_kalitesi'),
     konu_uyumu: t('breakdown_konu_uyumu'),
+    kategori_gorunurlugu: t('breakdown_kategori_gorunurlugu'),
   }
   return (
     <div className="breakdown">
@@ -215,6 +217,9 @@ export default function BrandCheckResultsPage({ result, onReset, user, onLogin, 
             </div>
           )}
         </div>
+
+        {/* Share of Voice: kategori sorgularinda gorunurluk (v3) */}
+        <SovSection sov={result.sov} t={t} isPro={isPro} />
 
         <div className="topics">
           <div className="topics__col">

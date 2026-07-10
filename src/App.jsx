@@ -69,7 +69,7 @@ const SAMPLE_RESULT_BY_LANG = {
   tr: {
     domain: 'ornek-magaza.com',
     score: 68,
-    score_breakdown: { index_coverage: 74, authority: 61, freshness: 55, schema: 82, engagement: 63, brand_recall: 71 },
+    score_breakdown: { index_coverage: 74, authority: 61, freshness: 55, schema: 82, ai_access: 88, engagement: 63, brand_recall: 71 },
     total_pages: 142,
     indexed_pages: 118,
     platforms: { chatgpt: true, anthropic: true, google: false },
@@ -79,6 +79,17 @@ const SAMPLE_RESULT_BY_LANG = {
       { topic: 'Lojistik ve Tedarik Zinciri Danışmanlığı', platforms: ['chatgpt'] },
       { topic: 'Kurumsal Satın Alma Süreçleri', platforms: ['claude'] },
     ],
+    sov: {
+      checked: true, score: 33.3, mention_count: 1, query_count: 3,
+      engines_used: ['perplexity', 'google'], custom_queries_used: false, own_cited_count: 1,
+      queries: [
+        { query: 'Türkiye\'de en iyi B2B e-ticaret çözümü sunanlar kimler?', mentioned: true, engines: { perplexity: { answered: true, mentioned: true }, google: { answered: true, mentioned: false } } },
+        { query: 'Kurumsal tedarik zinciri yazılımı için hangi firmayı önerirsin?', mentioned: false, engines: { perplexity: { answered: true, mentioned: false }, google: { answered: true, mentioned: false } } },
+        { query: 'Lojistik danışmanlığında öne çıkan markalar hangileri?', mentioned: false, engines: { perplexity: { answered: true, mentioned: false }, google: { answered: true, mentioned: false } } },
+      ],
+      competitors: [ { name: 'Rakip A', mentions: 3 }, { name: 'Rakip B', mentions: 2 }, { name: 'Rakip C', mentions: 1 } ],
+      sources: [ { domain: 'ecommercedb.com', mentions: 3, own: false }, { domain: 'ornek-magaza.com', mentions: 1, own: true }, { domain: 'webrazzi.com', mentions: 1, own: false } ],
+    },
     opportunities: [
       { topic: 'Yapay Zeka Destekli Envanter Yönetimi', platforms: [], competitors: ['rakip-a.com', 'rakip-b.com'] },
       { topic: 'Sürdürülebilir Ambalaj Çözümleri', platforms: [], competitors: ['rakip-c.com'] },
@@ -89,7 +100,7 @@ const SAMPLE_RESULT_BY_LANG = {
   en: {
     domain: 'example-store.com',
     score: 68,
-    score_breakdown: { index_coverage: 74, authority: 61, freshness: 55, schema: 82, engagement: 63, brand_recall: 71 },
+    score_breakdown: { index_coverage: 74, authority: 61, freshness: 55, schema: 82, ai_access: 88, engagement: 63, brand_recall: 71 },
     total_pages: 142,
     indexed_pages: 118,
     platforms: { chatgpt: true, anthropic: true, google: false },
@@ -99,6 +110,17 @@ const SAMPLE_RESULT_BY_LANG = {
       { topic: 'Logistics and Supply Chain Consulting', platforms: ['chatgpt'] },
       { topic: 'Corporate Procurement Processes', platforms: ['claude'] },
     ],
+    sov: {
+      checked: true, score: 33.3, mention_count: 1, query_count: 3,
+      engines_used: ['perplexity', 'google'], custom_queries_used: false, own_cited_count: 1,
+      queries: [
+        { query: 'Who are the best B2B e-commerce solution providers?', mentioned: true, engines: { perplexity: { answered: true, mentioned: true }, google: { answered: true, mentioned: false } } },
+        { query: 'Which company would you recommend for enterprise supply chain software?', mentioned: false, engines: { perplexity: { answered: true, mentioned: false }, google: { answered: true, mentioned: false } } },
+        { query: 'Which brands stand out in logistics consulting?', mentioned: false, engines: { perplexity: { answered: true, mentioned: false }, google: { answered: true, mentioned: false } } },
+      ],
+      competitors: [ { name: 'Competitor A', mentions: 3 }, { name: 'Competitor B', mentions: 2 }, { name: 'Competitor C', mentions: 1 } ],
+      sources: [ { domain: 'ecommercedb.com', mentions: 3, own: false }, { domain: 'example-store.com', mentions: 1, own: true }, { domain: 'retaildive.com', mentions: 1, own: false } ],
+    },
     opportunities: [
       { topic: 'AI-Powered Inventory Management', platforms: [], competitors: ['competitor-a.com', 'competitor-b.com'] },
       { topic: 'Sustainable Packaging Solutions', platforms: [], competitors: ['competitor-c.com'] },

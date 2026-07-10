@@ -254,6 +254,11 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
             {mode === 'person' && (
               <>
                 <StepTitle titles={PERSON_STEP_TITLES} />
+                {/* Dogru-veri vurgusu: baglam alanlari adas karismasini ve
+                    halusinasyonu azaltir - kullanici bunu bilerek doldursun */}
+                {step >= 1 && step <= 2 && (
+                  <p className="wizard-accuracy-note">{t('wizard_accuracy_note')}</p>
+                )}
 
                 {step === 0 && (
                   <div className="landing__field landing__field--hero">
@@ -312,6 +317,9 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
             {mode === 'brand' && (
               <>
                 <StepTitle titles={BRAND_STEP_TITLES} />
+                {step >= 1 && step <= 2 && (
+                  <p className="wizard-accuracy-note">{t('wizard_accuracy_note')}</p>
+                )}
 
                 {step === 0 && (
                   <div className="landing__field landing__field--hero">

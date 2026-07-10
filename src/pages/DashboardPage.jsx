@@ -865,6 +865,11 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                     const delta = series && series.length >= 2 ? series[series.length - 1].score - series[series.length - 2].score : null
                     const matchedAudit = key ? latestAuditByTarget[key] : null
                     const TypeIcon = typeIcon[item.type] || FileText
+                    // Ucretlendirme: ilk 30 gun ucretsiz izleme; sonrasinda
+                    // bakiyesiz kullanicida backend taramayi atlar, burada
+                    // 'duraklatildi' rozeti gosterilir (bkz. monitor.py).
+                    const freePeriodOver = item.created_at && (Date.now() - new Date(item.created_at).getTime()) > 30 * 24 * 3600 * 1000
+                    const monitorPaused = item.monitor_enabled !== false && freePeriodOver && (profile?.credit_balance ?? 0) <= 0
                     return (
                       <div key={item.id}>
                       <div
@@ -876,8 +881,11 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                           <span className="dash-audit-ico"><TypeIcon size={14} strokeWidth={1.5} /></span>
                           <div className="dash-audit-info">
                             <div className="dash-audit-name">{item.label}</div>
-                            <div className="dash-audit-sub">
-                              {item.monitor_enabled !== false ? t('watchlist_monitor_badge') : t('watchlist_monitor_off')}
+                            <div className={`dash-audit-sub ${monitorPaused ? 'dash-audit-sub--warn' : ''}`}>
+                              {item.monitor_enabled === false ? t('watchlist_monitor_off')
+                                : monitorPaused ? t('watchlist_monitor_paused')
+                                : !freePeriodOver ? t('watchlist_monitor_badge_free')
+                                : t('watchlist_monitor_badge')}
                               {(item.custom_queries || []).length > 0 && ` · ${(item.custom_queries || []).length} ${t('watchlist_queries_count')}`}
                             </div>
                           </div>

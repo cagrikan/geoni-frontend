@@ -75,6 +75,7 @@ export const translations = {
 
     // ── Wizard nav ──
     wizard_back: '← Geri',
+    wizard_accuracy_note: 'Bu bilgiler yalnızca sizi doğru tespit etmek için kullanılır: ne kadar doğru doldurursanız, adaş karışması ve yanlış eşleşme riski o kadar azalır, rapor o kadar isabetli olur.',
     wizard_next: 'İleri →',
     wizard_step_count: 'Adım',
     submit_site: 'Ücretsiz Taramayı Başlat',
@@ -312,6 +313,8 @@ export const translations = {
     watchlist_rescan: 'Yeniden Tara',
     watchlist_not_scanned_yet: 'Henüz taranmadı',
     watchlist_monitor_badge: 'Haftalık izleme açık',
+    watchlist_monitor_badge_free: 'Haftalık izleme açık · ilk ay ücretsiz',
+    watchlist_monitor_paused: 'İzleme duraklatıldı — devam etmek için token paketi alın',
     watchlist_monitor_off: 'İzleme kapalı',
     watchlist_queries_btn: 'Özel izleme soruları',
     watchlist_queries_count: 'özel soru',
@@ -649,6 +652,7 @@ export const translations = {
 
     // ── Wizard nav ──
     wizard_back: '← Back',
+    wizard_accuracy_note: 'These details are used solely to correctly identify you: the more accurate they are, the lower the risk of namesake mix-ups and false matches — and the more accurate your report.',
     wizard_next: 'Next →',
     wizard_step_count: 'Step',
     submit_site: 'Start Free Scan',
@@ -886,6 +890,8 @@ export const translations = {
     watchlist_rescan: 'Rescan',
     watchlist_not_scanned_yet: 'Not scanned yet',
     watchlist_monitor_badge: 'Weekly monitoring on',
+    watchlist_monitor_badge_free: 'Weekly monitoring on · first month free',
+    watchlist_monitor_paused: 'Monitoring paused — buy a token package to continue',
     watchlist_monitor_off: 'Monitoring off',
     watchlist_queries_btn: 'Custom monitoring questions',
     watchlist_queries_count: 'custom questions',

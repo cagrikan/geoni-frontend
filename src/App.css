@@ -1594,6 +1594,7 @@ body {
 .dash-audit-info { flex: 1; min-width: 0; }
 .dash-audit-name { font-weight: 500; color: var(--text); font-size: .875rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .dash-audit-sub { font-size: .75rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dash-audit-sub--warn { color: var(--warn); }
 .dash-audit-meta { font-size: .75rem; color: var(--text-muted); margin-top: 1px; font-variant-numeric: tabular-nums; }
 .dash-audit-tag {
   font-size: .75rem; color: var(--text-sub); background: var(--surface-2);
@@ -2924,6 +2925,18 @@ body {
 .sentiment-tag--pos { background: var(--good-soft); color: var(--good); }
 .sentiment-tag--neu { background: var(--tint); color: var(--text-muted); }
 .sentiment-tag--neg { background: var(--bad-soft); color: var(--bad); }
+
+/* Tarama sihirbazi: dogru-veri vurgusu (adas karismasi/halusinasyon notu) */
+.wizard-accuracy-note {
+  font-size: .75rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  background: var(--tint);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 8px 12px;
+  margin-bottom: 14px;
+}
 
 /* ===== Izleme v2: ozel sorgu editoru ===== */
 .watch-queries {

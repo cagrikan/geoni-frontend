@@ -15,7 +15,10 @@
   --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
-  font: 18px/145% var(--sans);
+  /* Taban 16px: geoni.ai ile ayni olcek. Eski sablon 18px birakmisti -
+     tum rem boyutlari %12.5 buyuk render oluyordu (logo fark sikayetiyle
+     ortaya cikti); v2 tasarim sistemi ve onaylanan onizlemeler 16px tabanli. */
+  font: 16px/150% var(--sans);
   letter-spacing: 0.18px;
   color-scheme: light dark;
   color: var(--text);

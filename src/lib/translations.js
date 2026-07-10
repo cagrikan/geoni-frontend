@@ -142,6 +142,10 @@ export const translations = {
     sov_mentioned: 'Öneriliyor',
     sov_not_mentioned: 'Geçmiyor',
     sov_competitors_title: 'Bu sorgularda öne çıkanlar:',
+    sov_sources_title: 'AI yanıtlarında kaynak gösterilen siteler:',
+    sov_own_cited_prefix: 'Siteniz',
+    sov_own_cited_suffix: 'yanıtta kaynak gösterildi.',
+    sov_own_not_cited: 'Siteniz bu yanıtların hiçbirinde kaynak gösterilmedi — aşağıdaki sitelerde yer almak AI yanıtlarına girmenin en kısa yoludur.',
 
     // ── Örnek rapor banner ──
     sample_banner_text: 'Bu bir',
@@ -712,6 +716,10 @@ export const translations = {
     sov_mentioned: 'Recommended',
     sov_not_mentioned: 'Not mentioned',
     sov_competitors_title: 'Standing out in these queries:',
+    sov_sources_title: 'Sites cited as sources in AI answers:',
+    sov_own_cited_prefix: 'Your site was cited in',
+    sov_own_cited_suffix: 'answers.',
+    sov_own_not_cited: 'Your site was not cited in any of these answers — getting listed on the sites below is the shortest path into AI answers.',
 
     // ── Sample report banner ──
     sample_banner_text: 'This is a',

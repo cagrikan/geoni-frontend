@@ -63,6 +63,28 @@ export default function SovSection({ sov, t, isPro = false }) {
             </div>
           </div>
         )}
+
+        {/* Atif/kaynak istihbarati: AI bu kategoride hangi siteleri kaynak gosteriyor? */}
+        {(sov.sources || []).length > 0 && (
+          <div className="sov__competitors">
+            <span className="sov__competitors-label">{t('sov_sources_title')}</span>
+            {sov.own_cited_count > 0 ? (
+              <p className="sov__own-cited sov__own-cited--yes">
+                ✓ {t('sov_own_cited_prefix')} {sov.own_cited_count} {t('sov_own_cited_suffix')}
+              </p>
+            ) : (
+              <p className="sov__own-cited">{t('sov_own_not_cited')}</p>
+            )}
+            <div className="sov__competitors-list">
+              {sov.sources.map((s, i) => (
+                <span className={`sov__competitor ${s.own ? 'sov__competitor--own' : ''}`} key={i}>
+                  {s.domain}
+                  {s.mentions > 1 && <em>×{s.mentions}</em>}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </ProBlur>
     </div>
   )

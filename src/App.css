@@ -2928,14 +2928,15 @@ body {
 
 /* Tarama sihirbazi: dogru-veri vurgusu (adas karismasi/halusinasyon notu) */
 .wizard-accuracy-note {
-  font-size: .75rem;
-  color: var(--text-muted);
-  line-height: 1.5;
-  background: var(--tint);
-  border: 1px solid var(--border);
+  font-size: .875rem;
+  color: var(--text-sub);
+  line-height: 1.6;
+  background: var(--accent-dim);
+  border: 1px solid var(--border-mid);
+  border-left: 3px solid var(--accent);
   border-radius: var(--r-sm);
-  padding: 8px 12px;
-  margin-bottom: 14px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
 }
 
 /* ===== Izleme v2: ozel sorgu editoru ===== */

@@ -64,8 +64,13 @@ function Breakdown({ breakdown, t }) {
   )
 }
 
-/* Duygu (sentiment) rozeti: judge'in yanit tonu degerlendirmesi (v3) */
-function SentimentTag({ sentiment, t }) {
+/* Duygu (sentiment) rozeti: judge'in yanit tonu degerlendirmesi (v3).
+   Uydurma suphesinde ton yerine "karistiriyor olabilir" uyarisi gosterilir —
+   model "taniyor" gorunse de muhtemelen yanlis kisiyi anlatiyordur. */
+function SentimentTag({ sentiment, hallucination, t }) {
+  if (hallucination) {
+    return <span className="sentiment-tag sentiment-tag--warn" title={t('sentiment_hallucination_hint')}>⚠ {t('sentiment_hallucination')}</span>
+  }
   if (!sentiment) return null
   const map = {
     pozitif: { cls: 'sentiment-tag--pos', label: t('sentiment_pozitif') },
@@ -208,21 +213,21 @@ export default function BrandCheckResultsPage({ result, onReset, user, onLogin, 
               {model_results?.claude?.recognized ? t('results_yes') : t('results_no')}
             </span>
             <span className="results__stat-l">{t('results_brand_claude_recognizes')}</span>
-            <SentimentTag sentiment={model_results?.claude?.sentiment} t={t} />
+            <SentimentTag sentiment={model_results?.claude?.sentiment} hallucination={model_results?.claude?.hallucination} t={t} />
           </div>
           <div className="results__stat">
             <span className="results__stat-n" style={{ color: model_results?.openai?.recognized ? 'var(--good)' : 'var(--bad)' }}>
               {model_results?.openai?.recognized ? t('results_yes') : t('results_no')}
             </span>
             <span className="results__stat-l">{t('results_brand_chatgpt_recognizes')}</span>
-            <SentimentTag sentiment={model_results?.openai?.sentiment} t={t} />
+            <SentimentTag sentiment={model_results?.openai?.sentiment} hallucination={model_results?.openai?.hallucination} t={t} />
           </div>
           <div className="results__stat">
             <span className="results__stat-n" style={{ color: model_results?.gemini?.recognized ? 'var(--good)' : 'var(--bad)' }}>
               {model_results?.gemini?.recognized ? t('results_yes') : t('results_no')}
             </span>
             <span className="results__stat-l">{t('results_brand_gemini_recognizes')}</span>
-            <SentimentTag sentiment={model_results?.gemini?.sentiment} t={t} />
+            <SentimentTag sentiment={model_results?.gemini?.sentiment} hallucination={model_results?.gemini?.hallucination} t={t} />
           </div>
           {model_results?.perplexity && (
             <div className="results__stat">
@@ -230,7 +235,7 @@ export default function BrandCheckResultsPage({ result, onReset, user, onLogin, 
                 {model_results.perplexity.recognized ? t('results_yes') : t('results_no')}
               </span>
               <span className="results__stat-l">{t('results_brand_perplexity_recognizes')}</span>
-              <SentimentTag sentiment={model_results.perplexity.sentiment} t={t} />
+              <SentimentTag sentiment={model_results.perplexity.sentiment} hallucination={model_results.perplexity.hallucination} t={t} />
             </div>
           )}
         </div>

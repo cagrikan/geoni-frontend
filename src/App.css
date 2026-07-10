@@ -1564,7 +1564,7 @@ body {
 .dash-audit-head,
 .dash-audit-row {
   display: grid;
-  grid-template-columns: 24px minmax(0, 1fr) 88px 92px 132px 52px;
+  grid-template-columns: 24px minmax(0, 1fr) 88px 92px 132px 128px;
   align-items: center;
   gap: 12px;
   padding: 10px 16px;
@@ -1608,7 +1608,7 @@ body {
 .dash-audit-row--clickable:hover .dash-audit-chev { color: var(--accent); }
 /* Takip Listesi ayni tabloyu kullanir: checkbox/tarih sutunu yok, iki aksiyon butonu var */
 .dash-audit-head--watch,
-.dash-audit-row--watch { grid-template-columns: minmax(0, 1fr) 88px 110px 84px; }
+.dash-audit-row--watch { grid-template-columns: minmax(0, 1fr) 88px 110px 168px; }
 /* Yukleme iskeletleri tablonun icinde satir gibi dursun */
 .dash-audit-list .dash-skeleton-row { border-bottom: 1px solid var(--border); border-radius: 0; background: none; }
 .dash-audit-list .dash-skeleton-row:last-child { border-bottom: 0; }
@@ -1765,7 +1765,7 @@ body {
   .dash-audit-head,
   .dash-audit-row { grid-template-columns: 24px minmax(0, 1fr) 92px 52px; }
   .dash-audit-head--watch,
-  .dash-audit-row--watch { grid-template-columns: minmax(0, 1fr) 110px 84px; }
+  .dash-audit-row--watch { grid-template-columns: minmax(0, 1fr) 110px 168px; }
   .dash-audit-tag, .dash-audit-date, .dash-audit-head__date,
   .dash-audit-head span:nth-child(3), .dash-audit-head span:nth-child(5) { display: none; }
   .dash-audit-head--watch span:nth-child(2) { display: none; }
@@ -2953,6 +2953,7 @@ body {
 .sentiment-tag--pos { background: var(--good-soft); color: var(--good); }
 .sentiment-tag--neu { background: var(--tint); color: var(--text-muted); }
 .sentiment-tag--neg { background: var(--bad-soft); color: var(--bad); }
+.sentiment-tag--warn { background: var(--warn-soft); color: var(--warn); cursor: help; }
 
 /* Tarama sihirbazi: dogru-veri vurgusu (adas karismasi/halusinasyon notu) */
 .wizard-accuracy-note {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Globe, User, Building2, ScanSearch, GitCompareArrows, Award, Eye, EyeOff, Wrench } from 'lucide-react'
+import { Globe, User, Building2, ScanSearch, GitCompareArrows, Award, EyeOff, Wrench } from 'lucide-react'
 import GeoniMark from './GeoniMark'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import ThemeSwitcher from './components/ThemeSwitcher'
@@ -13,6 +13,8 @@ const BRAND_LAST_STEP = 2
 
 export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading = false, statusText = '', error, user, onDashboard, onLogin, onViewSample }) {
   const { t } = useLanguage()
+  // Slogan havuzu: her sayfa acilisinda rastgele biri (mount basina sabit)
+  const [sloganNo] = useState(() => Math.floor(Math.random() * 5) + 1)
   const [mode, setMode] = useState('site') // 'site' | 'person' | 'brand'
   const [step, setStep] = useState(0)
   const [scanCount, setScanCount] = useState(0)
@@ -168,55 +170,38 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
         </div>
       </header>
 
-      {/* ══ HERO: split — sol deger onerisi, sag yuzen tarama karti (onaylanan konsept) ══ */}
-      <section className="hero-split">
-        <div className="hero-split__left">
-          <div className="hero-eyeline">
-            <span className="hero-eyeline__pulse" />
-            <span>
-              {scanCount > 0 ? <><b>{scanCount.toLocaleString('tr-TR')}</b> {t('hero_eyeline_scans')}</> : t('hero_eyebrow')}
-            </span>
-          </div>
-          <h1 className="landing__headline">
-            {t('hero_headline_1')}
-            <br />
-            <em>{t('hero_headline_2')}</em>
-          </h1>
-          <p className="hero-split__subhead">{t('hero_subhead')}</p>
-          <div className="hero-proofs">
-            <div className="hero-proof" dangerouslySetInnerHTML={{ __html: '✓ ' + t('hero_proof1') }} />
-            <div className="hero-proof" dangerouslySetInnerHTML={{ __html: '✓ ' + t('hero_proof2') }} />
-            <div className="hero-proof" dangerouslySetInnerHTML={{ __html: '✓ ' + t('hero_proof3') }} />
-          </div>
-          {onViewSample && (
-            <button type="button" className="hero-sample-link" onClick={onViewSample}>{t('hero_sample_btn')}</button>
-          )}
+      {/* ══ GIRIS: form-odakli uygulama sahnesi (onaylanan onizleme, slogan v2) ══ */}
+      <section className="app-stage">
+        <h1 className="app-slogan">{t(`app_slogan_${sloganNo}`)}</h1>
+        <div className="hero-eyeline app-stage__eyeline">
+          <span className="hero-eyeline__pulse" />
+          <span>
+            {scanCount > 0 ? <>{t('eyeline_today_prefix')}<b>{scanCount.toLocaleString('tr-TR')}</b> {t('hero_eyeline_scans')}</> : t('hero_eyebrow')}
+          </span>
         </div>
 
-        <div className="hero-split__right">
-        <div className="scan-card">
-          <h2 className="scan-card__title">{t('scan_card_title')} <span>{t('scan_card_eta')}</span></h2>
-          <div className="mode-tabs">
+        <div className="scan-app">
+          <div className="scan-app__head">
+            <div className="scan-app__title">
+              <span className="scan-app__tico"><GeoniMark /></span>
+              {t('scan_card_title')}
+            </div>
+            <span className="scan-app__eta">{t('scan_card_eta')}</span>
+          </div>
+
+          <div className="app-tabs">
             {MODE_TABS.map(({ key, icon: Icon, title }) => (
               <button
                 key={key}
                 type="button"
-                className={`mode-tab ${mode === key ? 'mode-tab--active' : ''}`}
+                className={`app-tab ${mode === key ? 'app-tab--on' : ''}`}
                 onClick={() => changeMode(key)}
               >
-                <Icon size={16} strokeWidth={1.5} />
+                <span className="app-tab__ico"><Icon size={17} strokeWidth={1.75} /></span>
                 {title}
+                <small>{t(`tab_desc_${key}`)}</small>
               </button>
             ))}
-            <button
-              type="button"
-              className={`mode-tab mode-tab--private ${isPrivate ? 'mode-tab--active' : ''}`}
-              onClick={togglePrivate}
-              title={t('private_scan_label')}
-              aria-label={t('private_scan_label')}
-            >
-              {isPrivate ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
-            </button>
           </div>
 
           {showPrivateToast && (
@@ -371,11 +356,20 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
           </form>
 
           {error && <p className="landing__error">{error}</p>}
+
+          <label className="app-priv">
+            <input type="checkbox" checked={isPrivate} onChange={togglePrivate} />
+            <EyeOff size={13} strokeWidth={1.5} />
+            {t('private_scan_label')}
+          </label>
+          <div className="app-trust"><b>{t('trust_free')}</b> · {t('scan_trust_line')}</div>
         </div>
-        <div className="scan-peek">
-          <span className="scan-peek__ring"><i>68</i></span>
-          <p dangerouslySetInnerHTML={{ __html: t('scan_peek_text') }} />
-        </div>
+
+        <div className="app-underlinks">
+          {onViewSample && (
+            <button type="button" onClick={onViewSample}>{t('hero_sample_btn')} →</button>
+          )}
+          <button type="button" onClick={() => document.querySelector('.how-band')?.scrollIntoView({ behavior: 'smooth' })}>{t('underlink_how')}</button>
         </div>
       </section>
 

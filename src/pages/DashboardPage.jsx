@@ -530,6 +530,28 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
     setWatchlist(prev => prev.filter(w => w.id !== id))
   }
 
+  // Tarama gecmisi satirindan yeniden tarama: hedef izleme listesindeyse
+  // oradaki ozel sorgular da tasinir (ayni olcum kosullari).
+  const rescanAudit = (audit) => {
+    const label = (audit.type === 'web' ? audit.domain : audit.name)?.toLowerCase().trim()
+    const watchItem = watchlist.find(w => w.label?.toLowerCase().trim() === label)
+    const customQueries = (watchItem?.custom_queries || []).length ? watchItem.custom_queries : null
+    if (audit.type === 'web') {
+      onRescanWeb(audit.domain, user?.email, false, customQueries)
+    } else {
+      onRescanBrand({
+        type: audit.type,
+        name: audit.name,
+        topic: audit.topic || '',
+        role: audit.role || '',
+        company: audit.company || '',
+        location: audit.location || '',
+        email: user?.email,
+        custom_queries: customQueries,
+      })
+    }
+  }
+
   const rescanItem = (item) => {
     const customQueries = (item.custom_queries || []).length ? item.custom_queries : null
     if (item.type === 'web') {
@@ -822,6 +844,11 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                       <span className="dash-audit-date">{formatDate(audit.created_at)}</span>
                       <div className="dash-audit-actions">
                         {audit.result_json && <ChevronRight size={14} strokeWidth={1.5} className="dash-audit-chev" />}
+                        <button
+                          onClick={(e) => { e.stopPropagation(); rescanAudit(audit) }}
+                          className="dash-audit-delete"
+                          title={t('watchlist_rescan')}
+                        ><RefreshCw size={13} strokeWidth={1.5} /></button>
                         <button
                           onClick={(e) => deleteAudit(e, audit.id)}
                           className="dash-audit-delete"

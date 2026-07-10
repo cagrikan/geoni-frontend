@@ -251,8 +251,10 @@ export default function ResultsPage({ result, onReset, user, onLogin, onDashboar
           </div>
           <div className="results__stat">
             <ProBlur isPro={isPro} label={t('results_site_llmtxt_label')}>
-              <span className="results__stat-n">—</span>
-              <span className="results__stat-l">llm.txt</span>
+              <span className="results__stat-n" style={{ color: result.llms_txt == null ? 'var(--text-muted)' : result.llms_txt ? 'var(--good)' : 'var(--bad)' }}>
+                {result.llms_txt == null ? '—' : result.llms_txt ? t('results_yes') : t('results_no')}
+              </span>
+              <span className="results__stat-l">llms.txt</span>
             </ProBlur>
           </div>
         </div>

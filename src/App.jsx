@@ -65,6 +65,17 @@ function capturePendingTab() {
   } catch { /* ignore */ }
 }
 
+// geoni.ai'daki on-rapor widget'i "tam skorunu al" derken taradigi domaini
+// tasir (?scan_domain=...). Giris tamamlaninca tam tarama otomatik baslar -
+// eskiden domain kayboluyor, kullanici bos dashboard'a dusuyordu.
+function captureScanDomain() {
+  try {
+    const params = new URLSearchParams(window.location.search)
+    const d = params.get('scan_domain')
+    if (d) localStorage.setItem('geoni_pending_scan', JSON.stringify({ type: 'site', domain: d }))
+  } catch { /* ignore */ }
+}
+
 const SAMPLE_RESULT_BY_LANG = {
   tr: {
     domain: 'ornek-magaza.com',
@@ -141,7 +152,7 @@ function AppInner() {
     if (desc) desc.setAttribute('content', t('page_description'))
   }, [language])
 
-  useEffect(() => { captureAcquisition(); capturePendingTab() }, [])
+  useEffect(() => { captureAcquisition(); capturePendingTab(); captureScanDomain() }, [])
 
   // Login oncesi doldurulmus kisi/marka formu: giris tamamlaninca tarama
   // otomatik baslar - kullanici login duvarindan sonra her seyi bastan
@@ -153,7 +164,12 @@ function AppInner() {
       if (!raw) return
       localStorage.removeItem('geoni_pending_scan')
       const payload = JSON.parse(raw)
-      if (payload && payload.name) handleBrandCheck(payload)
+      if (payload?.type === 'site' && payload.domain) {
+        // Site taramasi: geoni.ai widget'i ya da login duvarindan gelen form
+        handleAudit(payload.domain, payload.email, !!payload.private)
+      } else if (payload && payload.name) {
+        handleBrandCheck(payload)
+      }
     } catch { /* bozuk kayit - sessizce yok say */ }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])

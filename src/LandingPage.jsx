@@ -84,6 +84,12 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
       if (step === 0 && !domain) return
       if (step < SITE_LAST_STEP) { setStep(s => s + 1); return }
       if (!domain || !siteEmail) return
+      if (!user) {
+        // Kisi/marka ile ayni desen: anonim tarama hesaba baglanamiyor ve
+        // gecmiste gorunmuyordu - form saklanir, giris sonrasi otomatik baslar.
+        try { localStorage.setItem('geoni_pending_scan', JSON.stringify({ type: 'site', domain, email: siteEmail, private: isPrivate })) } catch { /* ignore */ }
+        onLogin(); return
+      }
       onSubmitAudit(domain, siteEmail, isPrivate)
     } else if (mode === 'person') {
       if (step === 0 && !personName) return
@@ -244,7 +250,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
                   <WizardProgress total={SITE_LAST_STEP} />
                   {step > 0 && <button type="button" className="wizard-back" onClick={() => setStep(s => s - 1)}>{t('wizard_back')}</button>}
                   <button type="submit" className="landing__submit" disabled={loading}>
-                    {loading ? statusText + '…' : step < SITE_LAST_STEP ? t('wizard_next') : t('submit_site')}
+                    {loading ? statusText + '…' : step < SITE_LAST_STEP ? t('wizard_next') : !user ? `${t('nav_login')} →` : t('submit_site')}
                   </button>
                 </div>
               </>

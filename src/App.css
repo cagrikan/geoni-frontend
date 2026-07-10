@@ -2937,6 +2937,9 @@ body {
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
 .app-stage__eyeline { margin-bottom: 28px; justify-content: center; }
+@keyframes eyeline-fade { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+.eyeline-swap { animation: eyeline-fade .45s ease; }
+@media (prefers-reduced-motion: reduce) { .eyeline-swap { animation: none; } }
 .scan-app {
   position: relative;
   width: 100%;

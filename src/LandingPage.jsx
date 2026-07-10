@@ -15,6 +15,13 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
   const { t } = useLanguage()
   // Slogan havuzu: her sayfa acilisinda rastgele biri (mount basina sabit)
   const [sloganNo] = useState(() => Math.floor(Math.random() * 5) + 1)
+  // Sayac gecisi: once 3 sn "AI Gorunurluk Taramasi" gorunur, sonra sayi
+  // yumusak gecisle gelir - fetch bitince aninda takas goz tirmaliyordu.
+  const [eyelineCountReady, setEyelineCountReady] = useState(false)
+  useEffect(() => {
+    const id = setTimeout(() => setEyelineCountReady(true), 3000)
+    return () => clearTimeout(id)
+  }, [])
   const [mode, setMode] = useState('site') // 'site' | 'person' | 'brand'
   const [step, setStep] = useState(0)
   const [scanCount, setScanCount] = useState(0)
@@ -175,8 +182,10 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
         <h1 className="app-slogan">{t(`app_slogan_${sloganNo}`)}</h1>
         <div className="hero-eyeline app-stage__eyeline">
           <span className="hero-eyeline__pulse" />
-          <span>
-            {scanCount > 0 ? <>{t('eyeline_today_prefix')}<b>{scanCount.toLocaleString('tr-TR')}</b> {t('hero_eyeline_scans')}</> : t('hero_eyebrow')}
+          <span key={eyelineCountReady && scanCount > 0 ? 'count' : 'eyebrow'} className="eyeline-swap">
+            {eyelineCountReady && scanCount > 0
+              ? <>{t('eyeline_today_prefix')}<b>{scanCount.toLocaleString('tr-TR')}</b> {t('hero_eyeline_scans')}</>
+              : t('hero_eyebrow')}
           </span>
         </div>
 

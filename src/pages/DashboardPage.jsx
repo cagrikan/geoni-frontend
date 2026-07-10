@@ -846,9 +846,9 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                         {audit.result_json && <ChevronRight size={14} strokeWidth={1.5} className="dash-audit-chev" />}
                         <button
                           onClick={(e) => { e.stopPropagation(); rescanAudit(audit) }}
-                          className="dash-audit-delete"
+                          className="dash-audit-rescan"
                           title={t('watchlist_rescan')}
-                        ><RefreshCw size={13} strokeWidth={1.5} /></button>
+                        ><RefreshCw size={12} strokeWidth={1.75} /> {t('rescan_short')}</button>
                         <button
                           onClick={(e) => deleteAudit(e, audit.id)}
                           className="dash-audit-delete"
@@ -933,9 +933,9 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                           ><MessageSquareText size={13} strokeWidth={1.5} /></button>
                           <button
                             onClick={(e) => { e.stopPropagation(); rescanItem(item) }}
-                            className="dash-audit-delete"
+                            className="dash-audit-rescan"
                             title={t('watchlist_rescan')}
-                          ><RefreshCw size={13} strokeWidth={1.5} /></button>
+                          ><RefreshCw size={12} strokeWidth={1.75} /> {t('rescan_short')}</button>
                           <button
                             onClick={(e) => removeWatchlistItem(e, item.id)}
                             className="dash-audit-delete"

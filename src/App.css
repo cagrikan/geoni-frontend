@@ -2949,7 +2949,7 @@ body {
   padding: 32px 36px;
   text-align: left;
   /* geoni.ai .chat-win golgesiyle ayni dil: genis, dagilan yumusak golge */
-  box-shadow: 0 40px 100px rgba(0, 0, 0, .25);
+  box-shadow: 0 40px 100px rgba(0, 0, 0, .33);
 }
 .scan-app__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 24px; }
 .scan-app__title {

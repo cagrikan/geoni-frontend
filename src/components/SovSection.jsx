@@ -28,7 +28,14 @@ export default function SovSection({ sov, t, isPro = false }) {
               {q.mentioned
                 ? <CheckCircle2 size={14} strokeWidth={1.75} style={{ color: 'var(--good)' }} />
                 : <XCircle size={14} strokeWidth={1.75} style={{ color: 'var(--bad)' }} />}
-              <span className="sov__query-text">{q.query}</span>
+              <span className="sov__query-text">
+                {q.query}
+                {q.adjacent && (
+                  <span className="sov__adjacent-tag" title={q.adjacent_topic || ''}>
+                    {t('sov_adjacent_tag')}{q.adjacent_topic ? `: ${q.adjacent_topic}` : ''}
+                  </span>
+                )}
+              </span>
               {q.engines ? (
                 /* Motor bazinda sonuc: Perplexity + Google AI (Overviews esdegeri) */
                 Object.entries(q.engines).map(([eng, st]) => (

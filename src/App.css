@@ -2913,6 +2913,12 @@ body {
 .sov__query-tag--na { background: var(--tint); color: var(--text-muted); }
 .sov__custom-note { font-size: .75rem; color: var(--text-muted); margin-top: 10px; }
 .sov__own-cited { font-size: .75rem; color: var(--text-muted); margin: 6px 0 0; line-height: 1.5; }
+.sov__adjacent-tag {
+  display: inline-block; margin-left: 8px;
+  font-size: .6875rem; font-weight: 600; color: var(--accent);
+  background: var(--accent-dim); border-radius: var(--r-full);
+  padding: 1px 8px; white-space: nowrap; vertical-align: 1px;
+}
 .sov__own-cited--yes { color: var(--good); }
 .sov__competitor--own { border-color: var(--good); color: var(--good); background: var(--good-soft); }
 

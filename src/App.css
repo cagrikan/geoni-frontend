@@ -2912,8 +2912,14 @@ body {
   position: relative;
   max-width: 680px;
   margin: 0 auto;
-  padding: 56px 24px 40px;
+  padding: 32px 24px 48px;
   text-align: center;
+  /* geoni.ai'daki gibi tam sayfa: nav dusuldukten sonra ekrani kaplar,
+     icerik dikeyde ortalanir; alt bolumler kaydirinca gelir */
+  min-height: calc(100vh - 74px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .app-stage::before {
   content: "";

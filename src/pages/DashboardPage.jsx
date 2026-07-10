@@ -13,7 +13,7 @@ import TicketDetailOverlay from '../components/TicketDetailOverlay'
 import {
   Gem, History, Bookmark, Settings, Globe, User, Building2, FileText,
   TrendingUp, TrendingDown, ChevronRight, X, RefreshCw, ShieldCheck, Wrench, ClipboardList,
-  Ticket, Braces, Bot, Landmark, Link2, Search,
+  Ticket, Braces, Bot, Landmark, Link2, Search, MessageSquareText, Plus,
 } from 'lucide-react'
 
 const TICKET_TYPE_ICONS = {
@@ -420,6 +420,59 @@ function DeltaBadge({ delta }) {
   )
 }
 
+/* İzleme v2: kullanıcı tanımlı SOV soruları editörü. Buraya yazılan
+   sorular haftalık otomatik taramada AI motorlarına aynen sorulur
+   (otomatik üretilen kategori sorularının yerine geçer, en çok 3). */
+function WatchlistQueryEditor({ item, t, onSaved }) {
+  const [queries, setQueries] = useState(item.custom_queries || [])
+  const [draft, setDraft] = useState('')
+  const [saving, setSaving] = useState(false)
+
+  const save = async (next) => {
+    setSaving(true)
+    const { error } = await supabase.from('watchlist').update({ custom_queries: next }).eq('id', item.id)
+    if (!error) { setQueries(next); onSaved?.(next) }
+    setSaving(false)
+  }
+
+  const add = () => {
+    const q = draft.trim()
+    if (q.length < 5 || queries.length >= 3) return
+    setDraft('')
+    save([...queries, q])
+  }
+
+  return (
+    <div className="watch-queries" onClick={(e) => e.stopPropagation()}>
+      <div className="watch-queries__head">{t('watchlist_queries_title')}</div>
+      <p className="watch-queries__hint">{t('watchlist_queries_hint')}</p>
+      {queries.length === 0 && <p className="watch-queries__empty">{t('watchlist_queries_empty')}</p>}
+      {queries.map((q, i) => (
+        <div className="watch-queries__row" key={i}>
+          <span>{q}</span>
+          <button type="button" disabled={saving} onClick={() => save(queries.filter((_, j) => j !== i))} title={t('dash_delete_title')}>
+            <X size={12} strokeWidth={1.75} />
+          </button>
+        </div>
+      ))}
+      {queries.length < 3 && (
+        <div className="watch-queries__add">
+          <input
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && add()}
+            placeholder={t('watchlist_queries_placeholder')}
+            maxLength={200}
+          />
+          <button type="button" disabled={saving || draft.trim().length < 5} onClick={add}>
+            <Plus size={13} strokeWidth={2} /> {t('watchlist_queries_add')}
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // Bir taramayı, aynı hedefin (domain/isim) kronolojik geçmişindeki
 // bir öncekiyle karşılaştırıp skor deltasını döndürür.
 function targetKey(audit) {
@@ -437,6 +490,7 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
   const [watchlistLoading, setWatchlistLoading] = useState(true)
   const [selectedIds, setSelectedIds] = useState(new Set())
   const [confirmState, setConfirmState] = useState(null)
+  const [queryEditor, setQueryEditor] = useState(null) // acik ozel-sorgu editorunun watchlist id'si
   const [tab, setTab] = useState(() => {
     try {
       const pending = localStorage.getItem('geoni_pending_tab')
@@ -477,14 +531,16 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
   }
 
   const rescanItem = (item) => {
+    const customQueries = (item.custom_queries || []).length ? item.custom_queries : null
     if (item.type === 'web') {
-      onRescanWeb(item.target?.domain || item.label, user?.email)
+      onRescanWeb(item.target?.domain || item.label, user?.email, false, customQueries)
     } else {
       onRescanBrand({
         type: item.type,
         name: item.target?.name || item.label,
         topic: item.target?.topic || '',
         email: user?.email,
+        custom_queries: customQueries,
       })
     }
   }
@@ -810,8 +866,8 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                     const matchedAudit = key ? latestAuditByTarget[key] : null
                     const TypeIcon = typeIcon[item.type] || FileText
                     return (
+                      <div key={item.id}>
                       <div
-                        key={item.id}
                         className={`dash-audit-row dash-audit-row--watch ${matchedAudit ? 'dash-audit-row--clickable' : ''}`}
                         onClick={() => matchedAudit && onViewAudit && onViewAudit(matchedAudit)}
                         style={{ cursor: matchedAudit ? 'pointer' : 'default' }}
@@ -820,16 +876,26 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                           <span className="dash-audit-ico"><TypeIcon size={14} strokeWidth={1.5} /></span>
                           <div className="dash-audit-info">
                             <div className="dash-audit-name">{item.label}</div>
+                            <div className="dash-audit-sub">
+                              {item.monitor_enabled !== false ? t('watchlist_monitor_badge') : t('watchlist_monitor_off')}
+                              {(item.custom_queries || []).length > 0 && ` · ${(item.custom_queries || []).length} ${t('watchlist_queries_count')}`}
+                            </div>
                           </div>
                         </div>
                         <span className="dash-audit-tag">{typeLabel[item.type]}</span>
                         <div className="dash-audit-score">
+                          {series && series.length >= 2 && <Sparkline points={series.slice(-10)} width={72} height={24} />}
                           {latest ? (
                             <><ScoreBadge score={latest.score} /><DeltaBadge delta={delta} /></>
                           ) : <span className="dash-audit-pending">{t('watchlist_not_scanned_yet')}</span>}
                         </div>
                         <div className="dash-audit-actions">
                           {matchedAudit && <ChevronRight size={14} strokeWidth={1.5} className="dash-audit-chev" />}
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setQueryEditor(queryEditor === item.id ? null : item.id) }}
+                            className={`dash-audit-delete ${queryEditor === item.id ? 'dash-audit-delete--active' : ''}`}
+                            title={t('watchlist_queries_btn')}
+                          ><MessageSquareText size={13} strokeWidth={1.5} /></button>
                           <button
                             onClick={(e) => { e.stopPropagation(); rescanItem(item) }}
                             className="dash-audit-delete"
@@ -841,6 +907,12 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                             title={t('dash_delete_title')}
                           ><X size={13} strokeWidth={1.5} /></button>
                         </div>
+                      </div>
+                      {queryEditor === item.id && (
+                        <WatchlistQueryEditor item={item} t={t} onSaved={(queries) => {
+                          setWatchlist(prev => prev.map(w => w.id === item.id ? { ...w, custom_queries: queries } : w))
+                        }} />
+                      )}
                       </div>
                     )
                   })}

@@ -217,7 +217,7 @@ function AppInner() {
     setError(t('error_query_timeout')); pushView('landing')
   }
 
-  const handleAudit = async (domain, email, isPrivate = false) => {
+  const handleAudit = async (domain, email, isPrivate = false, customQueries = null) => {
     setError(null); setIsSample(false); setIsPrivateResult(isPrivate); setScanKind('site'); setScanTarget(domain); setStatusKey('queued'); setProgressLog([])
     pushView('loading')
     try {
@@ -226,7 +226,7 @@ function AppInner() {
       const res = await fetch(`${API_URL}/api/audit/quick`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ domain, email: email || user?.email || 'anonymous@geoni.ai', competitors: [], lang: language, private: isPrivate }),
+        body: JSON.stringify({ domain, email: email || user?.email || 'anonymous@geoni.ai', competitors: [], lang: language, private: isPrivate, custom_queries: customQueries }),
       })
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || t('error_request_failed'))
       const jobId = (await res.json()).job_id

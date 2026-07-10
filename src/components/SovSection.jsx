@@ -1,6 +1,8 @@
 import { Radar, CheckCircle2, XCircle } from 'lucide-react'
 import ProBlur from '../ProBlur'
 
+const ENGINE_LABELS = { perplexity: 'Perplexity', google: 'Google AI' }
+
 /* Share of Voice (v3): markayi bilmeyen kullanicinin kategori sorgularinda
    marka oneriliyor mu? Ozet satiri herkese acik (satisin kancasi), sorgu
    detaylari ve rakip listesi Pro'ya. */
@@ -27,12 +29,26 @@ export default function SovSection({ sov, t, isPro = false }) {
                 ? <CheckCircle2 size={14} strokeWidth={1.75} style={{ color: 'var(--good)' }} />
                 : <XCircle size={14} strokeWidth={1.75} style={{ color: 'var(--bad)' }} />}
               <span className="sov__query-text">{q.query}</span>
-              <span className={`sov__query-tag ${q.mentioned ? 'sov__query-tag--yes' : 'sov__query-tag--no'}`}>
-                {q.mentioned ? t('sov_mentioned') : t('sov_not_mentioned')}
-              </span>
+              {q.engines ? (
+                /* Motor bazinda sonuc: Perplexity + Google AI (Overviews esdegeri) */
+                Object.entries(q.engines).map(([eng, st]) => (
+                  <span
+                    key={eng}
+                    className={`sov__query-tag ${!st.answered ? 'sov__query-tag--na' : st.mentioned ? 'sov__query-tag--yes' : 'sov__query-tag--no'}`}
+                    title={ENGINE_LABELS[eng] || eng}
+                  >
+                    {ENGINE_LABELS[eng] || eng} {!st.answered ? '—' : st.mentioned ? '✓' : '✗'}
+                  </span>
+                ))
+              ) : (
+                <span className={`sov__query-tag ${q.mentioned ? 'sov__query-tag--yes' : 'sov__query-tag--no'}`}>
+                  {q.mentioned ? t('sov_mentioned') : t('sov_not_mentioned')}
+                </span>
+              )}
             </div>
           ))}
         </div>
+        {sov.custom_queries_used && <p className="sov__custom-note">{t('sov_custom_note')}</p>}
 
         {(sov.competitors || []).length > 0 && (
           <div className="sov__competitors">

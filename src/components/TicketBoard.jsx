@@ -12,7 +12,7 @@ import TicketCard from './TicketCard'
 // sutunlar yerine ust durum sekmeleri + secili duruma ait tam genislikte
 // liste (Linear/Asana mobil deseni) - ikisi de ayni DOM'da, CSS ile
 // gosterilip gizleniyor.
-export default function TicketBoard({ tickets, columns, authedFetch, onCardClick, subtitleFor }) {
+export default function TicketBoard({ tickets, columns, authedFetch, onCardClick, subtitleFor, scrollColumns = false }) {
   const colStatuses = (c) => c.statuses || [c.key]
   const colTicketsOf = (c) => tickets.filter((tk) => colStatuses(c).includes(tk.status))
   const firstNonEmpty = columns.find((c) => colTicketsOf(c).length > 0)?.key || columns[0]?.key
@@ -50,7 +50,7 @@ export default function TicketBoard({ tickets, columns, authedFetch, onCardClick
         })()}
       </div>
 
-      <div className="ticket-board">
+      <div className={`ticket-board ${scrollColumns ? 'ticket-board--scroll' : ''}`}>
         {columns.map((col) => {
           const colTickets = colTicketsOf(col)
           return (

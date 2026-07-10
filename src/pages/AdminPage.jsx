@@ -1401,6 +1401,7 @@ function TicketsAdminTab() {
   const [busyId, setBusyId] = useState(null)
   const [rejectDrafts, setRejectDrafts] = useState({})
   const [selected, setSelected] = useState(null)
+  const [query, setQuery] = useState('')
 
   useEffect(() => { if (tickets) setLocal(tickets) }, [tickets])
   useEffect(() => { authedFetch('/api/admin/experts').then(setExperts).catch(() => setExperts([])) }, [])
@@ -1483,6 +1484,17 @@ function TicketsAdminTab() {
 
   const columns = ADMIN_TICKET_COLUMNS_KEY.map((key) => ({ key, label: t(TICKET_STATUS_KEY_MAP[key]) }))
 
+  // Gercek trafikte kanban tek basina yetmez: #id, hedef, musteri/uzman
+  // e-postasi ve hizmet adina gore hizli filtre (uzman panelindeki desen).
+  const q = query.trim().toLowerCase()
+  const visible = !q ? local : (local || []).filter((tk) =>
+    String(tk.id).includes(q)
+    || (tk.target || '').toLowerCase().includes(q)
+    || (tk.user_email || '').toLowerCase().includes(q)
+    || (tk.expert_email || '').toLowerCase().includes(q)
+    || (tk.ticket_type_name || '').toLowerCase().includes(q)
+  )
+
   return (
     <div className="admin-section">
       <div className="admin-widget">
@@ -1493,7 +1505,18 @@ function TicketsAdminTab() {
         {!local ? <div className="admin-loading admin-loading--widget">{t('admin_loading')}</div> : local.length === 0 ? (
           <div className="admin-empty">{t('admin_tickets_empty')}</div>
         ) : (
-          <TicketBoard tickets={local} columns={columns} authedFetch={authedFetch} onCardClick={openTicket} subtitleFor={(tk) => tk.target || tk.user_email} />
+          <>
+            <div className="admin-search dash-expert-search">
+              <Search size={15} strokeWidth={1.5} />
+              <input
+                type="text"
+                placeholder={t('admin_tickets_search_ph')}
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </div>
+            <TicketBoard tickets={visible} columns={columns} authedFetch={authedFetch} onCardClick={openTicket} subtitleFor={(tk) => tk.target || tk.user_email} scrollColumns />
+          </>
         )}
       </div>
 

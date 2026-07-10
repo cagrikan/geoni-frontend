@@ -2896,6 +2896,13 @@ body {
   max-width: 380px; box-shadow: 0 8px 24px rgba(0,0,0,.15);
 }
 
+/* Admin kanban: cok bilet sutuna sigmaz — sutun icinde dikey kaydirma */
+.ticket-board--scroll .ticket-board__col-body {
+  max-height: 62vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
 /* ===== Rapor: skor istikrari (yumusatilmis skor + oynaklik notu) ===== */
 .results__gauge-col { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .stability { text-align: center; max-width: 240px; }

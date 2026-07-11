@@ -809,6 +809,8 @@ function UserDetailView({ userId, onBack, onChanged }) {
   const [pendingCreditDelta, setPendingCreditDelta] = useState(null)
   const [creditComment, setCreditComment] = useState('')
   const [viewingAuditId, setViewingAuditId] = useState(null)
+  const [pendingRefund, setPendingRefund] = useState(null)
+  const [txListKey, setTxListKey] = useState(0)
 
   const load = useCallback(() => {
     authedFetch(`/api/admin/users/${userId}/detail`)
@@ -832,6 +834,21 @@ function UserDetailView({ userId, onBack, onChanged }) {
       setCreditDraft('')
       setPendingCreditDelta(null)
       setCreditComment('')
+      load(); onChanged?.()
+    } catch (e) { setError(e.message) }
+    setBusy(false)
+  }
+
+  const confirmRefund = async () => {
+    if (!pendingRefund) return
+    setBusy(true)
+    try {
+      await authedFetch('/api/admin/refunds', {
+        method: 'POST',
+        body: JSON.stringify({ transaction_id: String(pendingRefund.id) }),
+      })
+      setPendingRefund(null)
+      setTxListKey((k) => k + 1) // ekstre listesini yeniden yukle
       load(); onChanged?.()
     } catch (e) { setError(e.message) }
     setBusy(false)
@@ -1028,6 +1045,7 @@ function UserDetailView({ userId, onBack, onChanged }) {
                 />
 
                 <PaginatedSubList
+                  key={txListKey}
                   title={t('admin_user_recent_transactions')}
                   fetchPath={`/api/admin/users/${userId}/transactions`}
                   columns={[t('admin_sublist_col_desc'), t('admin_sublist_col_amount'), t('admin_sublist_col_date')]}
@@ -1037,6 +1055,14 @@ function UserDetailView({ userId, onBack, onChanged }) {
                       <span>{tx.description || tx.type}</span>
                       <span>{tx.amount > 0 ? '+' : ''}{tx.amount}</span>
                       <span>{formatDate(tx.created_at)}</span>
+                      {tx.type === 'purchase' && tx.external_id?.startsWith('polar_') && (
+                        <button
+                          type="button"
+                          className="admin-refund-btn"
+                          disabled={busy}
+                          onClick={() => setPendingRefund(tx)}
+                        >{t('admin_refund_btn')}</button>
+                      )}
                     </div>
                   )}
                 />
@@ -1045,6 +1071,19 @@ function UserDetailView({ userId, onBack, onChanged }) {
           </>
         )
       })()}
+
+      {pendingRefund && (
+        <div className="confirm-overlay" onClick={() => !busy && setPendingRefund(null)}>
+          <div className="confirm-dialog" onClick={(e) => e.stopPropagation()}>
+            <div className="confirm-dialog__title">{t('admin_refund_confirm_title', { amount: pendingRefund.amount })}</div>
+            <div className="confirm-dialog__message">{t('admin_refund_confirm_message')}</div>
+            <div className="confirm-dialog__actions">
+              <button type="button" className="confirm-dialog__cancel" disabled={busy} onClick={() => setPendingRefund(null)}>{t('confirm_cancel')}</button>
+              <button type="button" className="confirm-dialog__confirm" disabled={busy} onClick={confirmRefund}>{t('admin_refund_confirm_submit')}</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {pendingCreditDelta !== null && (
         <div className="confirm-overlay" onClick={() => !busy && setPendingCreditDelta(null)}>

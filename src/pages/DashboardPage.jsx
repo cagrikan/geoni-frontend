@@ -844,7 +844,7 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
               <Bookmark size={16} strokeWidth={1.5} /> {t('dash_nav_watchlist')}
             </button>
             <button className={`dash-nav__item ${tab === 'credits' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('credits')}>
-              <Gem size={16} strokeWidth={1.5} /> {t('dash_nav_credits')}
+              <Wallet size={16} strokeWidth={1.5} /> {t('dash_nav_credits')}
             </button>
             <button className={`dash-nav__item ${tab === 'tickets' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('tickets')}>
               <Wrench size={16} strokeWidth={1.5} /> {t('dash_nav_tickets')}

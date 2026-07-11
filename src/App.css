@@ -1701,6 +1701,14 @@ body {
 .dash-buy-btn { border: none; cursor: pointer; font-size: 1rem; width: 100%; }
 .dash-buy-btn:disabled { opacity: .5; cursor: default; }
 
+.admin-refund-btn {
+  background: none; border: 1px solid rgba(229,72,77,.35); color: #e5484d;
+  border-radius: 6px; padding: 3px 10px; font-size: .75rem; font-weight: 600;
+  cursor: pointer; flex-shrink: 0; transition: background .15s;
+}
+.admin-refund-btn:hover { background: rgba(229,72,77,.08); }
+.admin-refund-btn:disabled { opacity: .5; cursor: default; }
+
 /* Cuzdan gorunumu: bakiye karti + paketler + hesap hareketleri (ekstre) */
 .dash-wallet { display: flex; flex-direction: column; gap: 20px; }
 .dash-wallet__pending {

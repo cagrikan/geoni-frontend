@@ -69,11 +69,11 @@ function useAdminFetch(path) {
   return { data, error }
 }
 
-function Widget({ title, hint, path, render }) {
+function Widget({ title, hint, path, render, span }) {
   const { t } = useLanguage()
   const { data, error } = useAdminFetch(path)
   return (
-    <div className="admin-widget">
+    <div className={`admin-widget ${span ? `admin-widget--${span}` : ''}`}>
       {title && <h3 className="admin-section__title">{title}</h3>}
       {hint && <p className="admin-hint">{hint}</p>}
       {error ? <div className="admin-error">{error}</div>
@@ -1259,77 +1259,6 @@ function AuditsTab() {
   )
 }
 
-function PricingTiersWidget() {
-  const { t } = useLanguage()
-  const { data: tiers, error } = useAdminFetch('/api/admin/pricing-tiers')
-  const [local, setLocal] = useState(null)
-  const [form, setForm] = useState({ platform: 'web', min_credits: '', max_credits: '', price_per_credit: '', currency: 'TRY' })
-  const [saving, setSaving] = useState(false)
-
-  useEffect(() => { if (tiers) setLocal(tiers) }, [tiers])
-
-  const addTier = async () => {
-    if (!form.min_credits || !form.price_per_credit) return
-    setSaving(true)
-    try {
-      await authedFetch('/api/admin/pricing-tiers', {
-        method: 'POST',
-        body: JSON.stringify({
-          platform: form.platform,
-          min_credits: Number(form.min_credits),
-          max_credits: form.max_credits ? Number(form.max_credits) : null,
-          price_per_credit: Number(form.price_per_credit),
-          currency: form.currency,
-        }),
-      })
-      setLocal((prev) => [...(prev || []), { id: `tmp-${Date.now()}`, ...form, max_credits: form.max_credits || null }])
-      setForm((f) => ({ ...f, min_credits: '', max_credits: '', price_per_credit: '' }))
-    } catch { /* ignore - kullanici tekrar deneyebilir */ }
-    setSaving(false)
-  }
-
-  const deleteTier = async (id) => {
-    try {
-      await authedFetch(`/api/admin/pricing-tiers/${id}`, { method: 'DELETE' })
-      setLocal((prev) => prev.filter((x) => x.id !== id))
-    } catch { /* ignore */ }
-  }
-
-  if (error) return <div className="admin-error">{error}</div>
-  if (!local) return <div className="admin-loading admin-loading--widget">{t('admin_loading')}</div>
-
-  return (
-    <div className="admin-widget admin-widget--w2">
-      <h3 className="admin-section__title">{t('admin_sales_pricing_tiers')}</h3>
-      <p className="admin-hint">{t('admin_sales_pricing_hint')}</p>
-      <div className="admin-table-wrap">
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>{t('admin_pricing_range')}</th><th>{t('admin_pricing_price')}</th><th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {local.map((tier) => (
-              <tr key={tier.id}>
-                <td>{tier.min_credits} - {tier.max_credits ?? t('admin_pricing_none')}</td>
-                <td>{tier.price_per_credit} {tier.currency}</td>
-                <td><button onClick={() => deleteTier(tier.id)}>{t('admin_pricing_delete')}</button></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="topup-form">
-        <input type="number" placeholder={t('admin_pricing_min')} value={form.min_credits} onChange={(e) => setForm((f) => ({ ...f, min_credits: e.target.value }))} />
-        <input type="number" placeholder={t('admin_pricing_max')} value={form.max_credits} onChange={(e) => setForm((f) => ({ ...f, max_credits: e.target.value }))} />
-        <input type="number" step="0.01" placeholder={t('admin_pricing_price')} value={form.price_per_credit} onChange={(e) => setForm((f) => ({ ...f, price_per_credit: e.target.value }))} />
-        <button disabled={saving || !form.min_credits || !form.price_per_credit} onClick={addTier}>{t('admin_pricing_add')}</button>
-      </div>
-    </div>
-  )
-}
-
 function CampaignsTab() {
   const { t } = useLanguage()
   const { data: campaigns, error } = useAdminFetch('/api/admin/campaigns')
@@ -1644,6 +1573,50 @@ function TicketTypesWidget() {
   )
 }
 
+function PolarProductsWidget() {
+  const { t } = useLanguage()
+  return (
+    <Widget span="w2" title={t('admin_polar_products_title')} hint={t('admin_polar_products_hint')} path="/api/admin/polar/products" render={(data) => (
+      <>
+        <div className="admin-table-wrap">
+          <table className="admin-table">
+            <thead><tr><th>{t('admin_sales_polar_col_product')}</th><th>{t('admin_polar_col_kind')}</th><th>{t('admin_polar_col_price')}</th></tr></thead>
+            <tbody>
+              {data.products.map((p, i) => (
+                <tr key={i}>
+                  <td>{p.name}</td>
+                  <td>{p.kind === 'service' ? t('admin_polar_kind_service') : t('admin_polar_kind_package')}</td>
+                  <td>{p.price.toFixed(2)} {p.currency}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {data.discounts.length > 0 && (
+          <>
+            <div className="admin-subtitle">{t('admin_polar_discounts_title')}</div>
+            <div className="admin-table-wrap">
+              <table className="admin-table">
+                <thead><tr><th>{t('admin_polar_col_code')}</th><th>{t('admin_polar_col_discount')}</th><th>{t('admin_polar_col_scope')}</th><th>{t('admin_polar_col_used')}</th></tr></thead>
+                <tbody>
+                  {data.discounts.map((d, i) => (
+                    <tr key={i}>
+                      <td><strong>{d.code}</strong></td>
+                      <td>{d.label}</td>
+                      <td>{d.products.length > 0 ? d.products.join(', ') : t('admin_polar_scope_all')}</td>
+                      <td>{d.redemptions ?? 0}{d.max_redemptions ? ` / ${d.max_redemptions}` : ''}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+      </>
+    )} />
+  )
+}
+
 function SalesTab() {
   const { t, language } = useLanguage()
   const [days, setDays] = useState(14)
@@ -1766,7 +1739,7 @@ function SalesTab() {
         )}
       </div>
 
-      <PricingTiersWidget />
+      <PolarProductsWidget />
     </div>
   )
 }

@@ -1685,6 +1685,41 @@ function SalesTab() {
       </div>
 
       <div className="admin-widget">
+        <h3 className="admin-section__title">{t('admin_sales_polar_title')}</h3>
+        <p className="admin-hint">{t('admin_sales_polar_hint')}</p>
+        {!data ? <div className="admin-loading admin-loading--widget">{t('admin_loading')}</div> : !data.polar ? (
+          <div className="admin-empty">{t('admin_sales_polar_unavailable')}</div>
+        ) : (
+          <>
+            <div className="admin-stats-grid admin-stats-grid--compact">
+              <StatTile icon={ShoppingCart} label={t('admin_sales_polar_orders')} value={data.polar.order_count} />
+              <StatTile icon={TrendingUp} label={t('admin_sales_polar_gross')} range={data.polar.currency} value={data.polar.gross.toFixed(2)} />
+              <StatTile icon={PiggyBank} label={t('admin_sales_polar_net')} range={data.polar.currency} value={data.polar.net.toFixed(2)} />
+              <StatTile icon={Tag} label={t('admin_sales_polar_discount')} range={data.polar.currency} value={data.polar.discount.toFixed(2)} />
+              <StatTile icon={RotateCcw} label={t('admin_sales_polar_refunded')} range={data.polar.currency} value={data.polar.refunded.toFixed(2)} />
+            </div>
+            {data.polar.recent.length > 0 && (
+              <div className="admin-table-wrap">
+                <table className="admin-table">
+                  <thead><tr><th>{t('admin_table_date')}</th><th>{t('admin_sales_polar_col_product')}</th><th>{t('admin_sales_polar_col_code')}</th><th>{t('admin_table_amount')}</th></tr></thead>
+                  <tbody>
+                    {data.polar.recent.map((o, i) => (
+                      <tr key={i} className={o.status === 'refunded' ? 'admin-row--muted' : ''}>
+                        <td>{new Date(o.created_at).toLocaleDateString(language === 'en' ? 'en-US' : 'tr-TR')}</td>
+                        <td>{o.product}</td>
+                        <td>{o.discount_code || '—'}</td>
+                        <td>{o.total.toFixed(2)} {o.currency}{o.status === 'refunded' ? ` · ${t('admin_sales_polar_refunded_flag')}` : ''}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      <div className="admin-widget">
         <h3 className="admin-section__title">{t('admin_sales_traffic_source')}</h3>
         {!data ? <div className="admin-loading admin-loading--widget">{t('admin_loading')}</div> : (() => {
           const items = Object.entries(data.by_source || {})

@@ -14,6 +14,7 @@ import {
   Gem, History, Bookmark, Settings, Globe, User, Building2, FileText,
   TrendingUp, TrendingDown, ChevronRight, X, RefreshCw, ShieldCheck, Wrench, ClipboardList,
   Ticket, Braces, Bot, Landmark, Link2, Search, MessageSquareText, Plus,
+  Wallet, ArrowDownLeft, ArrowUpRight,
 } from 'lucide-react'
 
 const TICKET_TYPE_ICONS = {
@@ -92,6 +93,124 @@ function BuyCreditsSection({ t }) {
           </div>
         ))}
       </div>
+    </div>
+  )
+}
+
+// Harcama aciklamalari backend'de makine-anahtari olarak tutuluyor
+// (deduct_credits cagrilari) - cuzdan ekstresinde okunur etikete cevrilir.
+const TX_DESCRIPTION_KEYS = {
+  web_audit: 'dash_tx_web_audit',
+  web_audit_private: 'dash_tx_web_audit',
+  person_check: 'dash_tx_person_check',
+  person_check_private: 'dash_tx_person_check',
+  brand_check: 'dash_tx_brand_check',
+  brand_check_private: 'dash_tx_brand_check',
+}
+
+function txLabel(tx, t) {
+  if (tx.type === 'purchase') return t('dash_tx_purchase')
+  const key = TX_DESCRIPTION_KEYS[tx.description]
+  if (key) return t(key)
+  const servicePrefix = 'Bilet satın alma: '
+  if (tx.description?.startsWith(servicePrefix)) {
+    return `${t('dash_tx_service')}: ${tx.description.slice(servicePrefix.length)}`
+  }
+  return tx.description || tx.type
+}
+
+function WalletSection({ t, profile, language, refreshProfile }) {
+  const [txs, setTxs] = useState(null)
+  const [pendingCheckout, setPendingCheckout] = useState(false)
+
+  const loadTxs = () => {
+    authedFetch('/api/me/transactions?limit=20')
+      .then((d) => setTxs(d.items || []))
+      .catch(() => setTxs([]))
+  }
+
+  useEffect(() => { loadTxs() }, [])
+
+  // Polar checkout donusu (?checkout=success): webhook krediyi birkac
+  // saniye icinde yazar - o pencerede "isleniyor" seridi gosterip bakiye
+  // ve ekstreyi tazeliyoruz; parametre URL'den temizlenir ki yenilemede
+  // serit tekrar cikmasin.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('checkout') !== 'success') return
+    setPendingCheckout(true)
+    params.delete('checkout')
+    const qs = params.toString()
+    window.history.replaceState({}, '', window.location.pathname + (qs ? `?${qs}` : ''))
+    let tries = 0
+    const timer = setInterval(() => {
+      tries += 1
+      refreshProfile()
+      loadTxs()
+      if (tries >= 5) { clearInterval(timer); setPendingCheckout(false) }
+    }, 3000)
+    return () => clearInterval(timer)
+  }, [])
+
+  const locale = language === 'tr' ? 'tr-TR' : 'en-US'
+  const fmtDate = (iso) => new Date(iso).toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' })
+
+  return (
+    <div className="dash-wallet">
+      {pendingCheckout && (
+        <div className="dash-wallet__pending">
+          <RefreshCw size={15} strokeWidth={1.5} className="dash-wallet__pending-icon" />
+          {t('dash_wallet_pending')}
+        </div>
+      )}
+      <div className="dash-wallet__card">
+        <div className="dash-wallet__card-head">
+          <Wallet size={18} strokeWidth={1.5} />
+          <span>{t('dash_credits_current')}</span>
+        </div>
+        <div className="dash-wallet__balance">
+          {profile?.credit_balance ?? '—'}
+          <span className="dash-wallet__unit">{t('dash_credit_unit')}</span>
+        </div>
+        <div className="dash-wallet__stats">
+          <span className="dash-wallet__stat dash-wallet__stat--in">
+            <ArrowDownLeft size={14} strokeWidth={1.5} />
+            {t('dash_credits_purchased')} <strong>{profile?.total_credits_purchased ?? 0}</strong>
+          </span>
+          <span className="dash-wallet__stat dash-wallet__stat--out">
+            <ArrowUpRight size={14} strokeWidth={1.5} />
+            {t('dash_credits_spent')} <strong>{profile?.total_credits_spent ?? 0}</strong>
+          </span>
+        </div>
+      </div>
+
+      <BuyCreditsSection t={t} />
+
+      <h3 className="dash-wallet__history-title">
+        <History size={16} strokeWidth={1.5} /> {t('dash_wallet_history')}
+      </h3>
+      {txs === null && <div className="dash-loading">{t('dash_loading')}</div>}
+      {txs !== null && txs.length === 0 && (
+        <div className="dash-wallet__empty">{t('dash_wallet_empty')}</div>
+      )}
+      {txs !== null && txs.length > 0 && (
+        <div className="dash-wallet__txs">
+          {txs.map((tx) => (
+            <div key={tx.id} className="dash-wallet__tx">
+              <div className={`dash-wallet__tx-icon ${tx.amount > 0 ? 'dash-wallet__tx-icon--in' : 'dash-wallet__tx-icon--out'}`}>
+                {tx.amount > 0 ? <ArrowDownLeft size={15} strokeWidth={1.5} /> : <ArrowUpRight size={15} strokeWidth={1.5} />}
+              </div>
+              <div className="dash-wallet__tx-body">
+                <div className="dash-wallet__tx-label">{txLabel(tx, t)}</div>
+                <div className="dash-wallet__tx-date">{fmtDate(tx.created_at)}</div>
+              </div>
+              <div className={`dash-wallet__tx-amount ${tx.amount > 0 ? 'dash-wallet__tx-amount--in' : 'dash-wallet__tx-amount--out'}`}>
+                {tx.amount > 0 ? '+' : ''}{tx.amount}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -481,7 +600,7 @@ function targetKey(audit) {
 }
 
 export default function DashboardPage({ onReset, onNewScan, onViewAudit, onRescanWeb, onRescanBrand, onAdmin }) {
-  const { user, profile, signOut } = useAuth()
+  const { user, profile, signOut, refreshProfile } = useAuth()
   const { t, language } = useLanguage()
   const { theme } = useTheme()
   const [audits, setAudits] = useState([])
@@ -960,17 +1079,7 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
           {tab === 'credits' && (
             <div className="dash-section">
               <h2 className="dash-section__title">{t('dash_credits_title')}</h2>
-              <div className="dash-credit-summary">
-                <div className="dash-credit-big">
-                  <span className="dash-credit-big__val">{profile?.credit_balance ?? '—'}</span>
-                  <span className="dash-credit-big__label">{t('dash_credits_current')}</span>
-                </div>
-                <div className="dash-credit-info">
-                  <div>{t('dash_credits_purchased')} <strong>{profile?.total_credits_purchased ?? 0}</strong></div>
-                  <div>{t('dash_credits_spent')} <strong>{profile?.total_credits_spent ?? 0}</strong></div>
-                </div>
-              </div>
-              <BuyCreditsSection t={t} />
+              <WalletSection t={t} profile={profile} language={language} refreshProfile={refreshProfile} />
             </div>
           )}
 

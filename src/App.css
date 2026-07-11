@@ -1701,6 +1701,68 @@ body {
 .dash-buy-btn { border: none; cursor: pointer; font-size: 1rem; width: 100%; }
 .dash-buy-btn:disabled { opacity: .5; cursor: default; }
 
+/* Cuzdan gorunumu: bakiye karti + paketler + hesap hareketleri (ekstre) */
+.dash-wallet { display: flex; flex-direction: column; gap: 20px; }
+.dash-wallet__pending {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; border-radius: 10px;
+  background: rgba(124,134,245,.1); border: 1px solid rgba(124,134,245,.25);
+  color: var(--text); font-size: .875rem;
+}
+.dash-wallet__pending-icon { animation: dash-wallet-spin 1.2s linear infinite; color: var(--accent); flex-shrink: 0; }
+@keyframes dash-wallet-spin { to { transform: rotate(360deg); } }
+.dash-wallet__card {
+  padding: 24px; border-radius: 16px;
+  background: linear-gradient(135deg, rgba(124,134,245,.12), rgba(124,134,245,.04));
+  border: 1px solid rgba(124,134,245,.2);
+}
+.dash-wallet__card-head {
+  display: flex; align-items: center; gap: 8px;
+  font-size: .8125rem; color: var(--text-muted); margin-bottom: 8px;
+}
+.dash-wallet__balance {
+  font-family: var(--display); font-size: 3rem; font-weight: 700;
+  color: var(--accent); font-variant-numeric: tabular-nums; line-height: 1.1;
+}
+.dash-wallet__unit { font-size: 1rem; font-weight: 500; color: var(--text-muted); margin-left: 8px; }
+.dash-wallet__stats { display: flex; gap: 24px; margin-top: 14px; flex-wrap: wrap; }
+.dash-wallet__stat {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .8125rem; color: var(--text-sub); font-variant-numeric: tabular-nums;
+}
+.dash-wallet__stat--in svg { color: #3fb27f; }
+.dash-wallet__stat--out svg { color: #e5484d; }
+.dash-wallet__history-title {
+  display: flex; align-items: center; gap: 8px; margin: 4px 0 0;
+  font-family: var(--display); font-size: 1rem; font-weight: 600; color: var(--text);
+}
+.dash-wallet__empty { font-size: .875rem; color: var(--text-muted); padding: 12px 0; }
+.dash-wallet__txs {
+  display: flex; flex-direction: column;
+  border: 1px solid var(--border); border-radius: 14px;
+  background: var(--surface); overflow: hidden;
+}
+.dash-wallet__tx {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px; border-bottom: 1px solid var(--border);
+}
+.dash-wallet__tx:last-child { border-bottom: none; }
+.dash-wallet__tx-icon {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.dash-wallet__tx-icon--in { background: rgba(63,178,127,.12); color: #3fb27f; }
+.dash-wallet__tx-icon--out { background: rgba(229,72,77,.1); color: #e5484d; }
+.dash-wallet__tx-body { flex: 1; min-width: 0; }
+.dash-wallet__tx-label { font-size: .875rem; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dash-wallet__tx-date { font-size: .75rem; color: var(--text-muted); margin-top: 2px; }
+.dash-wallet__tx-amount {
+  font-family: var(--display); font-weight: 600; font-size: .9375rem;
+  font-variant-numeric: tabular-nums; flex-shrink: 0;
+}
+.dash-wallet__tx-amount--in { color: #3fb27f; }
+.dash-wallet__tx-amount--out { color: #e5484d; }
+
 .dash-buy-credits { margin-top: 8px; }
 .dash-buy-error { color: #e5484d; font-size: .875rem; margin-bottom: 10px; }
 .dash-buy-credits__grid {

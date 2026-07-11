@@ -1476,6 +1476,22 @@ function TicketsAdminTab() {
           <div className="admin-empty">{t('admin_tickets_empty')}</div>
         ) : (
           <>
+            {(() => {
+              const byStatus = (...st) => local.filter((tk) => st.includes(tk.status)).length
+              const earnedTokens = local
+                .filter((tk) => tk.status === 'verified')
+                .reduce((sum, tk) => sum + (tk.token_cost || 0), 0)
+              return (
+                <div className="admin-stats-grid admin-stats-grid--compact">
+                  <StatTile icon={ScrollText} label={t('admin_tickets_stat_total')} value={local.length} />
+                  <StatTile icon={History} label={t('admin_tickets_stat_open')} value={byStatus('open')} />
+                  <StatTile icon={Wrench} label={t('admin_tickets_stat_active')} value={byStatus('assigned', 'in_progress')} />
+                  <StatTile icon={ShieldAlert} label={t('admin_tickets_stat_submitted')} value={byStatus('submitted', 'disputed')} />
+                  <StatTile icon={Check} label={t('admin_tickets_stat_verified')} value={byStatus('verified')} />
+                  <StatTile icon={Wallet} label={t('admin_tickets_stat_tokens')} range={t('admin_tickets_stat_tokens_range')} value={earnedTokens} />
+                </div>
+              )
+            })()}
             <div className="admin-search dash-expert-search">
               <Search size={15} strokeWidth={1.5} />
               <input

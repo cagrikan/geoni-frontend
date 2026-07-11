@@ -1052,17 +1052,19 @@ function UserDetailView({ userId, onBack, onChanged }) {
                   emptyLabel={t('admin_no_records')}
                   renderRow={(tx) => (
                     <div className="admin-sublist__row" key={tx.id}>
-                      <span>{tx.description || tx.type}</span>
+                      <span>
+                        {tx.description || tx.type}
+                        {tx.type === 'purchase' && tx.external_id?.startsWith('polar_') && (
+                          <button
+                            type="button"
+                            className="admin-refund-btn"
+                            disabled={busy}
+                            onClick={() => setPendingRefund(tx)}
+                          >{t('admin_refund_btn')}</button>
+                        )}
+                      </span>
                       <span>{tx.amount > 0 ? '+' : ''}{tx.amount}</span>
                       <span>{formatDate(tx.created_at)}</span>
-                      {tx.type === 'purchase' && tx.external_id?.startsWith('polar_') && (
-                        <button
-                          type="button"
-                          className="admin-refund-btn"
-                          disabled={busy}
-                          onClick={() => setPendingRefund(tx)}
-                        >{t('admin_refund_btn')}</button>
-                      )}
                     </div>
                   )}
                 />

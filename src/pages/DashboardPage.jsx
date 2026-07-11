@@ -611,6 +611,11 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
   const [confirmState, setConfirmState] = useState(null)
   const [queryEditor, setQueryEditor] = useState(null) // acik ozel-sorgu editorunun watchlist id'si
   const [tab, setTab] = useState(() => {
+    // Polar checkout donusu dogrudan cuzdana insin ki "siparisiniz alindi"
+    // seridi ve yuklenen tokenlar gorunsun (parametreyi WalletSection tuketir).
+    try {
+      if (new URLSearchParams(window.location.search).get('checkout') === 'success') return 'credits'
+    } catch { /* ignore */ }
     try {
       const pending = localStorage.getItem('geoni_pending_tab')
       if (pending) { localStorage.removeItem('geoni_pending_tab'); return pending }

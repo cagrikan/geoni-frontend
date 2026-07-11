@@ -1710,6 +1710,11 @@ body {
   margin-left: 8px; vertical-align: middle;
 }
 .admin-refund-btn:hover { background: rgba(229,72,77,.08); }
+.admin-refunded-tag {
+  margin-left: 8px; vertical-align: middle;
+  font-size: .75rem; font-weight: 600; color: var(--text-muted);
+  border: 1px solid var(--border); border-radius: 6px; padding: 2px 9px;
+}
 .admin-refund-btn:disabled { opacity: .5; cursor: default; }
 
 /* Cuzdan gorunumu: bakiye karti + paketler + hesap hareketleri (ekstre) */

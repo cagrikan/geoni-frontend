@@ -1055,12 +1055,16 @@ function UserDetailView({ userId, onBack, onChanged }) {
                       <span>
                         {tx.description || tx.type}
                         {tx.type === 'purchase' && tx.external_id?.startsWith('polar_') && (
-                          <button
-                            type="button"
-                            className="admin-refund-btn"
-                            disabled={busy}
-                            onClick={() => setPendingRefund(tx)}
-                          >{t('admin_refund_btn')}</button>
+                          tx.refunded
+                            ? <span className="admin-refunded-tag">{t('admin_refunded_tag')}</span>
+                            : (
+                              <button
+                                type="button"
+                                className="admin-refund-btn"
+                                disabled={busy}
+                                onClick={() => setPendingRefund(tx)}
+                              >{t('admin_refund_btn')}</button>
+                            )
                         )}
                       </span>
                       <span>{tx.amount > 0 ? '+' : ''}{tx.amount}</span>

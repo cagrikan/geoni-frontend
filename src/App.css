@@ -2442,15 +2442,27 @@ body {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
   align-items: stretch;
+  /* 2x/3x widget'lar bosluk birakinca 1x'ler geriden dolsun */
+  grid-auto-flow: row dense;
 }
+/* Widget boyut varyantlari: her kutu ayni genislikte olmak zorunda degil.
+   Genis tablolu / cok kutulu widget'lar 2-3 sutun kaplayabilir; --h2 dikeyde
+   iki satir kaplar (yaninda iki kisa widget ust uste dizilir). Spanlar dar
+   ekranlarda sutun sayisini asmayacak sekilde asagida kirpilir. */
+.admin-widget--w2 { grid-column: span 2; }
+.admin-widget--w3 { grid-column: span 3; }
+.admin-widget--h2 { grid-row: span 2; }
 @media (min-width: 1900px) {
   .admin-overview-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 @media (max-width: 900px) {
   .admin-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-widget--w2, .admin-widget--w3 { grid-column: span 2; }
 }
 @media (max-width: 600px) {
   .admin-overview-grid { grid-template-columns: 1fr; }
+  .admin-widget--w2, .admin-widget--w3 { grid-column: span 1; }
+  .admin-widget--h2 { grid-row: auto; }
 }
 .admin-widget {
   background: var(--surface); border: 1px solid var(--border);

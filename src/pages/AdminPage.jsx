@@ -428,7 +428,7 @@ function UsersAndScansWidget() {
   const { data: scans, error: scansError } = useAdminFetch(`/api/admin/stats/scans-daily?days=${days}`)
 
   return (
-    <div className="admin-widget">
+    <div className="admin-widget admin-widget--w2">
       <h3 className="admin-section__title">{t('admin_title_users_scans')}</h3>
       {summaryError && <div className="admin-error">{summaryError}</div>}
       {!summary ? <div className="admin-loading admin-loading--widget">{t('admin_loading')}</div> : (
@@ -1297,7 +1297,7 @@ function PricingTiersWidget() {
   if (!local) return <div className="admin-loading admin-loading--widget">{t('admin_loading')}</div>
 
   return (
-    <div className="admin-widget">
+    <div className="admin-widget admin-widget--w2">
       <h3 className="admin-section__title">{t('admin_sales_pricing_tiers')}</h3>
       <p className="admin-hint">{t('admin_sales_pricing_hint')}</p>
       <div className="admin-table-wrap">
@@ -1649,7 +1649,7 @@ function SalesTab() {
 
   return (
     <div className="admin-section admin-overview-grid">
-      <div className="admin-widget">
+      <div className="admin-widget admin-widget--w2">
         <h3 className="admin-section__title">{t('admin_title_sales')}</h3>
         <p className="admin-hint">{t('admin_sales_hint')}</p>
         {error && <div className="admin-error">{error}</div>}
@@ -1684,7 +1684,7 @@ function SalesTab() {
         })()}
       </div>
 
-      <div className="admin-widget">
+      <div className="admin-widget admin-widget--w2">
         <h3 className="admin-section__title">{t('admin_sales_polar_title')}</h3>
         <p className="admin-hint">{t('admin_sales_polar_hint')}</p>
         {!data ? <div className="admin-loading admin-loading--widget">{t('admin_loading')}</div> : !data.polar ? (

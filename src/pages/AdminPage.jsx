@@ -9,7 +9,6 @@ import BarChart from '../components/BarChart'
 import HBarList from '../components/HBarList'
 import ResultsPage from '../ResultsPage'
 import BrandCheckResultsPage from '../BrandCheckResultsPage'
-import TicketCard from '../components/TicketCard'
 import TicketDetailOverlay from '../components/TicketDetailOverlay'
 import {
   LayoutDashboard, Users, ScrollText, Search, Shield, ShieldOff,
@@ -1525,10 +1524,38 @@ function TicketsAdminTab() {
             {visible.length === 0 ? (
               <div className="admin-empty">{t('admin_tickets_empty')}</div>
             ) : (
-              <div className="admin-ticket-list">
-                {visible.map((tk) => (
-                  <TicketCard key={tk.id} ticket={tk} onClick={() => openTicket(tk)} subtitle={tk.target || tk.user_email} statusLabel={t(TICKET_STATUS_KEY_MAP[tk.status] || tk.status)} />
-                ))}
+              <div className="admin-table-wrap">
+                <table className="admin-table admin-table--tickets">
+                  <thead>
+                    <tr>
+                      <th className="admin-table__left">{t('ticket_detail_no')}</th>
+                      <th className="admin-table__left">{t('admin_sublist_col_type')}</th>
+                      <th className="admin-table__left">{t('admin_table_target')}</th>
+                      <th className="admin-table__left">{t('admin_sublist_col_status')}</th>
+                      <th className="admin-table__num">{t('admin_sublist_col_date')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {visible.map((tk) => (
+                      <tr key={tk.id} className="admin-table__row--clickable" onClick={() => openTicket(tk)}>
+                        <td className="admin-table__left admin-ticket-ref">
+                          {tk.ref_code || `#${tk.id}`}
+                          {tk.has_unread && <span className="ticket-unread-dot" />}
+                        </td>
+                        <td className="admin-table__left admin-table__ellipsis">{tk.ticket_type_name}</td>
+                        <td className="admin-table__left admin-table__ellipsis">{tk.target || tk.user_email || '—'}</td>
+                        <td className="admin-table__left">
+                          <span className={`ticket-status ticket-status--${tk.status}`}>{t(TICKET_STATUS_KEY_MAP[tk.status] || tk.status)}</span>
+                          {tk.tasks_total > 0 && <span className="admin-table__muted"> · {tk.tasks_done}/{tk.tasks_total}</span>}
+                        </td>
+                        <td className="admin-table__num admin-table__muted">
+                          {new Date(tk.created_at).toLocaleDateString(language === 'en' ? 'en-US' : 'tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                          <ChevronRight size={13} strokeWidth={1.5} className="admin-table__row-chevron" />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </>

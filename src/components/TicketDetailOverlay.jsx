@@ -53,6 +53,11 @@ export default function TicketDetailOverlay({ ticket, canEdit, currentUserId, au
   }
   const allDone = progress && progress.done === progress.total
 
+  // Musteriye ic checklist yerine hizmete ozel ust-duzey adimlar gosterilir
+  // (mobil ile ayni); detayli is kirilimi yalnizca admin/uzmanda (canEdit).
+  const stepsRaw = t(`ticket_steps_${ticket.ticket_type_key}`)
+  const customerSteps = stepsRaw && stepsRaw.includes('|') ? stepsRaw.split('|') : []
+
   return (
     <div className="tdo">
       <div className="tdo__topbar">
@@ -131,17 +136,28 @@ export default function TicketDetailOverlay({ ticket, canEdit, currentUserId, au
             </div>
           </div>
 
-          <div className="tdo__block">
-            <h3>{t('ticket_checklist_title')}{progress ? ` — ${progress.done}/${progress.total}` : ''}</h3>
-            <TicketChecklist
-              ticketId={ticket.id}
-              canEdit={canEdit}
-              authedFetch={authedFetch}
-              t={t}
-              bare
-              onProgress={(done, total) => setProgress({ done, total })}
-            />
-          </div>
+          {canEdit ? (
+            <div className="tdo__block">
+              <h3>{t('ticket_checklist_title')}{progress ? ` — ${progress.done}/${progress.total}` : ''}</h3>
+              <TicketChecklist
+                ticketId={ticket.id}
+                canEdit={canEdit}
+                authedFetch={authedFetch}
+                t={t}
+                bare
+                onProgress={(done, total) => setProgress({ done, total })}
+              />
+            </div>
+          ) : customerSteps.length > 0 ? (
+            <div className="tdo__block">
+              <h3>{t('ticket_steps_title')}</h3>
+              <ol className="tdo__steps">
+                {customerSteps.map((s, i) => (
+                  <li key={i}><span className="tdo__steps-num">{i + 1}</span><span>{s}</span></li>
+                ))}
+              </ol>
+            </div>
+          ) : null}
 
           <div className="tdo__block">
             <h3>{t('ticket_detail_details')}</h3>

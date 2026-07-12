@@ -309,6 +309,8 @@ function MyTicketsSection({ t, userId, language }) {
   const [disputeReason, setDisputeReason] = useState('')
   const [disputeBusy, setDisputeBusy] = useState(false)
   const [disputeError, setDisputeError] = useState(null)
+  const [confirmBusy, setConfirmBusy] = useState(false)
+  const [confirmError, setConfirmError] = useState(null)
 
   const load = () => authedFetch('/api/tickets').then(setMyTickets).catch(() => setMyTickets([]))
   useEffect(() => { load() }, [])
@@ -336,10 +338,31 @@ function MyTicketsSection({ t, userId, language }) {
     setDisputeBusy(false)
   }
 
+  const submitConfirm = async () => {
+    setConfirmBusy(true)
+    setConfirmError(null)
+    try {
+      await authedFetch(`/api/tickets/${selected.id}/confirm`, { method: 'POST' })
+      setSelected((s) => ({ ...s, status: 'verified' }))
+      load()
+    } catch (e) { setConfirmError(e.message) }
+    setConfirmBusy(false)
+  }
+
   if (selected) {
+    // Teslim onayi: is teslim edildiyse (submitted) musteri "tamam aldim"
+    // deyip talebi kapatir (verified). Sorun olursa sonra itiraz eder.
     // Itiraz hakki: yalnizca onaylanmis iste - admin karari olmadan is
     // kapanmis sayilmaz ama musteri memnuniyetsizligini kayda gecirebilir.
-    const extra = selected.status === 'verified' ? (
+    const extra = selected.status === 'submitted' ? (
+      <div className="ticket-confirm">
+        <p className="ticket-confirm__hint">{t('ticket_confirm_hint')}</p>
+        {confirmError && <div className="dash-buy-error">{confirmError}</div>}
+        <button type="button" className="ticket-confirm__submit" disabled={confirmBusy} onClick={submitConfirm}>
+          {t('ticket_confirm_cta')}
+        </button>
+      </div>
+    ) : selected.status === 'verified' ? (
       <div className="ticket-dispute">
         {!disputeOpen ? (
           <button type="button" className="ticket-dispute__open" onClick={() => setDisputeOpen(true)}>

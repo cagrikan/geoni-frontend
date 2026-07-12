@@ -9,7 +9,7 @@ import BarChart from '../components/BarChart'
 import HBarList from '../components/HBarList'
 import ResultsPage from '../ResultsPage'
 import BrandCheckResultsPage from '../BrandCheckResultsPage'
-import TicketBoard from '../components/TicketBoard'
+import TicketCard from '../components/TicketCard'
 import TicketDetailOverlay from '../components/TicketDetailOverlay'
 import {
   LayoutDashboard, Users, ScrollText, Search, Shield, ShieldOff,
@@ -38,9 +38,16 @@ async function authedFetch(path, options = {}) {
   return res.json()
 }
 
-function StatTile({ label, value, icon: Icon, range }) {
+function StatTile({ label, value, icon: Icon, range, onClick, active }) {
+  const clickable = typeof onClick === 'function'
   return (
-    <div className="admin-stat">
+    <div
+      className={`admin-stat ${clickable ? 'admin-stat--clickable' : ''} ${active ? 'admin-stat--active' : ''}`}
+      onClick={onClick}
+      role={clickable ? 'button' : undefined}
+      tabIndex={clickable ? 0 : undefined}
+      onKeyDown={clickable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick() } } : undefined}
+    >
       <div className="admin-stat__value">{value}</div>
       <div className="admin-stat__label">
         {Icon && <Icon size={12} strokeWidth={1.75} className="admin-stat__icon" />}
@@ -1376,6 +1383,9 @@ function TicketsAdminTab() {
   const [rejectDrafts, setRejectDrafts] = useState({})
   const [selected, setSelected] = useState(null)
   const [query, setQuery] = useState('')
+  // Tiklanan stat kutusuna gore durum filtresi. Kanban yerine bu filtreli
+  // liste gosterilir. 'all' | 'open' | 'active' | 'submitted' | 'verified'.
+  const [filterKey, setFilterKey] = useState('all')
 
   useEffect(() => { if (tickets) setLocal(tickets) }, [tickets])
   useEffect(() => { authedFetch('/api/admin/experts').then(setExperts).catch(() => setExperts([])) }, [])
@@ -1456,18 +1466,25 @@ function TicketsAdminTab() {
     )
   }
 
-  const columns = ADMIN_TICKET_COLUMNS_KEY.map((key) => ({ key, label: t(TICKET_STATUS_KEY_MAP[key]) }))
 
   // Gercek trafikte kanban tek basina yetmez: #id, hedef, musteri/uzman
   // e-postasi ve hizmet adina gore hizli filtre (uzman panelindeki desen).
+  const FILTER_STATUSES = {
+    all: null, open: ['open'], active: ['assigned', 'in_progress'],
+    submitted: ['submitted', 'disputed'], verified: ['verified'],
+  }
   const q = query.trim().toLowerCase()
-  const visible = !q ? local : (local || []).filter((tk) =>
-    String(tk.id).includes(q)
-    || (tk.target || '').toLowerCase().includes(q)
-    || (tk.user_email || '').toLowerCase().includes(q)
-    || (tk.expert_email || '').toLowerCase().includes(q)
-    || (tk.ticket_type_name || '').toLowerCase().includes(q)
-  )
+  const wantStatuses = FILTER_STATUSES[filterKey]
+  const visible = (local || []).filter((tk) => {
+    if (wantStatuses && !wantStatuses.includes(tk.status)) return false
+    if (!q) return true
+    return String(tk.id).includes(q)
+      || (tk.ref_code || '').toLowerCase().includes(q)
+      || (tk.target || '').toLowerCase().includes(q)
+      || (tk.user_email || '').toLowerCase().includes(q)
+      || (tk.expert_email || '').toLowerCase().includes(q)
+      || (tk.ticket_type_name || '').toLowerCase().includes(q)
+  })
 
   return (
     <div className="admin-section">
@@ -1487,11 +1504,11 @@ function TicketsAdminTab() {
                 .reduce((sum, tk) => sum + (tk.token_cost || 0), 0)
               return (
                 <div className="admin-stats-grid admin-stats-grid--compact">
-                  <StatTile icon={ScrollText} label={t('admin_tickets_stat_total')} value={local.length} />
-                  <StatTile icon={History} label={t('admin_tickets_stat_open')} value={byStatus('open')} />
-                  <StatTile icon={Wrench} label={t('admin_tickets_stat_active')} value={byStatus('assigned', 'in_progress')} />
-                  <StatTile icon={ShieldAlert} label={t('admin_tickets_stat_submitted')} value={byStatus('submitted', 'disputed')} />
-                  <StatTile icon={Check} label={t('admin_tickets_stat_verified')} value={byStatus('verified')} />
+                  <StatTile icon={ScrollText} label={t('admin_tickets_stat_total')} value={local.length} onClick={() => setFilterKey('all')} active={filterKey === 'all'} />
+                  <StatTile icon={History} label={t('admin_tickets_stat_open')} value={byStatus('open')} onClick={() => setFilterKey('open')} active={filterKey === 'open'} />
+                  <StatTile icon={Wrench} label={t('admin_tickets_stat_active')} value={byStatus('assigned', 'in_progress')} onClick={() => setFilterKey('active')} active={filterKey === 'active'} />
+                  <StatTile icon={ShieldAlert} label={t('admin_tickets_stat_submitted')} value={byStatus('submitted', 'disputed')} onClick={() => setFilterKey('submitted')} active={filterKey === 'submitted'} />
+                  <StatTile icon={Check} label={t('admin_tickets_stat_verified')} value={byStatus('verified')} onClick={() => setFilterKey('verified')} active={filterKey === 'verified'} />
                   <StatTile icon={Wallet} label={t('admin_tickets_stat_tokens')} range={t('admin_tickets_stat_tokens_range')} value={earnedTokens} />
                 </div>
               )
@@ -1505,12 +1522,18 @@ function TicketsAdminTab() {
                 onChange={(e) => setQuery(e.target.value)}
               />
             </div>
-            <TicketBoard tickets={visible} columns={columns} authedFetch={authedFetch} onCardClick={openTicket} subtitleFor={(tk) => tk.target || tk.user_email} scrollColumns />
+            {visible.length === 0 ? (
+              <div className="admin-empty">{t('admin_tickets_empty')}</div>
+            ) : (
+              <div className="admin-ticket-list">
+                {visible.map((tk) => (
+                  <TicketCard key={tk.id} ticket={tk} onClick={() => openTicket(tk)} subtitle={tk.target || tk.user_email} statusLabel={t(TICKET_STATUS_KEY_MAP[tk.status] || tk.status)} />
+                ))}
+              </div>
+            )}
           </>
         )}
       </div>
-
-      <TicketTypesWidget />
     </div>
   )
 }

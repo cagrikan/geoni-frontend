@@ -2173,6 +2173,12 @@ body {
 }
 .admin-stat__icon { flex-shrink: 0; opacity: .7; margin-top: .15em; }
 .admin-stat__range { font-size: .75rem; color: var(--text-muted); opacity: .75; margin-top: 3px; }
+.admin-stat--clickable { cursor: pointer; transition: border-color .12s, background .12s; }
+.admin-stat--clickable:hover { border-color: var(--border-mid); }
+.admin-stat--active { border-color: var(--accent); background: var(--accent-bg, rgba(99,102,241,.08)); }
+.admin-stat--active .admin-stat__value { color: var(--accent); }
+.admin-ticket-list { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+.admin-ticket-list .ticket-card__id { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
 .admin-search {
   display: flex; align-items: center; gap: 8px;

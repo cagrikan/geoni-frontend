@@ -11,7 +11,7 @@ const TICKET_TYPE_ICONS = {
 /* Ilerleme artik listeleme yanitindan geliyor (tasks_done/tasks_total) -
    eskiden her kart kendi /tasks istegini atiyordu, pano N bilet icin N
    yetki-kontrollu istek bekliyordu. */
-export default function TicketCard({ ticket, onClick, subtitle }) {
+export default function TicketCard({ ticket, onClick, subtitle, statusLabel }) {
   const Icon = TICKET_TYPE_ICONS[ticket.ticket_type_key] || Wrench
   const total = ticket.tasks_total || 0
   const done = ticket.tasks_done || 0
@@ -23,7 +23,10 @@ export default function TicketCard({ ticket, onClick, subtitle }) {
         {ticket.has_unread && <span className="ticket-unread-dot" />}
       </div>
       <div className="ticket-card__body">
-        <span className="ticket-card__id">{ticket.ref_code || `#${ticket.id}`}</span>
+        <span className="ticket-card__id">
+          {ticket.ref_code || `#${ticket.id}`}
+          {statusLabel && <span className={`ticket-status ticket-status--${ticket.status}`}>{statusLabel}</span>}
+        </span>
         <div className="ticket-card__name">{ticket.ticket_type_name}</div>
         <div className="ticket-card__sub">{subtitle || ticket.target || '\u2014'}</div>
         {total > 0 && (

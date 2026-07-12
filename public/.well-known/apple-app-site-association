@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "2Y6PBTM588.ai.geoni.app",
+        "paths": ["/r/*"]
+      }
+    ]
+  }
+}

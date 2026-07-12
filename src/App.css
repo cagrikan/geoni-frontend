@@ -3060,7 +3060,7 @@ body {
   background: var(--tint); border: 1px solid var(--border);
   padding: 3px 10px; border-radius: var(--r-full); white-space: nowrap;
 }
-.app-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; }
+.app-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px; }
 .app-tab {
   padding: 16px 12px; border-radius: var(--r-md);
   border: 1px solid var(--border-mid); background: var(--landing-bg);
@@ -3100,8 +3100,10 @@ body {
   .app-slogan { font-size: 1.25rem; }
   .scan-app { padding: 22px 18px; }
   .scan-app__title { font-size: 1.25rem; }
+  .app-tabs { gap: 6px; }
   .app-tab small { display: none; }
-  .app-tab { padding: 12px 8px; font-size: .8125rem; }
+  .app-tab { padding: 12px 6px; font-size: .8125rem; }
+  .app-tab__ico { width: 30px; height: 30px; margin-bottom: 6px; }
 }
 
 /* ===== Rapor: skor istikrari (yumusatilmis skor + oynaklik notu) ===== */

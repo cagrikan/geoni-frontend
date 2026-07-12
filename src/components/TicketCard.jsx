@@ -23,7 +23,7 @@ export default function TicketCard({ ticket, onClick, subtitle }) {
         {ticket.has_unread && <span className="ticket-unread-dot" />}
       </div>
       <div className="ticket-card__body">
-        <span className="ticket-card__id">#{ticket.id}</span>
+        <span className="ticket-card__id">{ticket.ref_code || `#${ticket.id}`}</span>
         <div className="ticket-card__name">{ticket.ticket_type_name}</div>
         <div className="ticket-card__sub">{subtitle || ticket.target || '\u2014'}</div>
         {total > 0 && (

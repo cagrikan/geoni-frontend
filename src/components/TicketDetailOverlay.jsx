@@ -25,9 +25,10 @@ export default function TicketDetailOverlay({ ticket, canEdit, currentUserId, au
 
   const Icon = TICKET_TYPE_ICONS[ticket.ticket_type_key] || Wrench
 
+  const refCode = ticket.ref_code || `BILET-${ticket.id}`
   const copyId = () => {
     try {
-      navigator.clipboard.writeText(`BILET-${ticket.id}`)
+      navigator.clipboard.writeText(refCode)
       setCopied(true)
       setTimeout(() => setCopied(false), 1500)
     } catch { /* pano erisimi engellenmis olabilir */ }
@@ -65,7 +66,7 @@ export default function TicketDetailOverlay({ ticket, canEdit, currentUserId, au
           <ArrowLeft size={15} strokeWidth={1.75} /> {contextLabel || t('ticket_detail_back')}
         </button>
         <span className="tdo__id">
-          BILET-{ticket.id}
+          {refCode}
           <button type="button" className="tdo__copy" onClick={copyId} title={t('ticket_detail_copy')}>
             {copied ? <Check size={12} strokeWidth={2} /> : <Copy size={12} strokeWidth={1.75} />}
           </button>
@@ -163,7 +164,7 @@ export default function TicketDetailOverlay({ ticket, canEdit, currentUserId, au
             <h3>{t('ticket_detail_details')}</h3>
             <div className="tdo__kv"><span>{t('ticket_detail_expert')}</span><span>{ticket.ticket_type_key === 'llms_robots' && !ticket.assigned_expert_id ? t('ticket_expert_auto') : (ticket.expert_email || '—')}</span></div>
             <div className="tdo__kv"><span>{t('dash_credit_unit')}</span><span>{ticket.token_cost}</span></div>
-            <div className="tdo__kv"><span>{t('ticket_detail_no')}</span><span>#{ticket.id}</span></div>
+            <div className="tdo__kv"><span>{t('ticket_detail_no')}</span><span>{refCode}</span></div>
           </div>
         </aside>
       </div>

@@ -102,6 +102,20 @@ export default function TicketDetailOverlay({ ticket, canEdit, currentUserId, au
             {extraActions}
           </div>
 
+          {attachments.length > 0 && (
+            <div className="tdo__block tdo__block--files">
+              <h3>{t('ticket_detail_files')}</h3>
+              <div className="tdo__files">
+                {attachments.map((m) => (
+                  <a key={m.id} href={m.attachment_url} target="_blank" rel="noopener noreferrer" download>
+                    <FileText size={15} strokeWidth={1.6} />
+                    <span>{m.attachment_name || t('ticket_thread_attachment')}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="tdo__block">
             <h3>{t('ticket_detail_process')}</h3>
             <div className="tdo__tl">
@@ -128,19 +142,6 @@ export default function TicketDetailOverlay({ ticket, canEdit, currentUserId, au
               onProgress={(done, total) => setProgress({ done, total })}
             />
           </div>
-
-          {attachments.length > 0 && (
-            <div className="tdo__block">
-              <h3>{t('ticket_detail_files')}</h3>
-              <div className="tdo__files">
-                {attachments.map((m) => (
-                  <a key={m.id} href={m.attachment_url} target="_blank" rel="noopener noreferrer">
-                    <FileText size={13} strokeWidth={1.5} /> {m.attachment_name || t('ticket_thread_attachment')}
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
 
           <div className="tdo__block">
             <h3>{t('ticket_detail_details')}</h3>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Globe, User, Building2, ScanSearch, GitCompareArrows, Award, EyeOff, Wrench } from 'lucide-react'
+import { Globe, User, Building2, ScanSearch, GitCompareArrows, Award, EyeOff, Wrench, AtSign } from 'lucide-react'
 import GeoniMark from './GeoniMark'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import ThemeSwitcher from './components/ThemeSwitcher'
@@ -11,7 +11,7 @@ const SITE_LAST_STEP = 1
 const PERSON_LAST_STEP = 3
 const BRAND_LAST_STEP = 2
 
-export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading = false, statusText = '', error, user, onDashboard, onLogin, onViewSample }) {
+export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, onSubmitSocial, loading = false, statusText = '', error, user, onDashboard, onLogin, onViewSample }) {
   const { t } = useLanguage()
   // Slogan havuzu: her sayfa acilisinda rastgele biri (mount basina sabit)
   const [sloganNo] = useState(() => Math.floor(Math.random() * 5) + 1)
@@ -43,6 +43,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
     { key: 'site', icon: Globe, title: t('mode_site') },
     { key: 'person', icon: User, title: t('mode_person') },
     { key: 'brand', icon: Building2, title: t('mode_brand') },
+    { key: 'social', icon: AtSign, title: t('mode_social') },
   ]
 
   const HOW_STEPS = [
@@ -87,8 +88,21 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
   const [brandWebsite, setBrandWebsite] = useState('')
   const [brandEmail, setBrandEmail]   = useState('')
 
+  // social (tek adim, anonim - giris gerekmez, funnel)
+  const [socialHandle, setSocialHandle] = useState('')
+  const [socialNiche, setSocialNiche]   = useState('')
+  const [socialEmail, setSocialEmail]   = useState('')
+
   const handleSubmit = (e) => {
     e.preventDefault()
+    // Sosyal: tek adim, ANONIM (giris gerekmez - funnel). Mevcut akislari
+    // etkilememek icin en basta ele alinir.
+    if (mode === 'social') {
+      const h = socialHandle.trim().replace(/^@/, '')
+      if (h.length < 2 || !socialEmail.trim()) return
+      onSubmitSocial?.({ handle: h, niche: socialNiche.trim(), email: socialEmail.trim() })
+      return
+    }
     if (mode === 'site') {
       if (step === 0 && !domain) return
       if (step < SITE_LAST_STEP) { setStep(s => s + 1); return }
@@ -357,6 +371,29 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, loading
                   {step > 0 && <button type="button" className="wizard-back" onClick={() => setStep(s => s - 1)}>{t('wizard_back')}</button>}
                   <button type="submit" className="landing__submit" disabled={loading}>
                     {loading ? statusText + '…' : step < BRAND_LAST_STEP ? t('wizard_next') : !user ? `${t('nav_login')} →` : t('submit_brand')}
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* ── SOSYAL (tek adim, anonim) ── */}
+            {mode === 'social' && (
+              <>
+                <div className="landing__field landing__field--hero">
+                  <label htmlFor="social-handle">{t('field_social_handle_label')}</label>
+                  <input id="social-handle" type="text" placeholder={t('field_social_handle_placeholder')} value={socialHandle} onChange={e => setSocialHandle(e.target.value)} disabled={loading} required autoFocus />
+                </div>
+                <div className="landing__field">
+                  <label htmlFor="social-niche">{t('field_social_niche_label')}</label>
+                  <input id="social-niche" type="text" placeholder={t('field_social_niche_placeholder')} value={socialNiche} onChange={e => setSocialNiche(e.target.value)} disabled={loading} />
+                </div>
+                <div className="landing__field">
+                  <label htmlFor="social-email">{t('field_site_email_label')}</label>
+                  <input id="social-email" type="email" placeholder={t('field_email_placeholder')} value={socialEmail} onChange={e => setSocialEmail(e.target.value)} disabled={loading} required />
+                </div>
+                <div className="wizard-nav">
+                  <button type="submit" className="landing__submit" disabled={loading}>
+                    {loading ? statusText + '…' : t('submit_site')}
                   </button>
                 </div>
               </>

@@ -323,6 +323,33 @@ function AppInner() {
     } catch (err) { setError(err.message || t('error_connection')); pushView('landing') }
   }
 
+  const handleSocialCheck = async ({ handle, niche, email }) => {
+    // Anonim sosyal gorunurluk taramasi (giris gerekmez). /api/social-check
+    // marka-recall motorunu @handle + nis ile calistirir; sonuc brand-check
+    // sekliyle doner, ayni ekranlarda gosterilir.
+    setError(null); setIsPrivateResult(false); setScanKind('brand'); setScanTarget('@' + handle); setProgressLog([])
+    pushView('loading')
+    try {
+      const res = await fetch(`${API_URL}/api/social-check`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ handle, niche, email, lang: language }),
+      })
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || t('error_request_failed'))
+      const data = await res.json()
+      let es
+      try {
+        es = new EventSource(`${API_URL}/api/brand-check/${data.job_id}/stream`)
+        es.onmessage = (evt) => {
+          try { const p = JSON.parse(evt.data); if (p.message) setProgressLog(prev => [...prev, p.message]); if (p.done) es.close() } catch { /* ignore */ }
+        }
+        es.onerror = () => es.close()
+      } catch { /* polling yeterli */ }
+      await pollBrandJob(data.job_id, 'brand')
+      es?.close()
+    } catch (err) { setError(err.message || t('error_connection')); pushView('landing') }
+  }
+
   const handleReset = () => { setResult(null); setBrandResult(null); setError(null); setIsSample(false); setIsPrivateResult(false); navigateTo('landing') }
 
   const handleViewSample = () => {
@@ -377,6 +404,7 @@ function AppInner() {
         <LandingPage
           onSubmitAudit={handleAudit}
           onSubmitBrandCheck={handleBrandCheck}
+          onSubmitSocial={handleSocialCheck}
           error={error}
           user={user}
           onDashboard={() => navigateTo('dashboard')}

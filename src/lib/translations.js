@@ -33,6 +33,7 @@ export const translations = {
     tab_desc_site: 'Alan adınızı tarayın',
     tab_desc_person: 'Kişisel marka',
     tab_desc_brand: 'Şirket / ürün',
+    tab_desc_social: 'AI seni öneriyor mu?',
     trust_free: 'Ücretsiz',
     scan_trust_line: 'Kredi kartı gerekmez · Skorunuz, her AI motorundaki erişim durumunuz ve size özel eksik listesi',
     underlink_how: 'Nasıl çalışır?',
@@ -47,6 +48,11 @@ export const translations = {
     mode_site: 'Web Sitesi',
     mode_person: 'Kişi',
     mode_brand: 'Marka / Şirket',
+    mode_social: 'Sosyal',
+    field_social_handle_label: 'Kullanıcı adınız (@handle)',
+    field_social_handle_placeholder: 'ör. geoni',
+    field_social_niche_label: 'Niş / konu',
+    field_social_niche_placeholder: 'ör. yapay zeka görünürlüğü',
 
     // ── Wizard: adım başlıkları ──
     step_title_contact: 'İletişim Bilginiz',
@@ -677,6 +683,7 @@ export const translations = {
     tab_desc_site: 'Scan your domain',
     tab_desc_person: 'Personal brand',
     tab_desc_brand: 'Company / product',
+    tab_desc_social: 'Does AI recommend you?',
     trust_free: 'Free',
     scan_trust_line: 'No credit card · Your score, per-engine access status and your personal gap list',
     underlink_how: 'How does it work?',
@@ -691,6 +698,11 @@ export const translations = {
     mode_site: 'Website',
     mode_person: 'Person',
     mode_brand: 'Brand / Company',
+    mode_social: 'Social',
+    field_social_handle_label: 'Your handle (@handle)',
+    field_social_handle_placeholder: 'e.g. geoni',
+    field_social_niche_label: 'Niche / topic',
+    field_social_niche_placeholder: 'e.g. AI visibility',
 
     // ── Wizard: step titles ──
     step_title_contact: 'Contact Information',

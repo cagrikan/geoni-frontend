@@ -4,122 +4,141 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="index,follow" />
-<title>Gizlilik Politikası — GEONI</title>
+<title>Gizlilik Politikası / Privacy Policy — GEONI</title>
 <style>
   :root { --ink:#1a1723; --muted:#6b6375; --accent:#8a2be2; --line:#e9e6ef; --bg:#ffffff; }
   * { box-sizing:border-box; }
   body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
-  .wrap { max-width:760px; margin:0 auto; padding:48px 22px 96px; }
-  header { border-bottom:1px solid var(--line); padding-bottom:20px; margin-bottom:32px; }
+  .wrap { max-width:760px; margin:0 auto; padding:40px 22px 96px; }
+  header { display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--line); padding-bottom:18px; margin-bottom:28px; }
   .brand { font-weight:800; font-size:20px; letter-spacing:-.4px; }
   .brand span { color:var(--accent); }
+  .lang button { border:1px solid var(--line); background:#fff; color:var(--muted); font-weight:700; font-size:13px; padding:6px 12px; border-radius:999px; cursor:pointer; margin-left:6px; }
+  .lang button.on { background:var(--accent); color:#fff; border-color:var(--accent); }
   h1 { font-size:30px; letter-spacing:-.6px; margin:.4em 0 .2em; }
   h2 { font-size:19px; letter-spacing:-.3px; margin:2em 0 .4em; }
   .updated { color:var(--muted); font-size:14px; }
   p, li { color:#2c2833; }
   a { color:var(--accent); }
-  ul { padding-left:20px; }
-  li { margin:.3em 0; }
+  ul { padding-left:20px; } li { margin:.3em 0; }
   .note { background:#f6f3fb; border:1px solid var(--line); border-radius:12px; padding:14px 16px; font-size:14px; color:var(--muted); }
   footer { margin-top:48px; border-top:1px solid var(--line); padding-top:18px; color:var(--muted); font-size:13px; }
-  code { background:#f2eefb; padding:1px 6px; border-radius:6px; font-size:14px; }
+  [data-lang]{ display:none; } [data-lang].show{ display:block; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <div class="brand">geo<span>ni</span></div>
+    <div class="lang">
+      <button id="btn-tr" onclick="setLang('tr')">TR</button>
+      <button id="btn-en" onclick="setLang('en')">EN</button>
+    </div>
   </header>
 
-  <h1>Gizlilik Politikası</h1>
-  <p class="updated">Son güncelleme: 12 Temmuz 2026</p>
+  <!-- ================= TR ================= -->
+  <div data-lang="tr">
+    <h1>Gizlilik Politikası</h1>
+    <p class="updated">Son güncelleme: 12 Temmuz 2026</p>
+    <p>GEONI ("GEONI", "biz"), yapay zeka arama motorlarındaki (ChatGPT, Gemini, Perplexity, Claude) görünürlüğünüzü ölçen bir hizmettir. Bu politika, GEONI mobil uygulaması ve <a href="https://geoni.ai">geoni.ai</a> üzerinden hangi kişisel verileri işlediğimizi, nasıl kullandığımızı ve haklarınızı açıklar.</p>
+    <div class="note">Not: Bu metin, hizmetin fiili veri işleme pratiklerine göre hazırlanmıştır. Şirket unvanı, adres ve iletişim bilgilerini kendi bilgilerinizle güncelleyin ve yayınlamadan önce bir hukuk danışmanına gözden geçirtin.</div>
+    <h2>1. İşlediğimiz veriler</h2>
+    <ul>
+      <li><b>Hesap bilgileri:</b> Apple veya Google ile giriş yaptığınızda ad ve e-posta adresiniz.</li>
+      <li><b>Tarama verileri:</b> Girdiğiniz hedefler (web sitesi, kişi/marka adı, sosyal hesap, konu ve isteğe bağlı bağlam) ve üretilen sonuç raporları.</li>
+      <li><b>Kullanım ve cihaz verileri:</b> Uygulama içi etkileşimler, cihaz türü ve —izin verirseniz— anonim push bildirim jetonu.</li>
+      <li><b>Satın alma kayıtları:</b> Token/hizmet alımlarının işlem kayıtları. Kart/ödeme bilgilerinizi <b>biz görmeyiz</b> — ödemeler Apple veya web'de ödeme sağlayıcısı tarafından işlenir.</li>
+    </ul>
+    <h2>2. Verileri ne için kullanırız</h2>
+    <ul>
+      <li>Talep ettiğiniz taramaları çalıştırmak ve sonuçları göstermek.</li>
+      <li>Hesabınızı, token bakiyenizi ve satın almalarınızı yönetmek.</li>
+      <li>İzlemeye aldığınız hedefleri düzenli ölçüp skor değişimlerinde bildirim göndermek.</li>
+      <li>Hizmeti geliştirmek, kötüye kullanımı önlemek ve yasal yükümlülükleri yerine getirmek.</li>
+    </ul>
+    <h2>3. Verilerin paylaşıldığı hizmet sağlayıcılar</h2>
+    <p>Hizmeti sunmak için verileriniz aşağıdaki sağlayıcılarla, yalnızca gerektiği ölçüde paylaşılır:</p>
+    <ul>
+      <li><b>Supabase</b> — kimlik doğrulama ve veritabanı.</li>
+      <li><b>Apple</b> — uygulama içi satın alma ve "Apple ile Giriş"; <b>Google</b> — "Google ile Giriş".</li>
+      <li><b>RevenueCat</b> — uygulama içi satın alma yönetimi.</li>
+      <li><b>Yapay zeka sağlayıcıları</b> — taramaları çalıştırmak için: OpenAI, Anthropic, Google (Gemini), Perplexity ve web arama sağlayıcıları.</li>
+      <li><b>Resend</b> — e-posta bildirimleri. <b>AWS & Vercel</b> — sunucu ve barındırma.</li>
+    </ul>
+    <p>Verilerinizi reklam amacıyla satmayız.</p>
+    <h2>4. Ödemeler</h2>
+    <p>Uygulama içi satın almalar Apple'ın sistemiyle; web satın almaları bir Merchant-of-Record sağlayıcısıyla işlenir. GEONI kart numaranıza erişmez.</p>
+    <h2>5. Saklama süresi</h2>
+    <p>Verilerinizi hesabınız etkin olduğu sürece ve yasal yükümlülükler gerektirdiği müddetçe saklarız. Hesabınızı sildiğinizde ilişkili kişisel verileriniz makul sürede silinir veya anonimleştirilir.</p>
+    <h2>6. Haklarınız</h2>
+    <p>KVKK (Türkiye) ve GDPR (AB) kapsamında verilerinize erişme, düzeltme, silme ve işlemeye itiraz etme haklarına sahipsiniz. Uygulama içinden hesabınızı silebilir veya <a href="mailto:destek@geoni.ai">destek@geoni.ai</a> ile bize ulaşabilirsiniz.</p>
+    <h2>7. Çocuklar</h2>
+    <p>GEONI 16 yaş altına yönelik değildir ve bilerek bu yaş altından veri toplamaz.</p>
+    <h2>8. Güvenlik</h2>
+    <p>Verileriniz aktarımda şifrelenir ve erişim kontrolleriyle korunur. Endüstri standardı önlemler uygularız.</p>
+    <h2>9. Değişiklikler</h2>
+    <p>Bu politikayı güncelleyebiliriz; önemli değişikliklerde "son güncelleme" tarihini yeniler, gerektiğinde bilgilendiririz.</p>
+    <h2>10. İletişim</h2>
+    <p>Sorularınız için: <a href="mailto:destek@geoni.ai">destek@geoni.ai</a></p>
+    <footer>© 2026 GEONI · <a href="https://geoni.ai/terms.html">Kullanım Şartları</a> · <a href="https://geoni.ai">geoni.ai</a></footer>
+  </div>
 
-  <p>GEONI ("GEONI", "biz"), yapay zeka arama motorlarındaki (ChatGPT, Gemini,
-  Perplexity, Claude vb.) görünürlüğünüzü ölçen bir hizmettir. Bu politika,
-  GEONI mobil uygulaması ve <a href="https://geoni.ai">geoni.ai</a> üzerinden
-  hangi kişisel verileri işlediğimizi, nasıl kullandığımızı ve haklarınızı
-  açıklar.</p>
-
-  <div class="note">Not: Bu metin, hizmetin fiili veri işleme pratiklerine göre
-  hazırlanmıştır. Şirket unvanı, adres ve iletişim bilgilerini kendi
-  bilgilerinizle güncelleyin ve yayınlamadan önce bir hukuk danışmanına
-  gözden geçirtin.</div>
-
-  <h2>1. İşlediğimiz veriler</h2>
-  <ul>
-    <li><b>Hesap bilgileri:</b> Apple veya Google ile giriş yaptığınızda ad ve
-      e-posta adresiniz.</li>
-    <li><b>Tarama verileri:</b> Görünürlüğünü ölçmek için girdiğiniz hedefler
-      (web sitesi adresi, kişi/marka adı, sosyal medya kullanıcı adı, alan/konu
-      ve isteğe bağlı bağlam bilgileri) ve üretilen sonuç raporları.</li>
-    <li><b>Kullanım ve cihaz verileri:</b> Uygulama içi etkileşimler, cihaz türü
-      ve —bildirimlere izin verirseniz— anonim push bildirim jetonu.</li>
-    <li><b>Satın alma kayıtları:</b> Token/hizmet satın almalarınızın işlem
-      kayıtları (tutar, tarih, ürün). Kart/ödeme bilgilerinizi <b>biz görmeyiz</b>
-      — ödemeler Apple veya web'de ödeme sağlayıcısı tarafından işlenir.</li>
-  </ul>
-
-  <h2>2. Verileri ne için kullanırız</h2>
-  <ul>
-    <li>Talep ettiğiniz taramaları çalıştırmak ve sonuçları göstermek.</li>
-    <li>Hesabınızı, token bakiyenizi ve satın almalarınızı yönetmek.</li>
-    <li>İzlemeye aldığınız hedefleri düzenli olarak yeniden ölçüp skor
-      değişimlerinde size bildirim göndermek.</li>
-    <li>Hizmeti geliştirmek, kötüye kullanımı önlemek ve yasal yükümlülükleri
-      yerine getirmek.</li>
-  </ul>
-
-  <h2>3. Verilerin paylaşıldığı hizmet sağlayıcılar</h2>
-  <p>Hizmeti sunmak için verileriniz aşağıdaki altyapı/işleyici sağlayıcılarla,
-  yalnızca gerektiği ölçüde paylaşılır:</p>
-  <ul>
-    <li><b>Supabase</b> — kimlik doğrulama ve veritabanı (hesap, tarama, bakiye).</li>
-    <li><b>Apple</b> — uygulama içi satın alma ve "Apple ile Giriş"; <b>Google</b> —
-      "Google ile Giriş".</li>
-    <li><b>RevenueCat</b> — uygulama içi satın alma yönetimi.</li>
-    <li><b>Yapay zeka sağlayıcıları</b> — taramaları çalıştırmak için girdiğiniz
-      hedef/konu bu motorlara sorgu olarak gönderilir: OpenAI, Anthropic,
-      Google (Gemini), Perplexity ve web arama sağlayıcıları.</li>
-    <li><b>Resend</b> — e-posta bildirimleri.</li>
-    <li><b>Amazon Web Services & Vercel</b> — sunucu ve barındırma.</li>
-  </ul>
-  <p>Verilerinizi reklam amacıyla satmayız.</p>
-
-  <h2>4. Ödemeler</h2>
-  <p>Uygulama içi token ve hizmet satın almaları Apple'ın Uygulama İçi Satın Alma
-  sistemiyle işlenir; web üzerindeki satın almalar bir Merchant-of-Record ödeme
-  sağlayıcısı tarafından işlenir. GEONI kart numaranıza erişmez.</p>
-
-  <h2>5. Saklama süresi</h2>
-  <p>Verilerinizi hesabınız etkin olduğu sürece ve yasal yükümlülükler gerektirdiği
-  müddetçe saklarız. Hesabınızı sildirdiğinizde ilişkili kişisel verileriniz makul
-  bir süre içinde silinir veya anonimleştirilir.</p>
-
-  <h2>6. Haklarınız</h2>
-  <p>KVKK (Türkiye) ve GDPR (AB) kapsamında; verilerinize erişme, düzeltme, silme
-  ve işlemeye itiraz etme haklarına sahipsiniz. Talepleriniz için bize
-  <a href="mailto:destek@geoni.ai">destek@geoni.ai</a> adresinden ulaşabilirsiniz.
-  Uygulama içinden hesabınızın silinmesini de talep edebilirsiniz.</p>
-
-  <h2>7. Çocuklar</h2>
-  <p>GEONI 16 yaş altındaki kullanıcılara yönelik değildir ve bilerek bu yaş
-  altından veri toplamaz.</p>
-
-  <h2>8. Güvenlik</h2>
-  <p>Verileriniz aktarım sırasında şifrelenir ve erişim kontrolleriyle korunur.
-  Hiçbir yöntem %100 güvenli olmasa da endüstri standardı önlemler uygularız.</p>
-
-  <h2>9. Değişiklikler</h2>
-  <p>Bu politikayı zaman zaman güncelleyebiliriz. Önemli değişikliklerde bu sayfadaki
-  "son güncelleme" tarihini yeniler, gerektiğinde ayrıca bilgilendiririz.</p>
-
-  <h2>10. İletişim</h2>
-  <p>Sorularınız için: <a href="mailto:destek@geoni.ai">destek@geoni.ai</a></p>
-
-  <footer>
-    © 2026 GEONI · <a href="https://geoni.ai/terms.html">Kullanım Şartları</a> ·
-    <a href="https://geoni.ai">geoni.ai</a>
-  </footer>
+  <!-- ================= EN ================= -->
+  <div data-lang="en">
+    <h1>Privacy Policy</h1>
+    <p class="updated">Last updated: July 12, 2026</p>
+    <p>GEONI ("GEONI", "we") is a service that measures your visibility in AI search engines (ChatGPT, Gemini, Perplexity, Claude). This policy explains what personal data we process through the GEONI mobile app and <a href="https://geoni.ai">geoni.ai</a>, how we use it, and your rights.</p>
+    <div class="note">Note: This text reflects the service's actual data practices. Update the company name, address, and contact details with your own, and have it reviewed by legal counsel before publishing.</div>
+    <h2>1. Data we process</h2>
+    <ul>
+      <li><b>Account info:</b> your name and email when you sign in with Apple or Google.</li>
+      <li><b>Scan data:</b> the targets you enter (website, person/brand name, social handle, topic and optional context) and the resulting reports.</li>
+      <li><b>Usage & device data:</b> in-app interactions, device type, and —if you allow— an anonymous push notification token.</li>
+      <li><b>Purchase records:</b> transaction records of token/service purchases. We <b>do not</b> see your card/payment details — payments are processed by Apple or a web payment provider.</li>
+    </ul>
+    <h2>2. How we use data</h2>
+    <ul>
+      <li>Run the scans you request and show results.</li>
+      <li>Manage your account, token balance, and purchases.</li>
+      <li>Periodically re-measure your watchlisted targets and notify you of score changes.</li>
+      <li>Improve the service, prevent abuse, and meet legal obligations.</li>
+    </ul>
+    <h2>3. Service providers we share data with</h2>
+    <p>To provide the service, your data is shared only as needed with:</p>
+    <ul>
+      <li><b>Supabase</b> — authentication and database.</li>
+      <li><b>Apple</b> — in-app purchases and "Sign in with Apple"; <b>Google</b> — "Sign in with Google".</li>
+      <li><b>RevenueCat</b> — in-app purchase management.</li>
+      <li><b>AI providers</b> — to run scans: OpenAI, Anthropic, Google (Gemini), Perplexity, and web search providers.</li>
+      <li><b>Resend</b> — email notifications. <b>AWS & Vercel</b> — servers and hosting.</li>
+    </ul>
+    <p>We do not sell your data for advertising.</p>
+    <h2>4. Payments</h2>
+    <p>In-app purchases are processed by Apple; web purchases by a Merchant-of-Record provider. GEONI never accesses your card number.</p>
+    <h2>5. Retention</h2>
+    <p>We keep your data while your account is active and as required by law. When you delete your account, related personal data is deleted or anonymized within a reasonable period.</p>
+    <h2>6. Your rights</h2>
+    <p>Under KVKK (Turkey) and GDPR (EU) you have the right to access, correct, delete, and object to processing of your data. You can delete your account in-app or contact us at <a href="mailto:destek@geoni.ai">destek@geoni.ai</a>.</p>
+    <h2>7. Children</h2>
+    <p>GEONI is not directed at children under 16 and does not knowingly collect their data.</p>
+    <h2>8. Security</h2>
+    <p>Your data is encrypted in transit and protected with access controls. We apply industry-standard measures.</p>
+    <h2>9. Changes</h2>
+    <p>We may update this policy; for material changes we update the "last updated" date and notify you where appropriate.</p>
+    <h2>10. Contact</h2>
+    <p>Questions: <a href="mailto:destek@geoni.ai">destek@geoni.ai</a></p>
+    <footer>© 2026 GEONI · <a href="https://geoni.ai/terms.html">Terms of Use</a> · <a href="https://geoni.ai">geoni.ai</a></footer>
+  </div>
 </div>
+<script>
+  function setLang(l){
+    document.documentElement.lang = l;
+    document.querySelectorAll('[data-lang]').forEach(function(el){ el.classList.toggle('show', el.getAttribute('data-lang')===l); });
+    document.getElementById('btn-tr').classList.toggle('on', l==='tr');
+    document.getElementById('btn-en').classList.toggle('on', l==='en');
+    try { localStorage.setItem('geoni_lang', l); } catch(e){}
+  }
+  setLang((localStorage.getItem('geoni_lang')) || ((navigator.language||'tr').slice(0,2)==='tr' ? 'tr' : 'en'));
+</script>
 </body>
 </html>

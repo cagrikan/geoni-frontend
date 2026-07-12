@@ -4,111 +4,121 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="index,follow" />
-<title>Kullanım Şartları — GEONI</title>
+<title>Kullanım Şartları / Terms of Use — GEONI</title>
 <style>
   :root { --ink:#1a1723; --muted:#6b6375; --accent:#8a2be2; --line:#e9e6ef; --bg:#ffffff; }
   * { box-sizing:border-box; }
   body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
-  .wrap { max-width:760px; margin:0 auto; padding:48px 22px 96px; }
-  header { border-bottom:1px solid var(--line); padding-bottom:20px; margin-bottom:32px; }
+  .wrap { max-width:760px; margin:0 auto; padding:40px 22px 96px; }
+  header { display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--line); padding-bottom:18px; margin-bottom:28px; }
   .brand { font-weight:800; font-size:20px; letter-spacing:-.4px; }
   .brand span { color:var(--accent); }
+  .lang button { border:1px solid var(--line); background:#fff; color:var(--muted); font-weight:700; font-size:13px; padding:6px 12px; border-radius:999px; cursor:pointer; margin-left:6px; }
+  .lang button.on { background:var(--accent); color:#fff; border-color:var(--accent); }
   h1 { font-size:30px; letter-spacing:-.6px; margin:.4em 0 .2em; }
   h2 { font-size:19px; letter-spacing:-.3px; margin:2em 0 .4em; }
   .updated { color:var(--muted); font-size:14px; }
   p, li { color:#2c2833; }
   a { color:var(--accent); }
-  ul { padding-left:20px; }
-  li { margin:.3em 0; }
+  ul { padding-left:20px; } li { margin:.3em 0; }
   .note { background:#f6f3fb; border:1px solid var(--line); border-radius:12px; padding:14px 16px; font-size:14px; color:var(--muted); }
   footer { margin-top:48px; border-top:1px solid var(--line); padding-top:18px; color:var(--muted); font-size:13px; }
+  [data-lang]{ display:none; } [data-lang].show{ display:block; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <div class="brand">geo<span>ni</span></div>
+    <div class="lang">
+      <button id="btn-tr" onclick="setLang('tr')">TR</button>
+      <button id="btn-en" onclick="setLang('en')">EN</button>
+    </div>
   </header>
 
-  <h1>Kullanım Şartları</h1>
-  <p class="updated">Son güncelleme: 12 Temmuz 2026</p>
+  <!-- ================= TR ================= -->
+  <div data-lang="tr">
+    <h1>Kullanım Şartları</h1>
+    <p class="updated">Son güncelleme: 12 Temmuz 2026</p>
+    <p>GEONI uygulamasını veya <a href="https://geoni.ai">geoni.ai</a>'yi kullanarak bu şartları kabul etmiş olursunuz. Kabul etmiyorsanız hizmeti kullanmayın.</p>
+    <div class="note">Not: Bu metin bir taslaktır; şirket unvanı ve iletişim bilgilerinizle güncelleyip yayınlamadan önce bir hukuk danışmanına gözden geçirtin.</div>
+    <h2>1. Hizmet</h2>
+    <p>GEONI, bir web sitesinin, kişinin, markanın veya sosyal hesabın yapay zeka arama motorlarındaki görünürlüğünü ölçen; skor, analiz ve öneri sunan bir araçtır. Token karşılığında uzman hizmetleri satın alınabilir.</p>
+    <h2>2. Hesap</h2>
+    <p>Bazı özellikler için Apple veya Google ile giriş yaparak hesap oluşturmanız gerekir. Hesabınızın güvenliğinden siz sorumlusunuz.</p>
+    <h2>3. Token'lar</h2>
+    <ul>
+      <li>Token'lar uygulama içi bir birimdir; nakit değeri yoktur, GEONI dışında kullanılamaz veya paraya çevrilemez.</li>
+      <li>Satın alınan token'lar, yürürlükteki tüketici mevzuatının gerektirdiği haller dışında iade edilmez.</li>
+      <li>Token bakiyeleri devredilemez.</li>
+    </ul>
+    <h2>4. Uygulama içi satın alma</h2>
+    <p>iOS'ta satın almalar Apple üzerinden yapılır ve Apple'ın Medya Hizmetleri Şartları'na tabidir.</p>
+    <h2>5. Uzman hizmetleri</h2>
+    <p>Uzman hizmetleri en iyi çaba esasıyla sunulur. GEONI, yapay zeka motorlarında belirli bir sıralama, tanınma veya sonuç <b>garanti etmez</b>; bu motorlar üçüncü taraftır ve davranışları kontrolümüz dışındadır.</p>
+    <h2>6. Kabul edilebilir kullanım</h2>
+    <p>Hizmeti yasa dışı amaçlarla, başkalarının haklarını ihlal edecek şekilde veya otomatik kötüye kullanımla kullanamazsınız.</p>
+    <h2>7. Fikri mülkiyet</h2>
+    <p>GEONI markası, yazılımı ve içeriği GEONI'ye aittir. Raporları kendi amaçlarınız için kullanabilir; ancak hizmeti kopyalayamaz veya yeniden satamazsınız.</p>
+    <h2>8. Sorumluluk reddi</h2>
+    <p>Skorlar ve öneriler tahmini analizlerdir ve "olduğu gibi" sunulur. Yapay zeka çıktıları hatalı olabilir; doğruluk veya belirli amaca uygunluk garanti edilmez.</p>
+    <h2>9. Sorumluluğun sınırlandırılması</h2>
+    <p>Yürürlükteki hukukun izin verdiği azami ölçüde GEONI dolaylı/arızi/sonuç niteliğindeki zararlardan sorumlu değildir; toplam sorumluluğumuz ilgili hizmet için ödediğiniz tutarla sınırlıdır.</p>
+    <h2>10. Fesih</h2>
+    <p>Şartları ihlal etmeniz halinde hesabınızı askıya alabilir veya sonlandırabiliriz. Siz de dilediğiniz zaman hesabınızı silebilirsiniz.</p>
+    <h2>11. Değişiklikler & Hukuk</h2>
+    <p>Bu şartları güncelleyebiliriz. Şartlar Türkiye Cumhuriyeti hukukuna tabidir; tüketici mevzuatından doğan haklar saklıdır.</p>
+    <h2>12. İletişim</h2>
+    <p>Sorularınız için: <a href="mailto:destek@geoni.ai">destek@geoni.ai</a></p>
+    <footer>© 2026 GEONI · <a href="https://geoni.ai/privacy.html">Gizlilik Politikası</a> · <a href="https://geoni.ai">geoni.ai</a></footer>
+  </div>
 
-  <p>GEONI uygulamasını veya <a href="https://geoni.ai">geoni.ai</a>'yi kullanarak
-  bu şartları kabul etmiş olursunuz. Kabul etmiyorsanız hizmeti kullanmayın.</p>
-
-  <div class="note">Not: Bu metin bir taslaktır; şirket unvanı ve iletişim
-  bilgilerinizle güncelleyip yayınlamadan önce bir hukuk danışmanına
-  gözden geçirtin.</div>
-
-  <h2>1. Hizmet</h2>
-  <p>GEONI, bir web sitesinin, kişinin, markanın veya sosyal hesabın yapay zeka
-  arama motorlarındaki görünürlüğünü ölçen; skor, analiz ve iyileştirme önerileri
-  sunan bir araçtır. Ayrıca token karşılığında uzman hizmetleri satın alınabilir.</p>
-
-  <h2>2. Hesap</h2>
-  <p>Bazı özellikler için Apple veya Google ile giriş yaparak hesap oluşturmanız
-  gerekir. Hesabınızın güvenliğinden ve altında gerçekleşen işlemlerden siz
-  sorumlusunuz.</p>
-
-  <h2>3. Token'lar (uygulama içi para birimi)</h2>
-  <ul>
-    <li>Token'lar, taramalarda ve uzman hizmetlerinde kullanılan uygulama içi bir
-      birimidir; nakit değeri yoktur ve GEONI dışında kullanılamaz veya paraya
-      çevrilemez.</li>
-    <li>Satın alınan token'lar, yürürlükteki tüketici mevzuatının gerektirdiği
-      haller dışında iade edilmez.</li>
-    <li>Token bakiyeleri devredilemez.</li>
-  </ul>
-
-  <h2>4. Uygulama içi satın alma</h2>
-  <p>iOS'ta satın almalar Apple üzerinden yapılır ve Apple'ın Medya Hizmetleri
-  Şartları'na tabidir. Ödeme, faturalandırma ve —geçerli olduğunda— iade süreçleri
-  ilgili mağaza politikalarına göre işler.</p>
-
-  <h2>5. Uzman hizmetleri</h2>
-  <p>Uzman hizmetleri en iyi çaba esasıyla sunulur. GEONI, yapay zeka motorlarında
-  belirli bir sıralama, tanınma veya sonuç <b>garanti etmez</b>; bu motorlar üçüncü
-  taraflardır ve davranışları GEONI'nin kontrolü dışındadır.</p>
-
-  <h2>6. Kabul edilebilir kullanım</h2>
-  <p>Hizmeti yasa dışı amaçlarla, başkalarının haklarını ihlal edecek şekilde,
-  otomatik kötüye kullanımla (aşırı sorgu, sistemleri atlatma) veya üçüncü tarafların
-  kullanım şartlarını ihlal edecek biçimde kullanamazsınız.</p>
-
-  <h2>7. Fikri mülkiyet</h2>
-  <p>GEONI markası, yazılımı ve içeriği GEONI'ye aittir. Ürettiğimiz raporları kendi
-  amaçlarınız için kullanabilirsiniz; ancak hizmeti kopyalayamaz veya yeniden
-  satamazsınız.</p>
-
-  <h2>8. Sorumluluk reddi</h2>
-  <p>Skorlar ve öneriler tahmini analizlerdir ve olduğu gibi ("as is") sunulur.
-  Yapay zeka çıktıları hatalı veya eksik olabilir. GEONI sonuçların doğruluğu veya
-  belirli bir amaca uygunluğu konusunda garanti vermez.</p>
-
-  <h2>9. Sorumluluğun sınırlandırılması</h2>
-  <p>Yürürlükteki hukukun izin verdiği azami ölçüde GEONI; dolaylı, arızi veya sonuç
-  niteliğindeki zararlardan sorumlu değildir. Toplam sorumluluğumuz, ilgili talebe
-  konu hizmet için ödediğiniz tutarla sınırlıdır.</p>
-
-  <h2>10. Fesih</h2>
-  <p>Bu şartları ihlal etmeniz halinde hesabınızı askıya alabilir veya
-  sonlandırabiliriz. Siz de dilediğiniz zaman hesabınızı silebilirsiniz.</p>
-
-  <h2>11. Değişiklikler</h2>
-  <p>Bu şartları güncelleyebiliriz. Güncel sürüm bu sayfada yayınlanır; kullanıma
-  devam etmeniz güncel şartları kabul ettiğiniz anlamına gelir.</p>
-
-  <h2>12. Uygulanacak hukuk</h2>
-  <p>Bu şartlar Türkiye Cumhuriyeti hukukuna tabidir ve uyuşmazlıklarda Türkiye
-  mahkemeleri yetkilidir (tüketici mevzuatından doğan haklar saklıdır).</p>
-
-  <h2>13. İletişim</h2>
-  <p>Sorularınız için: <a href="mailto:destek@geoni.ai">destek@geoni.ai</a></p>
-
-  <footer>
-    © 2026 GEONI · <a href="https://geoni.ai/privacy.html">Gizlilik Politikası</a> ·
-    <a href="https://geoni.ai">geoni.ai</a>
-  </footer>
+  <!-- ================= EN ================= -->
+  <div data-lang="en">
+    <h1>Terms of Use</h1>
+    <p class="updated">Last updated: July 12, 2026</p>
+    <p>By using the GEONI app or <a href="https://geoni.ai">geoni.ai</a> you agree to these terms. If you do not agree, do not use the service.</p>
+    <div class="note">Note: This is a draft; update the company name and contact details and have it reviewed by legal counsel before publishing.</div>
+    <h2>1. Service</h2>
+    <p>GEONI measures the visibility of a website, person, brand, or social account in AI search engines, providing a score, analysis, and recommendations. Expert services can be purchased with tokens.</p>
+    <h2>2. Account</h2>
+    <p>Some features require creating an account via Apple or Google sign-in. You are responsible for your account's security.</p>
+    <h2>3. Tokens</h2>
+    <ul>
+      <li>Tokens are an in-app unit; they have no cash value and cannot be used outside GEONI or exchanged for money.</li>
+      <li>Purchased tokens are non-refundable except as required by applicable consumer law.</li>
+      <li>Token balances are non-transferable.</li>
+    </ul>
+    <h2>4. In-app purchases</h2>
+    <p>On iOS, purchases are made through Apple and are subject to Apple's Media Services Terms.</p>
+    <h2>5. Expert services</h2>
+    <p>Expert services are provided on a best-effort basis. GEONI does <b>not guarantee</b> any specific ranking, recognition, or result in AI engines; these engines are third parties and their behavior is outside our control.</p>
+    <h2>6. Acceptable use</h2>
+    <p>You may not use the service for unlawful purposes, to infringe others' rights, or via automated abuse.</p>
+    <h2>7. Intellectual property</h2>
+    <p>The GEONI brand, software, and content belong to GEONI. You may use reports for your own purposes but may not copy or resell the service.</p>
+    <h2>8. Disclaimer</h2>
+    <p>Scores and recommendations are estimated analyses provided "as is". AI outputs may be inaccurate; no warranty of accuracy or fitness for a particular purpose is given.</p>
+    <h2>9. Limitation of liability</h2>
+    <p>To the maximum extent permitted by law, GEONI is not liable for indirect, incidental, or consequential damages; our total liability is limited to the amount you paid for the relevant service.</p>
+    <h2>10. Termination</h2>
+    <p>We may suspend or terminate your account if you violate these terms. You may delete your account at any time.</p>
+    <h2>11. Changes & Law</h2>
+    <p>We may update these terms. They are governed by the laws of the Republic of Türkiye; rights arising from consumer law are reserved.</p>
+    <h2>12. Contact</h2>
+    <p>Questions: <a href="mailto:destek@geoni.ai">destek@geoni.ai</a></p>
+    <footer>© 2026 GEONI · <a href="https://geoni.ai/privacy.html">Privacy Policy</a> · <a href="https://geoni.ai">geoni.ai</a></footer>
+  </div>
 </div>
+<script>
+  function setLang(l){
+    document.documentElement.lang = l;
+    document.querySelectorAll('[data-lang]').forEach(function(el){ el.classList.toggle('show', el.getAttribute('data-lang')===l); });
+    document.getElementById('btn-tr').classList.toggle('on', l==='tr');
+    document.getElementById('btn-en').classList.toggle('on', l==='en');
+    try { localStorage.setItem('geoni_lang', l); } catch(e){}
+  }
+  setLang((localStorage.getItem('geoni_lang')) || ((navigator.language||'tr').slice(0,2)==='tr' ? 'tr' : 'en'));
+</script>
 </body>
 </html>

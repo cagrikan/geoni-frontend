@@ -162,7 +162,12 @@ export default function TicketDetailOverlay({ ticket, canEdit, currentUserId, au
 
           <div className="tdo__block">
             <h3>{t('ticket_detail_details')}</h3>
-            <div className="tdo__kv"><span>{t('ticket_detail_expert')}</span><span>{ticket.ticket_type_key === 'llms_robots' && !ticket.assigned_expert_id ? t('ticket_expert_auto') : (ticket.expert_email || '—')}</span></div>
+            <div className="tdo__kv"><span>{t('ticket_detail_expert')}</span><span>{(() => {
+              const isAuto = ['llms_robots', 'schema_setup'].includes(ticket.ticket_type_key)
+              if (!ticket.assigned_expert_id) return isAuto ? t('ticket_expert_auto') : '—'
+              // Musteriye uzmanin kimligini (e-posta) ASLA gosterme; sadece admin/uzman gorur.
+              return canEdit ? (ticket.expert_email || '—') : t('ticket_expert_generic')
+            })()}</span></div>
             <div className="tdo__kv"><span>{t('dash_credit_unit')}</span><span>{ticket.token_cost}</span></div>
             <div className="tdo__kv"><span>{t('ticket_detail_no')}</span><span>{refCode}</span></div>
           </div>

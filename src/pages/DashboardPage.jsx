@@ -312,13 +312,21 @@ function MyTicketsSection({ t, userId, language }) {
   const [confirmBusy, setConfirmBusy] = useState(false)
   const [confirmError, setConfirmError] = useState(null)
 
-  const load = () => authedFetch('/api/tickets').then(setMyTickets).catch(() => setMyTickets([]))
+  const load = () => authedFetch('/api/tickets').then((l) => { setMyTickets(l); return l }).catch(() => { setMyTickets([]); return [] })
   useEffect(() => { load() }, [])
 
   const openTicket = (tk) => {
     setSelected(tk)
     setDisputeOpen(false); setDisputeReason(''); setDisputeError(null)
     setMyTickets((list) => list?.map((t) => (t.id === tk.id ? { ...t, has_unread: false } : t)))
+  }
+
+  // Aksiyon sonrasi listeyi tazeleyip secili bileti tam guncel haliyle (status,
+  // verified_at, mesajlar) yeniden ata - boylece overlay sayfa yenilemeden dogru
+  // durumu gosterir (status degisince key sayesinde thread de remount olur).
+  const refreshSelected = async (fallbackStatus) => {
+    const list = await load()
+    setSelected((s) => (list.find((x) => x.id === s.id) || { ...s, status: fallbackStatus }))
   }
 
   const submitDispute = async () => {
@@ -330,10 +338,9 @@ function MyTicketsSection({ t, userId, language }) {
         method: 'POST',
         body: JSON.stringify({ reason: disputeReason.trim() }),
       })
-      setSelected((s) => ({ ...s, status: 'disputed' }))
       setDisputeOpen(false)
       setDisputeReason('')
-      load()
+      await refreshSelected('disputed')
     } catch (e) { setDisputeError(e.message) }
     setDisputeBusy(false)
   }
@@ -343,8 +350,7 @@ function MyTicketsSection({ t, userId, language }) {
     setConfirmError(null)
     try {
       await authedFetch(`/api/tickets/${selected.id}/confirm`, { method: 'POST' })
-      setSelected((s) => ({ ...s, status: 'verified' }))
-      load()
+      await refreshSelected('verified')
     } catch (e) { setConfirmError(e.message) }
     setConfirmBusy(false)
   }
@@ -387,6 +393,7 @@ function MyTicketsSection({ t, userId, language }) {
     ) : null
     return (
       <TicketDetailOverlay
+        key={`${selected.id}:${selected.status}`}
         ticket={selected} canEdit={false} currentUserId={userId} authedFetch={authedFetch} t={t} language={language}
         onBack={() => setSelected(null)} extraActions={extra} contextLabel={t('dash_tickets_mine')}
       />
@@ -637,14 +644,30 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
     // Polar checkout donusu dogrudan cuzdana insin ki "siparisiniz alindi"
     // seridi ve yuklenen tokenlar gorunsun (parametreyi WalletSection tuketir).
     try {
-      if (new URLSearchParams(window.location.search).get('checkout') === 'success') return 'credits'
+      const params = new URLSearchParams(window.location.search)
+      if (params.get('checkout') === 'success') return 'credits'
+      // Aktif sekme URL'de (?tab=) tutulur; sayfa yenilenince ayni sekmede kal.
+      const urlTab = params.get('tab')
+      if (urlTab) return urlTab
     } catch { /* ignore */ }
     try {
       const pending = localStorage.getItem('geoni_pending_tab')
       if (pending) { localStorage.removeItem('geoni_pending_tab'); return pending }
     } catch { /* ignore */ }
     return 'audits'
-  }) // 'audits' | 'assets' | 'credits' | 'settings'
+  }) // 'audits' | 'assets' | 'credits' | 'tickets' | 'my_tickets' | 'expert' | 'settings'
+
+  // Sekme degisince URL'i guncelle (replaceState - gecmisi kirletmeden), boylece
+  // yenileme ve paylasilan link ayni sekmeyi acar.
+  useEffect(() => {
+    try {
+      const url = new URL(window.location)
+      if (url.searchParams.get('tab') !== tab) {
+        url.searchParams.set('tab', tab)
+        window.history.replaceState({}, '', url)
+      }
+    } catch { /* ignore */ }
+  }, [tab])
 
   useEffect(() => {
     if (user) { fetchAudits(); fetchWatchlist() }

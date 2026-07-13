@@ -3442,3 +3442,30 @@ body {
   font-size: .875rem; font-weight: 600; cursor: pointer;
 }
 .share-result-btn:hover { opacity: .9; }
+
+/* Rozet gomme kutusu */
+.embed-badge { margin: 10px 0 4px; }
+.embed-badge summary {
+  cursor: pointer; font-size: .85rem; color: var(--text-sub); font-weight: 500;
+  list-style: none; display: inline-flex; align-items: center; gap: 4px;
+}
+.embed-badge summary::-webkit-details-marker { display: none; }
+.embed-badge summary:hover { color: var(--accent); }
+.embed-badge__body {
+  margin-top: 10px; background: var(--surface); border: 1px solid var(--border-mid);
+  border-radius: 10px; padding: 14px 16px; max-width: 560px;
+}
+.embed-badge__hint { margin: 0 0 10px; font-size: .8125rem; color: var(--text-muted); }
+.embed-badge__preview { display: block; margin-bottom: 12px; }
+.embed-badge__code { display: flex; gap: 8px; align-items: stretch; }
+.embed-badge__code code {
+  flex: 1; font-family: var(--mono); font-size: .7rem; line-height: 1.5;
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 7px;
+  padding: 8px 10px; word-break: break-all; color: var(--text-sub);
+}
+.embed-badge__code button {
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  background: var(--accent); color: #fff; border: 0; border-radius: 7px;
+  padding: 0 14px; font-size: .8125rem; font-weight: 600; cursor: pointer;
+}
+.embed-badge__code button:hover { opacity: .9; }

@@ -5,6 +5,7 @@ import SovSection from './components/SovSection'
 import StabilityNote from './components/StabilityNote'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import ShareResult from './components/ShareResult'
+import EmbedBadge from './components/EmbedBadge'
 import WatchlistButton from './components/WatchlistButton'
 import { useLanguage } from './lib/LanguageContext'
 
@@ -205,6 +206,7 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
         </div>
 
         <ShareResult jobId={jobId} text={t('share_site_text', { domain, score })} />
+        <EmbedBadge jobId={jobId} />
 
         {/* Skor + Breakdown (breakdown blur) */}
         <div className="results__top">

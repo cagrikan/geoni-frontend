@@ -5,6 +5,7 @@ import SovSection from './components/SovSection'
 import StabilityNote from './components/StabilityNote'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import ShareResult from './components/ShareResult'
+import EmbedBadge from './components/EmbedBadge'
 import WatchlistButton from './components/WatchlistButton'
 import { useLanguage } from './lib/LanguageContext'
 
@@ -188,6 +189,7 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
         </div>
 
         <ShareResult jobId={jobId} text={t('share_brand_text', { name: capitalizedName, score })} />
+        <EmbedBadge jobId={jobId} />
 
         <div className="results__top">
           <div className="results__gauge-col">

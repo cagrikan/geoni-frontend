@@ -226,6 +226,8 @@ function AppInner() {
   // birakir, boylece tarayci geri tusu her zaman bir onceki adima doner.
   const pushView = (v) => { setView(v); window.history.pushState({}, '', '/') }
 
+  const [lastJobId, setLastJobId] = useState(null)
+
   const pollAuditJob = async (jobId) => {
     for (let i = 0; i < 60; i++) {
       await new Promise(r => setTimeout(r, 3000))
@@ -233,7 +235,7 @@ function AppInner() {
         const res = await fetch(`${API_URL}/api/audit/${jobId}`)
         if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || t('error_audit_failed'))
         const data = await res.json()
-        if (data.status === 'complete') { setResult(data.result); pushView('results'); if (refreshProfile) refreshProfile(); return }
+        if (data.status === 'complete') { setResult(data.result); setLastJobId(jobId); pushView('results'); if (refreshProfile) refreshProfile(); return }
         if (data.status === 'failed') throw new Error(t('error_audit_failed'))
         setStatusKey(data.status)
       } catch (err) { setError(err.message); pushView('landing'); return }
@@ -248,7 +250,7 @@ function AppInner() {
         const res = await fetch(`${API_URL}/api/brand-check/${jobId}`)
         if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || t('error_query_failed'))
         const data = await res.json()
-        if (data.status === 'complete') { setBrandResult({ ...data.result, type: entityType }); pushView('brand_results'); if (refreshProfile) refreshProfile(); return }
+        if (data.status === 'complete') { setBrandResult({ ...data.result, type: entityType }); setLastJobId(jobId); pushView('brand_results'); if (refreshProfile) refreshProfile(); return }
         if (data.status === 'failed') throw new Error(t('error_query_failed'))
       } catch (err) { setError(err.message); pushView('landing'); return }
     }
@@ -421,9 +423,9 @@ function AppInner() {
           onCancel={handleReset}
         />
       )}
-      {view === 'results' && result && <ResultsPage result={result} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} isPro={isSample || profile?.is_admin || (profile?.credit_balance > 0 && profile?.total_credits_purchased > 0)} isSample={isSample} isPrivate={isPrivateResult} />}
+      {view === 'results' && result && <ResultsPage result={result} jobId={isPrivateResult || isSample ? null : lastJobId} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} isPro={isSample || profile?.is_admin || (profile?.credit_balance > 0 && profile?.total_credits_purchased > 0)} isSample={isSample} isPrivate={isPrivateResult} />}
       {view === 'brand_results' && brandResult && !brandResult.identity_mismatch && (
-        <BrandCheckResultsPage result={brandResult} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} isPro={profile?.is_admin || (profile?.credit_balance > 0 && profile?.total_credits_purchased > 0)} isPrivate={isPrivateResult} />
+        <BrandCheckResultsPage result={brandResult} jobId={isPrivateResult ? null : lastJobId} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} isPro={profile?.is_admin || (profile?.credit_balance > 0 && profile?.total_credits_purchased > 0)} isPrivate={isPrivateResult} />
       )}
       {view === 'brand_results' && brandResult?.identity_mismatch && (
         <IdentityMismatchPage result={brandResult} onReset={handleReset} />

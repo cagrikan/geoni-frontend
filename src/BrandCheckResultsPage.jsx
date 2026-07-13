@@ -4,6 +4,7 @@ import ProBlur from './ProBlur'
 import SovSection from './components/SovSection'
 import StabilityNote from './components/StabilityNote'
 import LanguageSwitcher from './components/LanguageSwitcher'
+import ShareResult from './components/ShareResult'
 import WatchlistButton from './components/WatchlistButton'
 import { useLanguage } from './lib/LanguageContext'
 
@@ -111,7 +112,7 @@ function TopicCard({ topic, isOpportunity }) {
   )
 }
 
-export default function BrandCheckResultsPage({ result, onReset, user, onLogin, onDashboard, isPro = false, isPrivate = false }) {
+export default function BrandCheckResultsPage({ result, jobId = null, onReset, user, onLogin, onDashboard, isPro = false, isPrivate = false }) {
   const { t, language } = useLanguage()
   const {
     name,
@@ -185,6 +186,8 @@ export default function BrandCheckResultsPage({ result, onReset, user, onLogin, 
             {!isPrivate && <WatchlistButton user={user} type={type} label={capitalizedName} target={{ name, topic }} />}
           </div>
         </div>
+
+        <ShareResult jobId={jobId} text={t('share_brand_text', { name: capitalizedName, score })} />
 
         <div className="results__top">
           <div className="results__gauge-col">

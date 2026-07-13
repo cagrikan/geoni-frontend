@@ -4,6 +4,7 @@ import ProBlur from './ProBlur'
 import SovSection from './components/SovSection'
 import StabilityNote from './components/StabilityNote'
 import LanguageSwitcher from './components/LanguageSwitcher'
+import ShareResult from './components/ShareResult'
 import WatchlistButton from './components/WatchlistButton'
 import { useLanguage } from './lib/LanguageContext'
 
@@ -137,7 +138,7 @@ function FixSuggestions({ result, t }) {
   )
 }
 
-export default function ResultsPage({ result, onReset, user, onLogin, onDashboard, isPro = false, isSample = false, isPrivate = false }) {
+export default function ResultsPage({ result, jobId = null, onReset, user, onLogin, onDashboard, isPro = false, isSample = false, isPrivate = false }) {
   const { t, language } = useLanguage()
   const {
     domain, score, score_breakdown,
@@ -202,6 +203,8 @@ export default function ResultsPage({ result, onReset, user, onLogin, onDashboar
             {!isSample && !isPrivate && <WatchlistButton user={user} type="web" label={domain} target={{ domain }} />}
           </div>
         </div>
+
+        <ShareResult jobId={jobId} text={t('share_site_text', { domain, score })} />
 
         {/* Skor + Breakdown (breakdown blur) */}
         <div className="results__top">

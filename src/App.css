@@ -3433,3 +3433,12 @@ body {
   color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
 }
 .ticket-lightbox__close:hover { background: rgba(255,255,255,.2); }
+
+/* Sonuc paylasim butonu (viral skor karti linkiyle) */
+.share-result-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin: 14px 0 4px; padding: 10px 20px;
+  background: var(--accent); color: #fff; border: 0; border-radius: 8px;
+  font-size: .875rem; font-weight: 600; cursor: pointer;
+}
+.share-result-btn:hover { opacity: .9; }

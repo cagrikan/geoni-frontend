@@ -5,10 +5,12 @@ import { useLanguage } from '../lib/LanguageContext'
 /* "Rozeti sitene ekle": kullanici sitesine skor rozeti gomer — ona statu
    gostergesi, bize her gomulumden kalici backlink + marka izi. jobId yoksa
    (ornek/ozel tarama) gorunmez. */
-export default function EmbedBadge({ jobId }) {
+export default function EmbedBadge({ jobId, score }) {
   const { t } = useLanguage()
   const [copied, setCopied] = useState(false)
-  if (!jobId) return null
+  // Rozet yalnizca "yesil" (70+) skorlarda sunulur — dusuk skoru kimse
+  // sitesine asmaz; teklif etmek bile garip kacar.
+  if (!jobId || !(score >= 70)) return null
 
   const code = `<a href="https://geoni.ai/s/${jobId}" target="_blank" rel="noopener"><img src="https://geoni.ai/badge/${jobId}" alt="AI Visibility Score — geoni.ai" width="232" height="44"></a>`
 

@@ -189,7 +189,7 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
         </div>
 
         <ShareResult jobId={jobId} text={t('share_brand_text', { name: capitalizedName, score })} />
-        <EmbedBadge jobId={jobId} />
+        <EmbedBadge jobId={jobId} score={score} />
 
         <div className="results__top">
           <div className="results__gauge-col">

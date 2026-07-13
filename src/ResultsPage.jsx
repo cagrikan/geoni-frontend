@@ -206,7 +206,7 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
         </div>
 
         <ShareResult jobId={jobId} text={t('share_site_text', { domain, score })} />
-        <EmbedBadge jobId={jobId} />
+        <EmbedBadge jobId={jobId} score={score} />
 
         {/* Skor + Breakdown (breakdown blur) */}
         <div className="results__top">

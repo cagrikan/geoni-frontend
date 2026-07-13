@@ -1421,17 +1421,6 @@ body {
   cursor: not-allowed;
 }
 .login-btn--disabled:hover { background: var(--surface); border-color: var(--border-mid); }
-.login-btn__badge {
-  margin-left: auto;
-  background: var(--tint);
-  color: var(--accent);
-  font-size: .75rem;
-  font-weight: 600;
-  letter-spacing: .02em;
-  padding: 2px 9px;
-  border-radius: var(--r-full);
-  white-space: nowrap;
-}
 .login-terms {
   font-size: .8125rem;
   color: var(--text-muted);

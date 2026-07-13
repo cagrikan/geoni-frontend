@@ -50,9 +50,9 @@ export const translations = {
     mode_brand: 'Marka / Şirket',
     mode_social: 'Sosyal',
     field_social_handle_label: 'Kullanıcı adınız (@handle)',
-    field_social_handle_placeholder: 'ör. geoni',
+    field_social_handle_placeholder: 'ör. kahveduragi',
     field_social_niche_label: 'Niş / konu',
-    field_social_niche_placeholder: 'ör. yapay zeka görünürlüğü',
+    field_social_niche_placeholder: 'ör. kahve, moda, fitness',
 
     // ── Wizard: adım başlıkları ──
     step_title_contact: 'İletişim Bilginiz',
@@ -83,7 +83,7 @@ export const translations = {
 
     // ── Wizard: Marka alanları ──
     field_brand_name_label: 'Marka veya şirket adınız nedir?',
-    field_brand_name_placeholder: 'Örn: Geoni',
+    field_brand_name_placeholder: 'Örn: markanızın adı',
     field_brand_sector_label: 'Faaliyet sektörünüz',
     field_brand_sector_placeholder: 'Örn: Teknoloji, Hukuk, Finans',
     field_brand_city_label: 'Bulunduğunuz şehir',
@@ -708,9 +708,9 @@ export const translations = {
     mode_brand: 'Brand / Company',
     mode_social: 'Social',
     field_social_handle_label: 'Your handle (@handle)',
-    field_social_handle_placeholder: 'e.g. geoni',
+    field_social_handle_placeholder: 'e.g. coffeecorner',
     field_social_niche_label: 'Niche / topic',
-    field_social_niche_placeholder: 'e.g. AI visibility',
+    field_social_niche_placeholder: 'e.g. coffee, fashion, fitness',
 
     // ── Wizard: step titles ──
     step_title_contact: 'Contact Information',
@@ -741,7 +741,7 @@ export const translations = {
 
     // ── Wizard: Brand fields ──
     field_brand_name_label: 'What is your brand or company name?',
-    field_brand_name_placeholder: 'e.g. Geoni',
+    field_brand_name_placeholder: 'e.g. your brand name',
     field_brand_sector_label: 'Your industry',
     field_brand_sector_placeholder: 'e.g. Technology, Law, Finance',
     field_brand_city_label: 'Your city',

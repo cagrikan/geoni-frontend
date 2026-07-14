@@ -64,8 +64,8 @@ function BuyCreditsSection({ t }) {
       })
       window.location.href = checkout_url
     } catch {
-      // Odeme saglayici henuz aktif degilken (Lemon Squeezy onayi bekleniyor)
-      // ham HTTP hatasi gostermek satisi oldurur - durust ve yol gosteren mesaj.
+      // Odeme saglayici gecici erisilemezken ham HTTP hatasi gostermek
+      // satisi oldurur - durust ve yol gosteren mesaj.
       setError(t('dash_checkout_unavailable'))
       setBuyingId(null)
     }

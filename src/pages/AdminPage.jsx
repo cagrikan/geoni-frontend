@@ -817,10 +817,17 @@ function UserDetailView({ userId, onBack, onChanged }) {
   const [viewingAuditId, setViewingAuditId] = useState(null)
   const [pendingRefund, setPendingRefund] = useState(null)
   const [txListKey, setTxListKey] = useState(0)
+  const [ticketTypes, setTicketTypes] = useState([])
+  const [specDraft, setSpecDraft] = useState([])  // secili gorev turu id'leri (uzmanlik alani)
+
+  useEffect(() => { authedFetch('/api/admin/ticket-types').then((r) => setTicketTypes(r || [])).catch(() => setTicketTypes([])) }, [])
 
   const load = useCallback(() => {
     authedFetch(`/api/admin/users/${userId}/detail`)
-      .then((res) => { setDetail(res); setNotesDraft(res.profile.admin_notes || ''); setError(null) })
+      .then((res) => {
+        setDetail(res); setNotesDraft(res.profile.admin_notes || '')
+        setSpecDraft(res.expert_specialization_ids || []); setError(null)
+      })
       .catch((e) => setError(e.message))
   }, [userId])
 
@@ -870,13 +877,38 @@ function UserDetailView({ userId, onBack, onChanged }) {
   }
 
   const toggleExpert = async () => {
+    const granting = !detail.profile.is_expert
+    // Yetki verirken en az bir uzmanlik alani secilmeli (uzman yalnizca
+    // secili gorev turlerine atanir + yalnizca onlar icin bildirim alir).
+    if (granting && specDraft.length === 0) {
+      setError(t('admin_expert_pick_spec') || 'En az bir görev türü seçin')
+      return
+    }
     setBusy(true)
     try {
-      await authedFetch(`/api/admin/users/${userId}/expert-flag`, { method: 'POST', body: JSON.stringify({ is_expert: !detail.profile.is_expert }) })
+      await authedFetch(`/api/admin/users/${userId}/expert-flag`, {
+        method: 'POST',
+        body: JSON.stringify({ is_expert: granting, ticket_type_ids: granting ? specDraft : [] }),
+      })
       load(); onChanged?.()
     } catch (e) { setError(e.message) }
     setBusy(false)
   }
+
+  const saveSpecialization = async () => {
+    // Mevcut uzmanin uzmanlik alanlarini gunceller (is_expert:true, yeni id'ler).
+    setBusy(true)
+    try {
+      await authedFetch(`/api/admin/users/${userId}/expert-flag`, {
+        method: 'POST',
+        body: JSON.stringify({ is_expert: true, ticket_type_ids: specDraft }),
+      })
+      load()
+    } catch (e) { setError(e.message) }
+    setBusy(false)
+  }
+
+  const toggleSpec = (id) => setSpecDraft((s) => s.includes(id) ? s.filter((x) => x !== id) : [...s, id])
 
   const toggleSuspended = async () => {
     setBusy(true)
@@ -995,8 +1027,33 @@ function UserDetailView({ userId, onBack, onChanged }) {
                       {p.is_expert && detail.expert_stats && (
                         <span className="admin-modal__expert-stats">
                           {t('admin_user_expert_verified')}: {detail.expert_stats.verified} · {t('admin_user_expert_rejected')}: {detail.expert_stats.rejected}
+                          {detail.expert_stats.disputed > 0
+                            ? ` · ${t('admin_expert_disputes') || 'İtiraz'}: ${detail.expert_stats.disputed}`
+                            : (detail.expert_stats.verified > 0 ? ` · ✅ ${t('admin_expert_never_disputed') || 'Hiç itiraz almadı'}` : '')}
                         </span>
                       )}
+
+                      {/* Uzmanlik alanlari: yetki verilirken secim zorunlu,
+                          mevcut uzmanda duzenlenebilir. */}
+                      <div className="admin-spec">
+                        <div className="admin-spec__label">
+                          {t('admin_expert_spec_title') || 'Yapabileceği görevler'}
+                          {!p.is_expert && <span className="admin-spec__hint"> — {t('admin_expert_spec_hint') || 'yetki için en az bir tane seç'}</span>}
+                        </div>
+                        <div className="admin-spec__grid">
+                          {ticketTypes.map((tt) => (
+                            <label key={tt.id} className={`admin-spec__chip ${specDraft.includes(tt.id) ? 'admin-spec__chip--on' : ''}`}>
+                              <input type="checkbox" checked={specDraft.includes(tt.id)} onChange={() => toggleSpec(tt.id)} disabled={busy} />
+                              {tt.name}
+                            </label>
+                          ))}
+                        </div>
+                        {p.is_expert && (
+                          <button className="admin-spec__save" disabled={busy} onClick={saveSpecialization}>
+                            {t('admin_expert_spec_save') || 'Uzmanlık alanlarını kaydet'}
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1439,7 +1496,15 @@ function TicketsAdminTab() {
             ) : canAssign ? (
               <select disabled={busyId === selected.id} value={selected.assigned_expert_id || ''} onChange={(e) => assign(selected.id, e.target.value)}>
                 <option value="">{t('admin_tickets_pick_expert')}</option>
-                {(experts || []).map((ex) => <option key={ex.id} value={ex.id}>{ex.email || ex.full_name}</option>)}
+                {(experts || [])
+                  // Yalnizca bu gorev turunu yapabilen uzmanlar (uzmanlik alani
+                  // bos degilse filtrele; bos veri gelirse hepsini goster).
+                  .filter((ex) => !selected.ticket_type_id || !ex.specialization_ids || ex.specialization_ids.length === 0 || ex.specialization_ids.includes(selected.ticket_type_id))
+                  .map((ex) => {
+                    const rep = ex.avg_rating != null ? ` · ★${ex.avg_rating}` : ''
+                    const disp = ex.never_disputed ? ' · ✅' : (ex.dispute_count > 0 ? ` · ⚠${ex.dispute_count}` : '')
+                    return <option key={ex.id} value={ex.id}>{(ex.email || ex.full_name) + rep + disp}</option>
+                  })}
               </select>
             ) : (selected.expert_email || '—')}
           </span>

@@ -2378,6 +2378,17 @@ body {
 }
 .admin-modal__scope-checkbox input { accent-color: var(--accent); }
 .admin-modal__expert-stats { font-size: .8125rem; color: var(--text-muted); }
+.admin-spec { margin-top: 10px; width: 100%; }
+.admin-spec__label { font-size: .8125rem; color: var(--text-muted); margin-bottom: 8px; }
+.admin-spec__hint { color: #b0863a; }
+.admin-spec__grid { display: flex; flex-wrap: wrap; gap: 6px; }
+.admin-spec__chip { display: inline-flex; align-items: center; gap: 6px; font-size: .8125rem; padding: 5px 11px; border: 1px solid rgba(124,134,245,.3); border-radius: 999px; cursor: pointer; user-select: none; transition: background .12s, border-color .12s; }
+.admin-spec__chip:hover { border-color: rgba(124,134,245,.6); }
+.admin-spec__chip--on { background: rgba(124,134,245,.14); border-color: rgba(124,134,245,.7); color: var(--text); font-weight: 600; }
+.admin-spec__chip input { accent-color: #7C86F5; margin: 0; }
+.admin-spec__save { margin-top: 10px; font-size: .8125rem; padding: 7px 14px; border-radius: 8px; border: 1px solid rgba(124,134,245,.4); background: transparent; color: var(--text); cursor: pointer; }
+.admin-spec__save:hover:not(:disabled) { background: rgba(124,134,245,.1); }
+.admin-spec__save:disabled { opacity: .5; cursor: default; }
 .admin-modal__credit-edit { display: flex; gap: 6px; }
 .admin-modal__credit-edit input {
   background: var(--tint); border: 1px solid var(--border); border-radius: 6px;
@@ -3262,6 +3273,20 @@ body {
   display: inline-flex; align-items: center; gap: 6px; flex: 0 0 auto;
   font-size: .8125rem; font-weight: 500; color: var(--accent);
 }
+
+/* ===== Bilet puanlama (cift yonlu) ===== */
+.rate-box { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; margin-bottom: 14px; border: 1px solid rgba(124,134,245,.22); border-radius: 12px; background: rgba(124,134,245,.04); }
+.rate-box__prompt { font-size: .9rem; font-weight: 600; color: var(--text); margin: 0; }
+.rate-box__stars { display: inline-flex; gap: 3px; }
+.rate-box__stars--input .rate-box__star-btn { background: none; border: none; padding: 2px; cursor: pointer; line-height: 0; }
+.rate-box__comment { border: 1px solid rgba(124,134,245,.25); border-radius: 8px; padding: 8px 10px; font: inherit; font-size: .85rem; resize: vertical; background: var(--bg); color: var(--text); }
+.rate-box__comment:focus { outline: 2px solid rgba(124,134,245,.4); outline-offset: -1px; border-color: transparent; }
+.rate-box__submit { align-self: flex-start; padding: 8px 18px; border-radius: 8px; border: none; background: #7C86F5; color: #fff; font-weight: 600; font-size: .85rem; cursor: pointer; }
+.rate-box__submit:disabled { opacity: .5; cursor: default; }
+.rate-box--done, .rate-box--rep { flex-direction: row; align-items: center; justify-content: space-between; }
+.rate-box__label { font-size: .85rem; color: var(--text-muted); }
+.rate-box__rep-val { font-size: .95rem; font-weight: 700; color: #F5A623; }
+.rate-box__rep-val small { color: var(--text-muted); font-weight: 400; }
 
 /* ===== Musteri itirazi (disputed) ===== */
 .ticket-status--disputed { background: var(--bad-soft); color: var(--bad); }

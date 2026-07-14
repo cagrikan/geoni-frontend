@@ -10,6 +10,26 @@ import ThemeSwitcher from '../components/ThemeSwitcher'
 import ConfirmDialog from '../components/ConfirmDialog'
 import TicketBoard from '../components/TicketBoard'
 import TicketDetailOverlay from '../components/TicketDetailOverlay'
+import RateTicket from '../components/RateTicket'
+
+/* Uzmanin, atandigi biletin MUSTERISININ itibarini gormesi - sorunlu
+   musteriyi onceden tanimak icin. Musteri tarafinda hic cagrilmaz. */
+function CustomerReputation({ ticketId, authedFetch, t }) {
+  const [rep, setRep] = useState(null)
+  useEffect(() => {
+    let alive = true
+    authedFetch(`/api/tickets/${ticketId}/customer-reputation`)
+      .then((r) => { if (alive) setRep(r || {}) }).catch(() => {})
+    return () => { alive = false }
+  }, [ticketId, authedFetch])
+  if (!rep || rep.rating_count === 0 || rep.avg_rating == null) return null
+  return (
+    <div className="rate-box rate-box--rep">
+      <span className="rate-box__label">{t('rate_customer_rep') || 'Müşteri puanı'}</span>
+      <span className="rate-box__rep-val">★ {rep.avg_rating} <small>({rep.rating_count})</small></span>
+    </div>
+  )
+}
 import {
   Gem, History, Bookmark, Settings, Globe, User, Building2, FileText,
   TrendingUp, TrendingDown, ChevronRight, X, RefreshCw, ShieldCheck, Wrench, ClipboardList,
@@ -368,9 +388,11 @@ function MyTicketsSection({ t, userId, language }) {
           {t('ticket_confirm_cta')}
         </button>
       </div>
-    ) : selected.status === 'verified' ? (
+    ) : (selected.status === 'verified' || selected.status === 'disputed') ? (
       <div className="ticket-dispute">
-        {!disputeOpen ? (
+        {/* Uzmani (isimsiz) puanla — is bittikten sonra */}
+        <RateTicket ticketId={selected.id} authedFetch={authedFetch} promptKey="rate_prompt_expert" />
+        {selected.status === 'verified' && (!disputeOpen ? (
           <button type="button" className="ticket-dispute__open" onClick={() => setDisputeOpen(true)}>
             {t('ticket_dispute_open')}
           </button>
@@ -388,7 +410,7 @@ function MyTicketsSection({ t, userId, language }) {
               <button type="button" className="ticket-dispute__submit" disabled={disputeBusy || !disputeReason.trim()} onClick={submitDispute}>{t('ticket_dispute_submit')}</button>
             </div>
           </div>
-        )}
+        ))}
       </div>
     ) : null
     return (
@@ -489,6 +511,11 @@ function ExpertPanelSection({ t, userId, language }) {
           </div>
         )}
         {selected.status === 'rejected' && selected.reject_reason && <div className="ticket-reject-reason">{selected.reject_reason}</div>}
+        {/* Musteri itibari (uzman gorur) + is bitince musteriyi puanla */}
+        <CustomerReputation ticketId={selected.id} authedFetch={authedFetch} t={t} />
+        {['submitted', 'verified', 'disputed'].includes(selected.status) && (
+          <RateTicket ticketId={selected.id} authedFetch={authedFetch} promptKey="rate_prompt_customer" />
+        )}
       </div>
     )
     return (

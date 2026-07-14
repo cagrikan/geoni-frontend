@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
 import { useLanguage } from '../lib/LanguageContext'
@@ -322,6 +322,32 @@ const CUSTOMER_TICKET_COLUMNS = [
   { key: 'verified', statuses: ['verified'], labelKey: 'ticket_status_verified' },
 ]
 
+/* E-postadaki "Bilete Git" linki ?ticket=<id> ile gelir. Liste yuklendiginde
+   o bileti bir kez otomatik acar ve URL'den parametreyi temizler (yenilemede
+   tekrar acilmasin). Hem musteri hem uzman bolumunde kullanilir. */
+function useAutoOpenTicket(list, openFn) {
+  const openedRef = useRef(false)
+  useEffect(() => {
+    if (openedRef.current || !list) return
+    let wanted = null
+    try { wanted = new URL(window.location).searchParams.get('ticket') } catch { /* */ }
+    // Giris yonlendirmesinde URL'den dusmus olabilir -> localStorage yedegi.
+    if (!wanted) { try { wanted = localStorage.getItem('geoni_pending_ticket') } catch { /* */ } }
+    if (!wanted) { openedRef.current = true; return }
+    const tk = list.find((x) => String(x.id) === String(wanted))
+    if (tk) {
+      openedRef.current = true
+      openFn(tk)
+      try { localStorage.removeItem('geoni_pending_ticket') } catch { /* */ }
+      try {
+        const url = new URL(window.location)
+        url.searchParams.delete('ticket')
+        window.history.replaceState({}, '', url)
+      } catch { /* ignore */ }
+    }
+  }, [list, openFn])
+}
+
 function MyTicketsSection({ t, userId, language }) {
   const [myTickets, setMyTickets] = useState(null)
   const [selected, setSelected] = useState(null)
@@ -340,6 +366,7 @@ function MyTicketsSection({ t, userId, language }) {
     setDisputeOpen(false); setDisputeReason(''); setDisputeError(null)
     setMyTickets((list) => list?.map((t) => (t.id === tk.id ? { ...t, has_unread: false } : t)))
   }
+  useAutoOpenTicket(myTickets, openTicket)
 
   // Aksiyon sonrasi listeyi tazeleyip secili bileti tam guncel haliyle (status,
   // verified_at, mesajlar) yeniden ata - boylece overlay sayfa yenilemeden dogru
@@ -458,6 +485,7 @@ function ExpertPanelSection({ t, userId, language }) {
     setSelected(tk)
     setTickets((list) => list?.map((t) => (t.id === tk.id ? { ...t, has_unread: false } : t)))
   }
+  useAutoOpenTicket(tickets, openTicket)
 
   const submit = async (ticketId) => {
     const form = forms[ticketId] || {}

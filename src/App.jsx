@@ -58,6 +58,10 @@ function capturePendingTab() {
     const params = new URLSearchParams(window.location.search)
     const tab = params.get('tab')
     if (tab) localStorage.setItem('geoni_pending_tab', tab)
+    // E-postadaki "Bilete Git" ?ticket=<id> ile gelir; giris yonlendirmesinde
+    // kaybolmasin diye sakla, DashboardPage acilinca ilgili bileti acar.
+    const ticket = params.get('ticket')
+    if (ticket) localStorage.setItem('geoni_pending_ticket', ticket)
     // Rapor sayfasindaki "bu eksigi giderin" koprusu hedefi de tasir -
     // Hizmetler sekmesi acilinca kartlarin hedef alani on-dolu gelir.
     const target = params.get('target')

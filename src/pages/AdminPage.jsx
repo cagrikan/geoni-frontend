@@ -2051,7 +2051,7 @@ function ImprovementTab() {
         <>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 22 }}>
             <StatTile label="Sorgu cevap oranı" value={pct(overall.answer_rate)} icon={TrendingUp} />
-            <StatTile label="Skor kararlılık (ort)" value={overall.score_stability ?? '—'} icon={Sparkles} />
+            <StatTile label="Skor oynaklığı ±(ort)" value={overall.score_stability ?? '—'} icon={Sparkles} />
             <StatTile label="Temelsiz iddia" value={overall.ungrounded_mentions ?? '—'} icon={ShieldAlert} />
           </div>
 

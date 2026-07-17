@@ -2052,7 +2052,7 @@ function ImprovementTab() {
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 22 }}>
             <StatTile label="Sorgu cevap oranı" value={pct(overall.answer_rate)} icon={TrendingUp} />
             <StatTile label="Skor oynaklığı ±(ort)" value={overall.score_stability ?? '—'} icon={Sparkles} />
-            <StatTile label="Temelsiz iddia" value={overall.ungrounded_mentions ?? '—'} icon={ShieldAlert} />
+            <StatTile label="Kaynaksız cevap" value={overall.ungrounded_mentions ?? '—'} icon={ShieldAlert} />
           </div>
 
           <h3 className="admin-section__title">Kendi AI-görünürlüğümüz (motor bazlı)</h3>
@@ -2084,6 +2084,41 @@ function ImprovementTab() {
               </tbody>
             </table>
           </div>
+
+          <h3 className="admin-section__title" style={{ marginTop: 24 }}>4 motor — tanınma / doğruluk / halüsinasyon (model_results)</h3>
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead><tr><th>Motor</th><th className="admin-table__num">Tanınma</th><th className="admin-table__num">Doğruluk (ort)</th><th className="admin-table__num">Halüsinasyon</th><th className="admin-table__num">Çelişki</th></tr></thead>
+              <tbody>
+                {(sig.quality_model || []).length === 0 && <tr><td colSpan={5} className="admin-table__muted">Veri yok.</td></tr>}
+                {(sig.quality_model || []).map((r) => (
+                  <tr key={r.subject}><td>{r.subject}</td>
+                    <td className="admin-table__num">{pct(r.metric)}</td>
+                    <td className="admin-table__num">{r.detail?.accuracy_avg ?? '—'}</td>
+                    <td className="admin-table__num">{pct(r.detail?.hallucination_rate)}</td>
+                    <td className="admin-table__num">{pct(r.detail?.contradiction_rate)}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {(sig.own_recognition || []).length > 0 && (
+            <>
+              <h3 className="admin-section__title" style={{ marginTop: 24 }}>geoni.ai — bizi hangi motor tanıyor? (self-scan)</h3>
+              <div className="admin-table-wrap">
+                <table className="admin-table">
+                  <thead><tr><th>Motor</th><th>Tanıyor mu?</th><th className="admin-table__num">Skor</th></tr></thead>
+                  <tbody>
+                    {(sig.own_recognition || []).map((r) => (
+                      <tr key={r.subject}><td>{r.subject}</td>
+                        <td style={{ color: r.metric ? 'var(--good,#1a7f37)' : 'var(--bad,#cf222e)' }}>{r.metric ? 'Evet' : 'Hayır'}</td>
+                        <td className="admin-table__num">{r.detail?.score ?? '—'}</td></tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
 
           <h3 className="admin-section__title" style={{ marginTop: 24 }}>İçerik boşluğu — en çok sorulan gerçek sorular</h3>
           <div className="admin-table-wrap">

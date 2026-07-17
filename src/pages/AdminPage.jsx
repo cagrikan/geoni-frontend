@@ -14,7 +14,7 @@ import {
   LayoutDashboard, Users, ScrollText, Search, Shield, ShieldOff,
   Plus, Minus, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ArrowLeft,
   UserPlus, RotateCcw, Globe, User, Tag, ShoppingCart, TrendingDown, TrendingUp, Gift, ShieldAlert,
-  CalendarDays, CalendarRange, Calendar, History, Wallet, PiggyBank, Database, Megaphone, Copy, Check, Wrench,
+  CalendarDays, CalendarRange, Calendar, History, Wallet, PiggyBank, Database, Megaphone, Copy, Check, Wrench, Sparkles,
 } from 'lucide-react'
 
 const COST_TILE_ICONS = { today: CalendarDays, week: CalendarRange, month: Calendar, allTime: History }
@@ -2004,6 +2004,118 @@ function PayoutsTab() {
   )
 }
 
+function ImprovementTab() {
+  const [data, setData] = useState(null)
+  const [error, setError] = useState(null)
+  const [running, setRunning] = useState(false)
+  const [digest, setDigest] = useState(null)
+
+  const load = useCallback(() => {
+    setData(null); setError(null)
+    authedFetch('/api/admin/improvement').then(setData).catch((e) => setError(e.message))
+  }, [])
+  useEffect(() => { load() }, [load])
+
+  const runNow = async () => {
+    setRunning(true); setDigest(null)
+    try {
+      const d = await authedFetch('/api/admin/improvement/run', { method: 'POST' })
+      setDigest(d); load()
+    } catch (e) { alert(e.message) } finally { setRunning(false) }
+  }
+
+  const pct = (n) => (n == null ? '—' : `%${Math.round(Number(n) * 100)}`)
+  const sig = data?.signals || {}
+  const ownVis = sig.own_visibility || []
+  const gaps = sig.content_gap || []
+  const niches = sig.niche_pain || []
+  const qEng = sig.quality_engine || []
+  const overall = Object.fromEntries((sig.quality_overall || []).map((r) => [r.subject, r.metric]))
+
+  return (
+    <div>
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap', marginBottom: 18 }}>
+        <h3 className="admin-section__title" style={{ margin: 0 }}>Öz-gelişim motoru</h3>
+        {data?.cycle_date && <span className="admin-table__muted">döngü: {data.cycle_date}</span>}
+        <button className="admin-back" disabled={running} onClick={runNow} style={{ marginLeft: 'auto' }}>
+          <RotateCcw size={14} strokeWidth={1.5} /> {running ? 'Çalışıyor…' : 'Şimdi çalıştır'}
+        </button>
+      </div>
+
+      {error && <div className="admin-error">{error}</div>}
+      {!data && !error && <div className="admin-loading">Yükleniyor…</div>}
+      {digest && <p className="admin-hint">Döngü çalıştı: {digest.scanned_audits} tarama tarandı, {digest.signals_written} sinyal yazıldı.</p>}
+      {data && !data.cycle_date && <p className="admin-hint">Henüz sinyal yok. "Şimdi çalıştır" ile ilk döngüyü başlat (her gün otomatik de döner).</p>}
+
+      {data?.cycle_date && (
+        <>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 22 }}>
+            <StatTile label="Sorgu cevap oranı" value={pct(overall.answer_rate)} icon={TrendingUp} />
+            <StatTile label="Skor kararlılık (ort)" value={overall.score_stability ?? '—'} icon={Sparkles} />
+            <StatTile label="Temelsiz iddia" value={overall.ungrounded_mentions ?? '—'} icon={ShieldAlert} />
+          </div>
+
+          <h3 className="admin-section__title">Kendi AI-görünürlüğümüz (motor bazlı)</h3>
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead><tr><th>Motor</th><th className="admin-table__num">geoni geçişi</th><th className="admin-table__num">Cevap</th><th className="admin-table__num">Oran</th></tr></thead>
+              <tbody>
+                {ownVis.length === 0 && <tr><td colSpan={4} className="admin-table__muted">Veri yok.</td></tr>}
+                {ownVis.map((r) => (
+                  <tr key={r.subject}><td>{r.subject}</td><td className="admin-table__num">{r.metric}</td>
+                    <td className="admin-table__num">{r.detail?.answered ?? '—'}</td>
+                    <td className="admin-table__num">{pct(r.detail?.mention_rate)}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <h3 className="admin-section__title" style={{ marginTop: 24 }}>Motor kalitesi</h3>
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead><tr><th>Motor</th><th className="admin-table__num">Cevap</th><th className="admin-table__num">Kaynaklı</th><th className="admin-table__num">Kaynak oranı</th></tr></thead>
+              <tbody>
+                {qEng.length === 0 && <tr><td colSpan={4} className="admin-table__muted">Veri yok.</td></tr>}
+                {qEng.map((r) => (
+                  <tr key={r.subject}><td>{r.subject}</td><td className="admin-table__num">{r.metric}</td>
+                    <td className="admin-table__num">{r.detail?.has_sources ?? '—'}</td>
+                    <td className="admin-table__num">{pct(r.detail?.source_rate)}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <h3 className="admin-section__title" style={{ marginTop: 24 }}>İçerik boşluğu — en çok sorulan gerçek sorular</h3>
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead><tr><th>Soru</th><th className="admin-table__num">Sıklık</th></tr></thead>
+              <tbody>
+                {gaps.length === 0 && <tr><td colSpan={2} className="admin-table__muted">Veri yok.</td></tr>}
+                {gaps.map((r, i) => (<tr key={i}><td>{r.subject}</td><td className="admin-table__num">{r.metric}</td></tr>))}
+              </tbody>
+            </table>
+          </div>
+
+          <h3 className="admin-section__title" style={{ marginTop: 24 }}>Niş acısı — düşük skorlu alanlar + domine rakipler</h3>
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead><tr><th>Niş</th><th className="admin-table__num">Ort skor</th><th className="admin-table__num">Tarama</th><th>Domine rakipler</th></tr></thead>
+              <tbody>
+                {niches.length === 0 && <tr><td colSpan={4} className="admin-table__muted">Veri yok.</td></tr>}
+                {niches.map((r, i) => (
+                  <tr key={i}><td>{r.subject}</td><td className="admin-table__num">{r.metric}</td>
+                    <td className="admin-table__num">{r.detail?.scans ?? '—'}</td>
+                    <td className="admin-table__muted">{(r.detail?.top_competitors || []).join(', ')}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
 export default function AdminPage({ onBack }) {
   const { t } = useLanguage()
   const { profile } = useAuth()
@@ -2063,6 +2175,9 @@ export default function AdminPage({ onBack }) {
             <button className={`dash-nav__item ${tab === 'payouts' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('payouts')}>
               <PiggyBank size={16} strokeWidth={1.5} /> Muhasebe
             </button>
+            <button className={`dash-nav__item ${tab === 'improvement' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('improvement')}>
+              <Sparkles size={16} strokeWidth={1.5} /> Öz-gelişim
+            </button>
           </nav>
         </aside>
 
@@ -2074,6 +2189,7 @@ export default function AdminPage({ onBack }) {
           {tab === 'campaigns' && <CampaignsTab />}
           {tab === 'tickets' && <TicketsAdminTab />}
           {tab === 'payouts' && <PayoutsTab />}
+          {tab === 'improvement' && <ImprovementTab />}
         </main>
       </div>
     </div>

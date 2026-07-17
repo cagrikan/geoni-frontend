@@ -1883,7 +1883,8 @@ const ADMIN_TABS = ['overview', 'users', 'audits', 'sales', 'campaigns', 'ticket
 
 function PayoutsTab() {
   const [period, setPeriod] = useState('')
-  const { data, error } = useAdminFetch(`/api/admin/payouts${period ? `?period=${period}` : ''}`)
+  const [reload, setReload] = useState(0)
+  const { data, error } = useAdminFetch(`/api/admin/payouts?${period ? `period=${period}&` : ''}_r=${reload}`)
   const [rows, setRows] = useState(null)
   const [busyId, setBusyId] = useState(null)
   useEffect(() => { setRows(data?.payouts ?? null) }, [data])
@@ -1895,14 +1896,20 @@ function PayoutsTab() {
     setBusyId(id)
     try {
       await authedFetch(`/api/admin/payouts/${id}/paid`, { method: 'POST', body: JSON.stringify({ paid }) })
-      setRows((rs) => rs.map((r) => (r.id === id ? { ...r, status: paid ? 'paid' : 'pending', paid_at: paid ? new Date().toISOString() : null } : r)))
+      // F5: tam refetch — sadece satiri degil, tile'lari (Ödenen/Kalan) ve Kişi
+      // özetini de tazele (aksi halde satır "Ödendi" derken üstteki toplam bayat kalır).
+      setReload((r) => r + 1)
     } catch (e) { alert(e.message) } finally { setBusyId(null) }
   }
 
   const exportCsv = () => {
     const list = rows || []
     const head = ['tarih', 'kisi', 'tur', 'musteri', 'baz', 'oran', 'tutar', 'durum', 'odendi']
-    const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`
+    const esc = (v) => {
+      let s = String(v ?? '')
+      if (/^[=+\-@]/.test(s)) s = "'" + s  // F5: Excel formül-enjeksiyonu (=HYPERLINK…) engeli
+      return `"${s.replace(/"/g, '""')}"`
+    }
     const csv = [head.join(',')].concat(list.map((r) => [
       r.created_at, r.expert_name, kindLabel(r.kind), r.customer_name || '',
       r.basis_amount, r.rate, r.amount, r.status, r.paid_at || '',

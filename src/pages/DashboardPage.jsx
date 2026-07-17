@@ -45,6 +45,10 @@ const TICKET_TYPE_ICONS = {
   citation_placement: Link2,
 }
 
+// Iki temel/otonom hizmet TEMELDIR; ileri hizmetler bunlar alinmadan sonuc
+// vermez (sunucu da engelliyor). UI'da siralamayi ogretmek icin isaretliyoruz.
+const FOUNDATION_KEYS = ['llms_robots', 'schema_setup']
+
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.geoni.ai'
 
 async function authedFetch(path, options = {}) {
@@ -293,6 +297,11 @@ function ServiceCatalogSection({ t, profile }) {
                 <p className="dash-service-card__desc">{tt.description}</p>
                 {tt.key === 'llms_robots' && (
                   <span className="dash-service-card__auto">{t('dash_service_auto_note')}</span>
+                )}
+                {FOUNDATION_KEYS.includes(tt.key) ? (
+                  <span className="dash-service-card__foundation">{t('dash_service_foundation')}</span>
+                ) : (
+                  <span className="dash-service-card__prereq">{t('dash_service_needs_foundation')}</span>
                 )}
                 <input
                   type="text"

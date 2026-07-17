@@ -2674,6 +2674,20 @@ body {
 .dash-service-card__auto::before {
   content: ''; width: 6px; height: 6px; border-radius: var(--r-full); background: var(--warn);
 }
+.dash-service-card__foundation {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .75rem; font-weight: 600; color: var(--accent);
+}
+.dash-service-card__foundation::before {
+  content: '⚑'; font-size: .8rem; line-height: 1;
+}
+.dash-service-card__prereq {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .75rem; color: var(--text-muted);
+}
+.dash-service-card__prereq::before {
+  content: '🔒'; font-size: .72rem; line-height: 1; filter: grayscale(1) opacity(.7);
+}
 .dash-service-card__target {
   width: 100%; box-sizing: border-box; background: var(--bg);
   border: 1px solid var(--border-mid); border-radius: 6px; padding: 8px 10px;

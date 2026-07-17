@@ -1881,6 +1881,129 @@ function SalesTab() {
 
 const ADMIN_TABS = ['overview', 'users', 'audits', 'sales', 'campaigns', 'tickets']
 
+function PayoutsTab() {
+  const [period, setPeriod] = useState('')
+  const { data, error } = useAdminFetch(`/api/admin/payouts${period ? `?period=${period}` : ''}`)
+  const [rows, setRows] = useState(null)
+  const [busyId, setBusyId] = useState(null)
+  useEffect(() => { setRows(data?.payouts ?? null) }, [data])
+
+  const money = (n) => `$${(Number(n) || 0).toFixed(2)}`
+  const kindLabel = (k) => (k === 'delivery' ? 'Hizmet (%33)' : 'Referral (%10)')
+
+  const markPaid = async (id, paid) => {
+    setBusyId(id)
+    try {
+      await authedFetch(`/api/admin/payouts/${id}/paid`, { method: 'POST', body: JSON.stringify({ paid }) })
+      setRows((rs) => rs.map((r) => (r.id === id ? { ...r, status: paid ? 'paid' : 'pending', paid_at: paid ? new Date().toISOString() : null } : r)))
+    } catch (e) { alert(e.message) } finally { setBusyId(null) }
+  }
+
+  const exportCsv = () => {
+    const list = rows || []
+    const head = ['tarih', 'kisi', 'tur', 'musteri', 'baz', 'oran', 'tutar', 'durum', 'odendi']
+    const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`
+    const csv = [head.join(',')].concat(list.map((r) => [
+      r.created_at, r.expert_name, kindLabel(r.kind), r.customer_name || '',
+      r.basis_amount, r.rate, r.amount, r.status, r.paid_at || '',
+    ].map(esc).join(','))).join('\n')
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = `muhasebe-${period || 'tumu'}.csv`
+    a.click()
+    URL.revokeObjectURL(a.href)
+  }
+
+  if (error) return <div className="admin-error">{error}</div>
+  if (!data) return <div className="admin-loading">Yükleniyor…</div>
+
+  const experts = data.experts || []
+  const totals = data.totals || {}
+  const list = rows || []
+
+  return (
+    <div>
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap', marginBottom: 18 }}>
+        <h3 className="admin-section__title" style={{ margin: 0 }}>Uzman / Influencer Muhasebe</h3>
+        <input type="month" value={period} onChange={(e) => setPeriod(e.target.value)}
+          style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid var(--border-mid, #ccc)', background: 'transparent', color: 'inherit' }} title="Dönem (ay)" />
+        {period && <button className="admin-back" onClick={() => setPeriod('')}>Tümü</button>}
+        <button className="admin-back" onClick={exportCsv} style={{ marginLeft: 'auto' }}><Database size={14} strokeWidth={1.5} /> CSV indir</button>
+      </div>
+
+      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 22 }}>
+        <StatTile label="Toplam kazanç" value={money(totals.earned)} icon={PiggyBank} />
+        <StatTile label="Ödenen" value={money(totals.paid)} icon={Check} />
+        <StatTile label="Kalan (borç)" value={money(totals.outstanding)} icon={Wallet} />
+      </div>
+
+      <h3 className="admin-section__title">Kişi özeti</h3>
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Kişi</th><th>Mod</th><th>Sözleşme</th>
+              <th className="admin-table__num">Hizmet</th><th className="admin-table__num">Referral</th>
+              <th className="admin-table__num">Toplam</th><th className="admin-table__num">Ödenen</th><th className="admin-table__num">Kalan</th>
+            </tr>
+          </thead>
+          <tbody>
+            {experts.length === 0 && <tr><td colSpan={8} className="admin-table__muted">Henüz kazanç kaydı yok.</td></tr>}
+            {experts.map((e) => (
+              <tr key={e.expert_id}>
+                <td>{e.name}{e.email ? <div className="admin-table__muted">{e.email}</div> : null}</td>
+                <td>{e.expert_mode === 'service' ? 'Hizmet' : e.expert_mode === 'referral' ? 'Referral' : '—'}</td>
+                <td>{e.contract ? `${e.contract.status} · bitiş ${formatDate(e.contract.ends_at)}` : '—'}</td>
+                <td className="admin-table__num">{money(e.delivery_earned)}</td>
+                <td className="admin-table__num">{money(e.referral_earned)}</td>
+                <td className="admin-table__num">{money(e.total_earned)}</td>
+                <td className="admin-table__num">{money(e.total_paid)}</td>
+                <td className="admin-table__num"><b>{money(e.outstanding)}</b></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h3 className="admin-section__title" style={{ marginTop: 26 }}>Kazanç satırları</h3>
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Tarih</th><th>Kişi</th><th>Tür</th><th>Müşteri</th>
+              <th className="admin-table__num">Baz</th><th className="admin-table__num">Oran</th><th className="admin-table__num">Tutar</th>
+              <th>Durum</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {list.length === 0 && <tr><td colSpan={9} className="admin-table__muted">Kayıt yok.</td></tr>}
+            {list.map((r) => (
+              <tr key={r.id}>
+                <td className="admin-table__muted">{formatDate(r.created_at)}</td>
+                <td>{r.expert_name}</td>
+                <td>{kindLabel(r.kind)}</td>
+                <td>{r.customer_name || '—'}</td>
+                <td className="admin-table__num">{money(r.basis_amount)}</td>
+                <td className="admin-table__num">{Math.round((r.rate || 0) * 100)}%</td>
+                <td className="admin-table__num"><b>{money(r.amount)}</b></td>
+                <td style={{ color: r.status === 'paid' ? 'var(--good, #1a7f37)' : r.status === 'void' ? 'var(--text-muted, #888)' : 'var(--warn, #9a6700)' }}>
+                  {r.status === 'paid' ? 'Ödendi' : r.status === 'void' ? 'İptal' : 'Bekliyor'}
+                </td>
+                <td>{r.status !== 'void' && (
+                  <button className="admin-back" disabled={busyId === r.id} onClick={() => markPaid(r.id, r.status !== 'paid')}>
+                    {r.status === 'paid' ? 'Geri al' : 'Ödendi işaretle'}
+                  </button>
+                )}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
 export default function AdminPage({ onBack }) {
   const { t } = useLanguage()
   const { profile } = useAuth()
@@ -1937,6 +2060,9 @@ export default function AdminPage({ onBack }) {
             <button className={`dash-nav__item ${tab === 'tickets' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('tickets')}>
               <Wrench size={16} strokeWidth={1.5} /> {t('admin_nav_tickets')}
             </button>
+            <button className={`dash-nav__item ${tab === 'payouts' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('payouts')}>
+              <PiggyBank size={16} strokeWidth={1.5} /> Muhasebe
+            </button>
           </nav>
         </aside>
 
@@ -1947,6 +2073,7 @@ export default function AdminPage({ onBack }) {
           {tab === 'sales' && <SalesTab />}
           {tab === 'campaigns' && <CampaignsTab />}
           {tab === 'tickets' && <TicketsAdminTab />}
+          {tab === 'payouts' && <PayoutsTab />}
         </main>
       </div>
     </div>

@@ -139,7 +139,7 @@ function FixSuggestions({ result, t }) {
   )
 }
 
-export default function ResultsPage({ result, jobId = null, onReset, user, onLogin, onDashboard, isPro = false, isSample = false, isPrivate = false }) {
+export default function ResultsPage({ result, jobId = null, onReset, user, onLogin, onDashboard, onUpgrade, isPro = false, isSample = false, isPrivate = false }) {
   const { t, language } = useLanguage()
   const {
     domain, score, score_breakdown,
@@ -218,7 +218,7 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
               t={t}
             />
           </div>
-          <ProBlur isPro={isPro} label={t('results_site_breakdown_label')}>
+          <ProBlur isPro={isPro} onUpgrade={onUpgrade} label={t('results_site_breakdown_label')}>
             <Breakdown breakdown={score_breakdown} language={language} />
           </ProBlur>
         </div>
@@ -255,7 +255,7 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
             <span className="results__stat-l">{t('results_site_gemini_access')}</span>
           </div>
           <div className="results__stat">
-            <ProBlur isPro={isPro} label={t('results_site_llmtxt_label')}>
+            <ProBlur isPro={isPro} onUpgrade={onUpgrade} label={t('results_site_llmtxt_label')}>
               <span className="results__stat-n" style={{ color: result.llms_txt == null ? 'var(--text-muted)' : result.llms_txt ? 'var(--good)' : 'var(--bad)' }}>
                 {result.llms_txt == null ? '—' : result.llms_txt ? t('results_yes') : t('results_no')}
               </span>
@@ -280,7 +280,7 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
               <div className="topics__empty">{t('results_strong_topics_empty')}</div>
             )}
             {paidTopics.length > 0 && (
-              <ProBlur isPro={isPro} label={`+${paidTopics.length} ${t('results_more_topics')}`}>
+              <ProBlur isPro={isPro} onUpgrade={onUpgrade} label={`+${paidTopics.length} ${t('results_more_topics')}`}>
                 {paidTopics.map((tp, i) => <TopicCard topic={tp} key={i} />)}
               </ProBlur>
             )}
@@ -293,7 +293,7 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
               <div className="topics__empty">{t('results_opportunities_empty')}</div>
             )}
             {paidOpps.length > 0 && (
-              <ProBlur isPro={isPro} label={`+${paidOpps.length} ${t('results_more_opportunities')}`}>
+              <ProBlur isPro={isPro} onUpgrade={onUpgrade} label={`+${paidOpps.length} ${t('results_more_opportunities')}`}>
                 {paidOpps.map((tp, i) => <TopicCard topic={tp} isOpportunity key={i} />)}
               </ProBlur>
             )}

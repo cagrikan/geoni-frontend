@@ -420,6 +420,14 @@ function AppInner() {
 
   const handleDashboard = () => navigateTo('dashboard')
 
+  // ProBlur "yukselt": kullaniciyi pazarlama sitesine (geoni.ai#paketler)
+  // atmak yerine uygulama ici kredi sekmesine goturur. Giris yapmamissa once
+  // login'e; geoni_pending_tab DashboardPage acilinca 'credits' sekmesini acar.
+  const handleUpgrade = () => {
+    try { localStorage.setItem('geoni_pending_tab', 'credits') } catch { /* ignore */ }
+    navigateTo(user ? 'dashboard' : 'login')
+  }
+
   if (authLoading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--bg)' }}>
       <div className="spinner" />
@@ -455,9 +463,9 @@ function AppInner() {
           onCancel={handleReset}
         />
       )}
-      {view === 'results' && result && <ResultsPage result={result} jobId={isPrivateResult || isSample ? null : lastJobId} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} isPro={isSample || profile?.is_admin || (profile?.credit_balance > 0 && profile?.total_credits_purchased > 0)} isSample={isSample} isPrivate={isPrivateResult} />}
+      {view === 'results' && result && <ResultsPage result={result} jobId={isPrivateResult || isSample ? null : lastJobId} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} onUpgrade={handleUpgrade} isPro={isSample || profile?.is_admin || (profile?.credit_balance > 0 && profile?.total_credits_purchased > 0)} isSample={isSample} isPrivate={isPrivateResult} />}
       {view === 'brand_results' && brandResult && !brandResult.identity_mismatch && (
-        <BrandCheckResultsPage result={brandResult} jobId={isPrivateResult ? null : lastJobId} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} isPro={profile?.is_admin || (profile?.credit_balance > 0 && profile?.total_credits_purchased > 0)} isPrivate={isPrivateResult} />
+        <BrandCheckResultsPage result={brandResult} jobId={isPrivateResult ? null : lastJobId} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} onUpgrade={handleUpgrade} isPro={profile?.is_admin || (profile?.credit_balance > 0 && profile?.total_credits_purchased > 0)} isPrivate={isPrivateResult} />
       )}
       {view === 'brand_results' && brandResult?.identity_mismatch && (
         <IdentityMismatchPage result={brandResult} onReset={handleReset} />

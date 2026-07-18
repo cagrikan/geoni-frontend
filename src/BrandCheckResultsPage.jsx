@@ -113,7 +113,7 @@ function TopicCard({ topic, isOpportunity }) {
   )
 }
 
-export default function BrandCheckResultsPage({ result, jobId = null, onReset, user, onLogin, onDashboard, isPro = false, isPrivate = false }) {
+export default function BrandCheckResultsPage({ result, jobId = null, onReset, user, onLogin, onDashboard, onUpgrade, isPro = false, isPrivate = false }) {
   const { t, language } = useLanguage()
   const {
     name,
@@ -205,7 +205,7 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
               t={t}
             />
           </div>
-          <ProBlur isPro={isPro} label={t('results_brand_breakdown_label')}>
+          <ProBlur isPro={isPro} onUpgrade={onUpgrade} label={t('results_brand_breakdown_label')}>
             <Breakdown breakdown={score_breakdown} t={t} />
           </ProBlur>
         </div>
@@ -270,7 +270,7 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
               <div className="topics__empty">{t('results_strong_topics_empty')}</div>
             )}
             {paidPerforming.length > 0 && (
-              <ProBlur isPro={isPro} label={`+${paidPerforming.length} ${t('results_more_topics')}`}>
+              <ProBlur isPro={isPro} onUpgrade={onUpgrade} label={`+${paidPerforming.length} ${t('results_more_topics')}`}>
                 {paidPerforming.map((tp, i) => <TopicCard topic={tp} key={i} />)}
               </ProBlur>
             )}
@@ -283,7 +283,7 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
               <div className="topics__empty">{t('results_opportunities_empty')}</div>
             )}
             {paidOpps.length > 0 && (
-              <ProBlur isPro={isPro} label={`+${paidOpps.length} ${t('results_more_opportunities')}`}>
+              <ProBlur isPro={isPro} onUpgrade={onUpgrade} label={`+${paidOpps.length} ${t('results_more_opportunities')}`}>
                 {paidOpps.map((tp, i) => <TopicCard topic={tp} isOpportunity key={i} />)}
               </ProBlur>
             )}

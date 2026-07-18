@@ -350,7 +350,7 @@ body {
   background: rgba(248, 81, 73, .07);
   border: 1px solid rgba(248, 81, 73, .18);
   font-size: .875rem;
-  color: #FCA5A5;
+  color: var(--bad);
   font-family: var(--mono);
   max-width: 460px;
 }
@@ -661,7 +661,7 @@ body {
 }
 .topic-badge--competitor {
   background: rgba(248, 81, 73, .08);
-  color: #FCA5A5;
+  color: var(--bad);
   border: 1px solid rgba(248, 81, 73, .18);
 }
 .topics__empty {

@@ -240,7 +240,10 @@ function AppInner() {
 
   const pollAuditJob = async (jobId, gen) => {
     let errStreak = 0
-    for (let i = 0; i < 60; i++) {
+    // cold-start: worker 0'dan ayağa kalkarken (~3dk) iş SQS'te bekler; eski
+    // 60×3sn=3dk tavan TAM bu pencerede pes ediyordu. 100×3sn = 5 dk (cold-start
+    // + tarama sığar; askıda kalan sorgu da 5dk'da bırakılır, e-posta fallback var).
+    for (let i = 0; i < 100; i++) {
       await new Promise(r => setTimeout(r, 3000))
       if (scanGenRef.current !== gen) return  // iptal edildi / yeni tarama basladi
       try {
@@ -263,7 +266,9 @@ function AppInner() {
 
   const pollBrandJob = async (jobId, entityType, gen) => {
     let errStreak = 0
-    for (let i = 0; i < 25; i++) {
+    // cold-start: eski 25×2sn=50sn tavan cold-start'ta (~3dk) kesin timeout ediyordu.
+    // 150×2sn = 5 dk (cold-start + sorgu sığar; askıda kalan da 5dk'da bırakılır).
+    for (let i = 0; i < 150; i++) {
       await new Promise(r => setTimeout(r, 2000))
       if (scanGenRef.current !== gen) return
       try {

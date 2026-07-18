@@ -399,15 +399,15 @@ export const translations = {
     dash_settings_theme_dark: 'Koyu',
     dash_settings_theme_light: 'Açık',
     dash_settings_membership: 'Üyelik',
-    dash_settings_free_plan: 'Ücretsiz Plan',
-    dash_settings_pro_plan: 'Pro',
+    dash_settings_free_plan: 'Token bakiyesi yok',
+    dash_settings_pro_plan: 'Token bakiyen var',
     dash_settings_admin_plan: 'Admin',
-    dash_settings_upgrade: "Pro'ya Geç",
+    dash_settings_upgrade: 'Token Al',
     dash_settings_signout: 'Çıkış Yap',
 
-    // ── Pro blur ──
-    problur_default_label: 'Pro içerik',
-    problur_upgrade: "Pro'ya Geç →",
+    // ── Kilitli (token ile açılan) içerik ──
+    problur_default_label: 'Kilitli',
+    problur_upgrade: 'Tam raporu aç →',
 
     // ── Hatalar ──
     error_audit_failed: 'Tarama başarısız',
@@ -1076,15 +1076,15 @@ export const translations = {
     dash_settings_theme_dark: 'Dark',
     dash_settings_theme_light: 'Light',
     dash_settings_membership: 'Membership',
-    dash_settings_free_plan: 'Free Plan',
-    dash_settings_pro_plan: 'Pro',
+    dash_settings_free_plan: 'No token balance',
+    dash_settings_pro_plan: 'You have tokens',
     dash_settings_admin_plan: 'Admin',
-    dash_settings_upgrade: 'Upgrade to Pro',
+    dash_settings_upgrade: 'Buy Tokens',
     dash_settings_signout: 'Sign Out',
 
-    // ── Pro blur ──
-    problur_default_label: 'Pro content',
-    problur_upgrade: 'Upgrade to Pro →',
+    // ── Locked (token-unlocked) content ──
+    problur_default_label: 'Locked',
+    problur_upgrade: 'Unlock full report →',
 
     // ── Errors ──
     error_audit_failed: 'Scan failed',

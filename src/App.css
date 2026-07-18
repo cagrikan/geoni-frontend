@@ -2035,19 +2035,42 @@ body {
   padding: 20px 24px 60px;
 }
 
-@keyframes scan-pulse-ring {
-  0%   { r: 20; opacity: .9; }
-  100% { r: 110; opacity: 0; }
+/* Takimyildiz tarama ekrani — immersive koyu (tema fark etmez, hep ayni premium his).
+   Metinler acik renge sabitlenir; constellation canvas icerigin arkasinda. */
+.scan-screen {
+  background: radial-gradient(130% 100% at 50% 42%, #1a1330 0%, #0f0c17 62%) !important;
+  color: #f4f2fb;
 }
-.scan-pulse { width: 160px; height: 160px; margin-bottom: 28px; }
-.scan-pulse__ring {
-  stroke: var(--accent-2);
-  transform-origin: 120px 120px;
-  animation: scan-pulse-ring 2.4s cubic-bezier(.2,.6,.35,1) infinite;
+.scan-screen__brand, .scan-screen__center { position: relative; z-index: 2; }
+.scan-constellation {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  z-index: 0; pointer-events: none;
 }
-.scan-pulse__ring--2 { animation-delay: .8s; }
-.scan-pulse__ring--3 { animation-delay: 1.6s; }
-.scan-pulse__core { fill: var(--accent-2); }
+.scan-core { position: relative; width: 132px; height: 132px; display: grid; place-items: center; margin-bottom: 30px; }
+.scan-core__ring { position: absolute; inset: 0; rotate: -90deg; }
+.scan-core__track { fill: none; stroke: rgba(255,255,255,.08); stroke-width: 3; }
+.scan-core__prog {
+  fill: none; stroke-width: 3; stroke-linecap: round;
+  stroke-dasharray: 396; stroke-dashoffset: 396;
+  animation: scan-core-fill 3.4s ease-in-out infinite;
+}
+@keyframes scan-core-fill { 0%{stroke-dashoffset:396} 55%{stroke-dashoffset:70} 100%{stroke-dashoffset:396} }
+.scan-core__mark {
+  position: relative; width: 62px; height: 62px; display: grid; place-items: center;
+  filter: drop-shadow(0 0 18px rgba(139,63,252,.5));
+  animation: scan-core-breathe 2.6s ease-in-out infinite;
+}
+.scan-core__mark .geoni-mark { width: 54px; height: 54px; }
+@keyframes scan-core-breathe { 0%,100%{scale:1} 50%{scale:1.06} }
+/* koyu zeminde okunur metinler */
+.scan-screen__title { color: #f6f3fc; }
+.scan-screen__sub, .scan-screen__eta { color: #a49bb8; }
+.scan-screen .scan-step__label { color: #d8d3e4; }
+.scan-screen .scan-step--pending .scan-step__label { color: #6f6a80; }
+.scan-screen__cancel { color: #a49bb8; }
+@media (prefers-reduced-motion: reduce) {
+  .scan-core__prog, .scan-core__mark { animation: none; }
+}
 
 .scan-screen__title {
   font-family: var(--display);

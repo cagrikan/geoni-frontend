@@ -1,15 +1,22 @@
 import { CircleCheck, Loader2 } from 'lucide-react'
 import GeoniMark from '../GeoniMark'
+import Constellation from './Constellation'
 import { useLanguage } from '../lib/LanguageContext'
 
-function Pulse() {
+// Merkez: dolan skor halkası + içinde GEONI logosu. Takımyıldız (Constellation)
+// bunun arkasında; birlikte "AI evrenini tarayıp seni ölçüyoruz" hissini verir.
+function ScoreCore() {
   return (
-    <svg className="scan-pulse" viewBox="0 0 240 240">
-      <circle className="scan-pulse__ring scan-pulse__ring--1" cx="120" cy="120" r="50" fill="none" strokeWidth="1.5" />
-      <circle className="scan-pulse__ring scan-pulse__ring--2" cx="120" cy="120" r="50" fill="none" strokeWidth="1.5" />
-      <circle className="scan-pulse__ring scan-pulse__ring--3" cx="120" cy="120" r="50" fill="none" strokeWidth="1.5" />
-      <circle className="scan-pulse__core" cx="120" cy="120" r="8" />
-    </svg>
+    <div className="scan-core">
+      <svg className="scan-core__ring" viewBox="0 0 132 132" aria-hidden="true">
+        <defs><linearGradient id="scanCoreG" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#c084fc" /><stop offset="1" stopColor="#7c3aed" />
+        </linearGradient></defs>
+        <circle className="scan-core__track" cx="66" cy="66" r="63" />
+        <circle className="scan-core__prog" cx="66" cy="66" r="63" stroke="url(#scanCoreG)" />
+      </svg>
+      <div className="scan-core__mark"><GeoniMark /></div>
+    </div>
   )
 }
 
@@ -50,13 +57,14 @@ export default function ScanningScreen({ kind, target, statusKey, progressLog = 
 
   return (
     <div className="scan-screen">
+      <Constellation />
       <button className="scan-screen__brand scan-screen__brand--clickable" onClick={onCancel} type="button">
         <GeoniMark />
         <span className="landing__logo">geoni</span>
       </button>
 
       <div className="scan-screen__center">
-        <Pulse />
+        <ScoreCore />
         <h1 className="scan-screen__title">
           {kind === 'site' ? (
             <>{target} <em>{t('scan_title_site_suffix')}</em></>

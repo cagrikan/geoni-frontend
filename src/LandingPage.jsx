@@ -13,6 +13,12 @@ const BRAND_LAST_STEP = 2
 
 export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, onSubmitSocial, loading = false, statusText = '', error, user, onDashboard, onLogin, onViewSample }) {
   const { t } = useLanguage()
+  // Worker'i onceden isit: landing ekrani = tarama niyeti. Kullanici formu
+  // doldururken worker cold-start'i (0->1) arka planda gecer (backend'de 25sn
+  // global cooldown var, spam olmaz).
+  useEffect(() => {
+    fetch(`${API_URL}/api/prewarm`, { method: 'POST' }).catch(() => {})
+  }, [])
   // Slogan havuzu: her sayfa acilisinda rastgele biri (mount basina sabit)
   const [sloganNo] = useState(() => Math.floor(Math.random() * 5) + 1)
   // Sayac gecisi: once 3 sn "AI Gorunurluk Taramasi" gorunur, sonra sayi

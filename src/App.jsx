@@ -1,4 +1,4 @@
-import { useState, useEffect, Suspense, lazy } from 'react'
+import { useState, useEffect, useRef, Suspense, lazy } from 'react'
 import { AuthProvider, useAuth } from './lib/AuthContext'
 import { LanguageProvider, useLanguage } from './lib/LanguageContext'
 import { ThemeProvider } from './lib/ThemeContext'
@@ -232,37 +232,58 @@ function AppInner() {
 
   const [lastJobId, setLastJobId] = useState(null)
 
-  const pollAuditJob = async (jobId) => {
+  // Tarama "nesli": her yeni tarama/iptal bunu artirir. Suren poll dongusu,
+  // kendi nesli hala guncel degilse sonucu UYGULAMAZ ve view degistirmez.
+  // Boylece (a) "Vazgec" sonrasi eski dongu kullaniciyi eski sonuca fırlatmaz,
+  // (b) ust uste iki tarama yarismaz (yanlis jobId ile paylasim linki uretmez).
+  const scanGenRef = useRef(0)
+
+  const pollAuditJob = async (jobId, gen) => {
+    let errStreak = 0
     for (let i = 0; i < 60; i++) {
       await new Promise(r => setTimeout(r, 3000))
+      if (scanGenRef.current !== gen) return  // iptal edildi / yeni tarama basladi
       try {
         const res = await fetch(`${API_URL}/api/audit/${jobId}`)
         if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || t('error_audit_failed'))
         const data = await res.json()
+        errStreak = 0
+        if (scanGenRef.current !== gen) return
         if (data.status === 'complete') { setResult(data.result); setLastJobId(jobId); pushView('results'); if (refreshProfile) refreshProfile(); return }
-        if (data.status === 'failed') throw new Error(t('error_audit_failed'))
+        if (data.status === 'failed') { setError(t('error_audit_failed')); pushView('landing'); return }
         setStatusKey(data.status)
-      } catch (err) { setError(err.message); pushView('landing'); return }
+      } catch (err) {
+        // Gecici ag hatasi (Wi-Fi->4G, tek 502) taramayi OLDURMESIN: is arka
+        // planda suruyor, kredi dusuldu. 4 ardisik hataya kadar tolere et.
+        if (++errStreak >= 4) { if (scanGenRef.current === gen) { setError(err.message); pushView('landing') } return }
+      }
     }
-    setError(t('error_audit_timeout')); pushView('landing')
+    if (scanGenRef.current === gen) { setError(t('error_audit_timeout')); pushView('landing') }
   }
 
-  const pollBrandJob = async (jobId, entityType) => {
+  const pollBrandJob = async (jobId, entityType, gen) => {
+    let errStreak = 0
     for (let i = 0; i < 25; i++) {
       await new Promise(r => setTimeout(r, 2000))
+      if (scanGenRef.current !== gen) return
       try {
         const res = await fetch(`${API_URL}/api/brand-check/${jobId}`)
         if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || t('error_query_failed'))
         const data = await res.json()
+        errStreak = 0
+        if (scanGenRef.current !== gen) return
         if (data.status === 'complete') { setBrandResult({ ...data.result, type: entityType }); setLastJobId(jobId); pushView('brand_results'); if (refreshProfile) refreshProfile(); return }
-        if (data.status === 'failed') throw new Error(t('error_query_failed'))
-      } catch (err) { setError(err.message); pushView('landing'); return }
+        if (data.status === 'failed') { setError(t('error_query_failed')); pushView('landing'); return }
+      } catch (err) {
+        if (++errStreak >= 4) { if (scanGenRef.current === gen) { setError(err.message); pushView('landing') } return }
+      }
     }
-    setError(t('error_query_timeout')); pushView('landing')
+    if (scanGenRef.current === gen) { setError(t('error_query_timeout')); pushView('landing') }
   }
 
   const handleAudit = async (domain, email, isPrivate = false, customQueries = null) => {
     setError(null); setIsSample(false); setIsPrivateResult(isPrivate); setScanKind('site'); setScanTarget(domain); setStatusKey('queued'); setProgressLog([])
+    const gen = ++scanGenRef.current
     pushView('loading')
     try {
       const session = (await import('./lib/supabase')).supabase.auth.getSession ? await (await import('./lib/supabase')).supabase.auth.getSession() : null
@@ -286,13 +307,14 @@ function AppInner() {
         }
         es.onerror = () => es.close()
       } catch { /* EventSource desteklenmiyorsa polling zaten yeterli */ }
-      await pollAuditJob(jobId)
+      await pollAuditJob(jobId, gen)
       es?.close()
     } catch (err) { setError(err.message || t('error_connection')); pushView('landing') }
   }
 
   const handleBrandCheck = async (payload) => {
     setError(null); setIsPrivateResult(!!payload.private); setScanKind('brand'); setScanTarget(payload.name); setProgressLog([])
+    const gen = ++scanGenRef.current
     pushView('loading')
     try {
       const session2 = (await import('./lib/supabase')).supabase.auth.getSession ? await (await import('./lib/supabase')).supabase.auth.getSession() : null
@@ -324,7 +346,7 @@ function AppInner() {
         }
         es.onerror = () => es.close()
       } catch { /* EventSource desteklenmiyorsa polling zaten yeterli */ }
-      await pollBrandJob(data.job_id, payload.type)
+      await pollBrandJob(data.job_id, payload.type, gen)
       es?.close()
     } catch (err) { setError(err.message || t('error_connection')); pushView('landing') }
   }
@@ -334,6 +356,7 @@ function AppInner() {
     // marka-recall motorunu @handle + nis ile calistirir; sonuc brand-check
     // sekliyle doner, ayni ekranlarda gosterilir.
     setError(null); setIsPrivateResult(false); setScanKind('brand'); setScanTarget('@' + handle); setProgressLog([])
+    const gen = ++scanGenRef.current
     pushView('loading')
     try {
       const res = await fetch(`${API_URL}/api/social-check`, {
@@ -351,12 +374,12 @@ function AppInner() {
         }
         es.onerror = () => es.close()
       } catch { /* polling yeterli */ }
-      await pollBrandJob(data.job_id, 'brand')
+      await pollBrandJob(data.job_id, 'brand', gen)
       es?.close()
     } catch (err) { setError(err.message || t('error_connection')); pushView('landing') }
   }
 
-  const handleReset = () => { setResult(null); setBrandResult(null); setError(null); setIsSample(false); setIsPrivateResult(false); navigateTo('landing') }
+  const handleReset = () => { scanGenRef.current++; setResult(null); setBrandResult(null); setError(null); setIsSample(false); setIsPrivateResult(false); navigateTo('landing') }
 
   const handleViewSample = () => {
     setError(null); setIsSample(true); setIsPrivateResult(false)

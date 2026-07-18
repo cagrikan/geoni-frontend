@@ -205,9 +205,6 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
           </div>
         </div>
 
-        <ShareResult jobId={jobId} text={t('share_site_text', { domain, score })} />
-        <EmbedBadge jobId={jobId} score={score} />
-
         {/* Skor + Breakdown (breakdown blur) */}
         <div className="results__top">
           <div className="results__gauge-col">
@@ -222,6 +219,9 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
             <Breakdown breakdown={score_breakdown} language={language} />
           </ProBlur>
         </div>
+
+        <ShareResult jobId={jobId} text={t('share_site_text', { domain, score })} />
+        <EmbedBadge jobId={jobId} score={score} />
 
         <div className="results__cta-compact">
           <span className="results__cta-compact-text">{t('results_upgrade_question')}</span>
@@ -255,12 +255,10 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
             <span className="results__stat-l">{t('results_site_gemini_access')}</span>
           </div>
           <div className="results__stat">
-            <ProBlur isPro={isPro} onUpgrade={onUpgrade} label={t('results_site_llmtxt_label')}>
-              <span className="results__stat-n" style={{ color: result.llms_txt == null ? 'var(--text-muted)' : result.llms_txt ? 'var(--good)' : 'var(--bad)' }}>
-                {result.llms_txt == null ? '—' : result.llms_txt ? t('results_yes') : t('results_no')}
-              </span>
-              <span className="results__stat-l">llms.txt</span>
-            </ProBlur>
+            <span className="results__stat-n" style={{ color: result.llms_txt == null ? 'var(--text-muted)' : result.llms_txt ? 'var(--good)' : 'var(--bad)' }}>
+              {result.llms_txt == null ? '—' : result.llms_txt ? t('results_yes') : t('results_no')}
+            </span>
+            <span className="results__stat-l">llms.txt</span>
           </div>
         </div>
 

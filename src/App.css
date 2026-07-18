@@ -1292,10 +1292,10 @@ body {
   overflow: hidden;
 }
 .pro-blur__content {
-  filter: blur(6px);
+  filter: blur(7px);
   user-select: none;
   pointer-events: none;
-  opacity: 0.6;
+  opacity: 0.45;
 }
 .pro-blur__overlay {
   position: absolute;
@@ -1303,43 +1303,51 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(7, 7, 15, 0.45);
-  backdrop-filter: blur(2px);
+  /* alttan yukari yumusak kararma: blur icerik ustte hafif gorunur (frosted) */
+  background: linear-gradient(180deg, rgba(18,14,28,.10) 0%, rgba(18,14,28,.55) 100%);
   border-radius: 14px;
-  border: 1px solid rgba(124, 134, 245, 0.2);
 }
+/* kilit rozeti: frosted cam cip — koyu/acik iki temada da okunur */
 .pro-blur__badge {
-  display: flex;
-  flex-direction: column;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  text-align: center;
-  padding: 16px 20px;
+  gap: 10px;
+  padding: 10px 14px 10px 12px;
+  background: rgba(24, 20, 38, 0.72);
+  border: 1px solid rgba(192, 132, 252, 0.28);
+  border-radius: 100px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(10px);
 }
 .pro-blur__lock {
   color: var(--accent);
+  background: rgba(192, 132, 252, 0.14);
+  border-radius: 50%;
+  padding: 6px;
+  box-sizing: content-box;
+  flex-shrink: 0;
 }
 .pro-blur__label {
-  font-family: var(--mono);
-  font-size: .75rem;
-  color: var(--text-sub);
-  letter-spacing: .04em;
+  font-size: .82rem;
+  font-weight: 600;
+  color: #e8e2f5;
+  letter-spacing: 0;
 }
 .pro-blur__btn {
-  background: var(--accent);
-  color: #FFFFFF;
+  background: linear-gradient(135deg, #c084fc, #7c3aed);
+  color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: 100px;
   padding: 8px 16px;
-  font-family: var(--display);
-  font-size: .875rem;
-  font-weight: 600;
+  font-size: .85rem;
+  font-weight: 700;
   text-decoration: none;
   cursor: pointer;
-  transition: opacity .2s;
+  transition: transform .15s, box-shadow .15s;
   white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(139, 63, 252, 0.35);
 }
-.pro-blur__btn:hover { opacity: .85; }
+.pro-blur__btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(139, 63, 252, 0.5); }
 
 /* ===== LOGIN PAGE ===== */
 .login-page {

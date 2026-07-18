@@ -21,7 +21,7 @@ export default function SovSection({ sov, t, isPro = false }) {
       </div>
       <p className="sov__sub">{t('sov_subtitle')}</p>
 
-      <ProBlur isPro={isPro} label={t('sov_detail_label')}>
+      <ProBlur isPro={isPro} cta={false} label={t('sov_detail_label')}>
         <div className="sov__queries">
           {(sov.queries || []).map((q, i) => (
             <div className="sov__query" key={i}>

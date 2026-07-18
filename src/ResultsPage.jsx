@@ -223,13 +223,6 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
         <ShareResult jobId={jobId} text={t('share_site_text', { domain, score })} />
         <EmbedBadge jobId={jobId} score={score} />
 
-        <div className="results__cta-compact">
-          <span className="results__cta-compact-text">{t('results_upgrade_question')}</span>
-          <a href={`https://app.geoni.ai/dashboard?tab=tickets&target=${encodeURIComponent(domain || '')}`} className="results__cta-compact-btn" target="_blank" rel="noopener">
-            {t('results_view_packages')}
-          </a>
-        </div>
-
         {/* Stats */}
         <div className="results__stats results__stats--five">
           <div className="results__stat">
@@ -278,7 +271,7 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
               <div className="topics__empty">{t('results_strong_topics_empty')}</div>
             )}
             {paidTopics.length > 0 && (
-              <ProBlur isPro={isPro} onUpgrade={onUpgrade} label={`+${paidTopics.length} ${t('results_more_topics')}`}>
+              <ProBlur isPro={isPro} onUpgrade={onUpgrade} cta={false} label={`+${paidTopics.length} ${t('results_more_topics')}`}>
                 {paidTopics.map((tp, i) => <TopicCard topic={tp} key={i} />)}
               </ProBlur>
             )}
@@ -291,7 +284,7 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
               <div className="topics__empty">{t('results_opportunities_empty')}</div>
             )}
             {paidOpps.length > 0 && (
-              <ProBlur isPro={isPro} onUpgrade={onUpgrade} label={`+${paidOpps.length} ${t('results_more_opportunities')}`}>
+              <ProBlur isPro={isPro} onUpgrade={onUpgrade} cta={false} label={`+${paidOpps.length} ${t('results_more_opportunities')}`}>
                 {paidOpps.map((tp, i) => <TopicCard topic={tp} isOpportunity key={i} />)}
               </ProBlur>
             )}
@@ -310,12 +303,14 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
         </div>
       </div>
 
-      <div className="results__sticky-bar">
-        <span className="results__sticky-text">{t('results_sticky_upgrade')}</span>
-        <a href={`https://app.geoni.ai/dashboard?tab=tickets&target=${encodeURIComponent(domain || '')}`} className="results__sticky-btn" target="_blank" rel="noopener">
-          {t('results_view_packages')}
-        </a>
-      </div>
+      {!isPro && (
+        <div className="results__sticky-bar">
+          <span className="results__sticky-text">{t('results_sticky_upgrade')}</span>
+          <a href={`https://app.geoni.ai/dashboard?tab=tickets&target=${encodeURIComponent(domain || '')}`} className="results__sticky-btn" target="_blank" rel="noopener">
+            {t('results_view_packages')}
+          </a>
+        </div>
+      )}
     </>
   )
 }

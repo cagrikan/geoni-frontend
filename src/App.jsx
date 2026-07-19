@@ -28,6 +28,25 @@ function PageFallback() {
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.geoni.ai'
 
+// Backend hata gövdesini okunur Error'a çevirir. Yapısal detail (ör. 402
+// free_limit_reached: {error, message, limit}) mesaj + kod taşır; düz string
+// detail aynen kullanılır. err.code paywall tetiği için okunur.
+async function apiErrorFrom(res, fallback) {
+  let message = fallback
+  let code
+  try {
+    const d = (await res.json())?.detail
+    if (typeof d === 'string') message = d
+    else if (d && typeof d === 'object') {
+      if (typeof d.message === 'string') message = d.message
+      if (typeof d.error === 'string') code = d.error
+    }
+  } catch { /* gövde JSON değil */ }
+  const e = new Error(message)
+  e.code = code
+  return e
+}
+
 // Ilk ziyarette (first-touch) UTM/referrer bilgisini yakalar - sadece bir
 // kez, sonraki ziyaretlerde uzerine yazilmaz. Kayit olma aninda
 // AuthContext bunu profile yazar (bkz. lib/AuthContext.jsx).
@@ -298,7 +317,7 @@ function AppInner() {
         headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
         body: JSON.stringify({ domain, email: email || user?.email || 'anonymous@geoni.ai', competitors: [], lang: language, private: isPrivate, custom_queries: customQueries, turnstile_token: turnstileToken }),
       })
-      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || t('error_request_failed'))
+      if (!res.ok) throw await apiErrorFrom(res, t('error_request_failed'))
       const jobId = (await res.json()).job_id
       let es
       try {
@@ -314,7 +333,10 @@ function AppInner() {
       } catch { /* EventSource desteklenmiyorsa polling zaten yeterli */ }
       await pollAuditJob(jobId, gen)
       es?.close()
-    } catch (err) { setError(err.message || t('error_connection')); pushView('landing') }
+    } catch (err) {
+      if (err?.code === 'free_limit_reached') { setError(err.message); handleUpgrade(); return }
+      setError(err.message || t('error_connection')); pushView('landing')
+    }
   }
 
   const handleBrandCheck = async (payload, turnstileToken = '') => {
@@ -340,7 +362,7 @@ function AppInner() {
         headers: { 'Content-Type': 'application/json', ...(token2 ? { 'Authorization': `Bearer ${token2}` } : {}) },
         body: JSON.stringify({ ...payload, email: payload.email || user?.email || 'anonymous@geoni.ai', lang: language, turnstile_token: turnstileToken }),
       })
-      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || t('error_request_failed'))
+      if (!res.ok) throw await apiErrorFrom(res, t('error_request_failed'))
       const data = await res.json()
       if (data.identity_mismatch) {
         setBrandResult({ identity_mismatch: true, match_score: data.match_score, name: payload.name })
@@ -364,7 +386,10 @@ function AppInner() {
       } catch { /* EventSource desteklenmiyorsa polling zaten yeterli */ }
       await pollBrandJob(data.job_id, payload.type, gen)
       es?.close()
-    } catch (err) { setError(err.message || t('error_connection')); pushView('landing') }
+    } catch (err) {
+      if (err?.code === 'free_limit_reached') { setError(err.message); handleUpgrade(); return }
+      setError(err.message || t('error_connection')); pushView('landing')
+    }
   }
 
   const handleSocialCheck = async ({ handle, niche, email, turnstile_token = '' }) => {
@@ -380,7 +405,7 @@ function AppInner() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ handle, niche, email, lang: language, turnstile_token }),
       })
-      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || t('error_request_failed'))
+      if (!res.ok) throw await apiErrorFrom(res, t('error_request_failed'))
       const data = await res.json()
       let es
       try {
@@ -392,7 +417,10 @@ function AppInner() {
       } catch { /* polling yeterli */ }
       await pollBrandJob(data.job_id, 'brand', gen)
       es?.close()
-    } catch (err) { setError(err.message || t('error_connection')); pushView('landing') }
+    } catch (err) {
+      if (err?.code === 'free_limit_reached') { setError(err.message); handleUpgrade(); return }
+      setError(err.message || t('error_connection')); pushView('landing')
+    }
   }
 
   const handleReset = () => { scanGenRef.current++; setResult(null); setBrandResult(null); setError(null); setIsSample(false); setIsPrivateResult(false); navigateTo('landing') }

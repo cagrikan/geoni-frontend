@@ -31,7 +31,7 @@ function CustomerReputation({ ticketId, authedFetch, t }) {
   )
 }
 import {
-  Gem, History, Bookmark, Settings, Globe, User, Building2, FileText,
+  Gem, History, Bookmark, Settings, Globe, User, Building2, AtSign, FileText,
   TrendingUp, TrendingDown, ChevronRight, X, RefreshCw, ShieldCheck, Wrench, ClipboardList,
   Ticket, Braces, Bot, Landmark, Link2, Search, MessageSquareText, Plus,
   Wallet, ArrowDownLeft, ArrowUpRight,
@@ -948,8 +948,9 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
     hour: '2-digit', minute: '2-digit'
   })
 
-  const typeLabel = { web: t('dash_type_web'), person: t('dash_type_person'), brand: t('dash_type_brand') }
-  const typeIcon = { web: Globe, person: User, brand: Building2 }
+  // Y5 (Fable 2026-07-19): 'social' tipi eksikti → boş rozet + generic ikon.
+  const typeLabel = { web: t('dash_type_web'), person: t('dash_type_person'), brand: t('dash_type_brand'), social: t('dash_type_social') }
+  const typeIcon = { web: Globe, person: User, brand: Building2, social: AtSign }
 
   return (
     <div className="dashboard">

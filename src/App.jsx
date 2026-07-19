@@ -318,6 +318,17 @@ function AppInner() {
   }
 
   const handleBrandCheck = async (payload, turnstileToken = '') => {
+    // Y5 (Fable 2026-07-19): sosyal hedef (@handle) rescan'i brand-check'e düşerse
+    // social=True kaybolur → yanlış ağırlık (WEIGHTS vs WEIGHTS_SOCIAL) + rakip
+    // biçimi (domain vs @handle). Sosyali doğru uca (social-check) yönlendir.
+    if (payload.type === 'social') {
+      return handleSocialCheck({
+        handle: String(payload.name || '').replace(/^@/, ''),
+        niche: payload.topic || '',
+        email: payload.email,
+        turnstile_token: turnstileToken,
+      })
+    }
     setError(null); setIsPrivateResult(!!payload.private); setScanKind('brand'); setScanTarget(payload.name); setProgressLog([])
     const gen = ++scanGenRef.current
     pushView('loading')

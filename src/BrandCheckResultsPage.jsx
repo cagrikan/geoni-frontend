@@ -129,6 +129,7 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
     created_at,
     resolved_identity = null,   // sosyal: {name, platform} (backend cozdu) veya null
     needs_niche = false,        // sosyal: nis yok -> SOV olculemedi
+    cached = false,             // A2-1: 24h idempotent cache'ten geldi mi
   } = result
 
   const isSocial = type === 'social'
@@ -191,6 +192,9 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
             {!isPrivate && <WatchlistButton user={user} type={type} label={capitalizedName} target={{ name, topic }} />}
           </div>
         </div>
+
+        {/* A2-1: sonuç yakın zamandaki taramadan (24h cache) — skor tutarlı kalsın diye. */}
+        {cached && <p className="results__cached-note">{t('brand_cached_note')}</p>}
 
         {/* Sosyal: "AI seni şöyle tanıyor" (viral) + niş yoksa asıl metrik (SOV) uyarısı */}
         {isSocial && resolved_identity?.name && (

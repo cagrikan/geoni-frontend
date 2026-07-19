@@ -2760,6 +2760,10 @@ body {
   border: 1px solid color-mix(in srgb, var(--danger, #d64545) 30%, transparent);
   border-radius: var(--r-sm, 8px); padding: 6px 8px; margin-top: 2px;
 }
+.results__cached-note {
+  font-size: .8rem; font-style: italic; color: var(--text-muted);
+  margin: 4px 0 12px; line-height: 1.5;
+}
 .dash-service-card__target {
   width: 100%; box-sizing: border-box; background: var(--bg);
   border: 1px solid var(--border-mid); border-radius: 6px; padding: 8px 10px;

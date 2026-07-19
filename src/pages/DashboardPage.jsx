@@ -877,6 +877,13 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
   const overallDelta = overallTrend.length >= 2
     ? overallTrend[overallTrend.length - 1].score - overallTrend[overallTrend.length - 2].score
     : null
+  // Trend, skor-modeli sürüm sınırını geçiyor mu? (Sparkline kesikli çizgi çizer;
+  // burada kullanıcıya kesikli çizginin anlamını açıklayan not gösterilir — skor
+  // sıçraması metodoloji değişimi mi yoksa gerçek görünürlük değişimi mi ayrışsın.)
+  const trendHasVersionChange = useMemo(() =>
+    overallTrend.some((p, i) => i > 0 && p.scoring_version && overallTrend[i - 1].scoring_version
+      && p.scoring_version !== overallTrend[i - 1].scoring_version),
+  [overallTrend])
 
   const deleteAudit = (e, auditId) => {
     e.stopPropagation()
@@ -1038,6 +1045,9 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                   {t('dash_trend_meta_prefix')} {overallTrend.length} {t('dash_trend_meta_suffix')}
                   {overallDelta != null && <DeltaBadge delta={overallDelta} />}
                 </div>
+                {trendHasVersionChange && (
+                  <div className="dash-trend-card__methodology">{t('dash_trend_methodology')}</div>
+                )}
               </div>
               <Sparkline points={overallTrend} width={220} height={44} />
             </div>

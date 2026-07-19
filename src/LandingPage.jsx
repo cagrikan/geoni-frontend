@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Globe, User, Building2, ScanSearch, GitCompareArrows, Award, EyeOff, Wrench, AtSign } from 'lucide-react'
 import GeoniMark from './GeoniMark'
 import LanguageSwitcher from './components/LanguageSwitcher'
@@ -6,6 +6,8 @@ import ThemeSwitcher from './components/ThemeSwitcher'
 import { useLanguage } from './lib/LanguageContext'
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.geoni.ai'
+// Cloudflare Turnstile (anti-abuse) — public site key.
+const TURNSTILE_SITE_KEY = '0x4AAAAAAD4ueQF4cOLzYPy4'
 
 const SITE_LAST_STEP = 1
 const PERSON_LAST_STEP = 3
@@ -30,6 +32,40 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, onSubmi
   }, [])
   const [mode, setMode] = useState('site') // 'site' | 'person' | 'brand'
   const [step, setStep] = useState(0)
+
+  // ── Cloudflare Turnstile (anti-abuse) ──────────────────────────────────
+  // Managed widget: cogu kullanici gorunmez cozer. Token tarama istegine
+  // eklenir (App.jsx -> body.turnstile_token). Yuklenmezse token bos gider;
+  // backend SOFT-ALLOW eder (soft rollout) -> mevcut taramalar kirilmaz.
+  const turnstileRef = useRef(null)
+  const widgetIdRef = useRef(null)
+  const turnstileTokenRef = useRef('')
+  useEffect(() => {
+    let cancelled = false
+    let poll = null
+    const render = () => {
+      if (cancelled || !turnstileRef.current || !window.turnstile) return
+      if (widgetIdRef.current !== null) return
+      try {
+        widgetIdRef.current = window.turnstile.render(turnstileRef.current, {
+          sitekey: TURNSTILE_SITE_KEY,
+          callback: (tok) => { turnstileTokenRef.current = tok || '' },
+          'error-callback': () => { turnstileTokenRef.current = '' },
+          'expired-callback': () => { turnstileTokenRef.current = '' },
+        })
+      } catch { /* script gec/gelmedi -> soft-allow */ }
+    }
+    if (window.turnstile) render()
+    else poll = setInterval(() => { if (window.turnstile) { clearInterval(poll); render() } }, 300)
+    return () => { cancelled = true; if (poll) clearInterval(poll) }
+  }, [])
+  // Token tek-kullanimlik: gercek tarama gonderildikten sonra widget'i sifirla
+  // ki ard arda taramalar taze token alsin.
+  const resetTurnstile = () => {
+    turnstileTokenRef.current = ''
+    try { if (window.turnstile && widgetIdRef.current !== null) window.turnstile.reset(widgetIdRef.current) } catch { /* ignore */ }
+  }
+
   const [scanCount, setScanCount] = useState(0)
   const [isPrivate, setIsPrivate] = useState(false)
   const [showPrivateToast, setShowPrivateToast] = useState(false)
@@ -106,7 +142,8 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, onSubmi
     if (mode === 'social') {
       const h = socialHandle.trim().replace(/^@/, '')
       if (h.length < 2 || !socialEmail.trim()) return
-      onSubmitSocial?.({ handle: h, niche: socialNiche.trim(), email: socialEmail.trim() })
+      onSubmitSocial?.({ handle: h, niche: socialNiche.trim(), email: socialEmail.trim(), turnstile_token: turnstileTokenRef.current })
+      resetTurnstile()
       return
     }
     if (mode === 'site') {
@@ -119,7 +156,8 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, onSubmi
         try { localStorage.setItem('geoni_pending_scan', JSON.stringify({ type: 'site', domain, email: siteEmail, private: isPrivate })) } catch { /* ignore */ }
         onLogin(); return
       }
-      onSubmitAudit(domain, siteEmail, isPrivate)
+      onSubmitAudit(domain, siteEmail, isPrivate, null, turnstileTokenRef.current)
+      resetTurnstile()
     } else if (mode === 'person') {
       if (step === 0 && !personName) return
       if (step < PERSON_LAST_STEP) { setStep(s => s + 1); return }
@@ -140,7 +178,8 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, onSubmi
         try { localStorage.setItem('geoni_pending_scan', JSON.stringify(personPayload)) } catch { /* ignore */ }
         onLogin(); return
       }
-      onSubmitBrandCheck(personPayload)
+      onSubmitBrandCheck(personPayload, turnstileTokenRef.current)
+      resetTurnstile()
     } else {
       if (step === 0 && !brandName) return
       if (step < BRAND_LAST_STEP) { setStep(s => s + 1); return }
@@ -157,7 +196,8 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, onSubmi
         try { localStorage.setItem('geoni_pending_scan', JSON.stringify(brandPayload)) } catch { /* ignore */ }
         onLogin(); return
       }
-      onSubmitBrandCheck(brandPayload)
+      onSubmitBrandCheck(brandPayload, turnstileTokenRef.current)
+      resetTurnstile()
     }
   }
 
@@ -404,6 +444,10 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, onSubmi
                 </div>
               </>
             )}
+
+            {/* Anti-abuse: Managed Turnstile (cogunlukla gorunmez). Token
+                tarama istegine eklenir; yuklenmezse istek yine gider (soft). */}
+            <div ref={turnstileRef} className="landing__turnstile" style={{ marginTop: 6 }} />
 
           </form>
 

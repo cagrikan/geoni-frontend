@@ -286,7 +286,7 @@ function AppInner() {
     if (scanGenRef.current === gen) { setError(t('error_query_timeout')); pushView('landing') }
   }
 
-  const handleAudit = async (domain, email, isPrivate = false, customQueries = null) => {
+  const handleAudit = async (domain, email, isPrivate = false, customQueries = null, turnstileToken = '') => {
     setError(null); setIsSample(false); setIsPrivateResult(isPrivate); setScanKind('site'); setScanTarget(domain); setStatusKey('queued'); setProgressLog([])
     const gen = ++scanGenRef.current
     pushView('loading')
@@ -296,7 +296,7 @@ function AppInner() {
       const res = await fetch(`${API_URL}/api/audit/quick`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ domain, email: email || user?.email || 'anonymous@geoni.ai', competitors: [], lang: language, private: isPrivate, custom_queries: customQueries }),
+        body: JSON.stringify({ domain, email: email || user?.email || 'anonymous@geoni.ai', competitors: [], lang: language, private: isPrivate, custom_queries: customQueries, turnstile_token: turnstileToken }),
       })
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || t('error_request_failed'))
       const jobId = (await res.json()).job_id
@@ -317,7 +317,7 @@ function AppInner() {
     } catch (err) { setError(err.message || t('error_connection')); pushView('landing') }
   }
 
-  const handleBrandCheck = async (payload) => {
+  const handleBrandCheck = async (payload, turnstileToken = '') => {
     setError(null); setIsPrivateResult(!!payload.private); setScanKind('brand'); setScanTarget(payload.name); setProgressLog([])
     const gen = ++scanGenRef.current
     pushView('loading')
@@ -327,7 +327,7 @@ function AppInner() {
       const res = await fetch(`${API_URL}/api/brand-check`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token2 ? { 'Authorization': `Bearer ${token2}` } : {}) },
-        body: JSON.stringify({ ...payload, email: payload.email || user?.email || 'anonymous@geoni.ai', lang: language }),
+        body: JSON.stringify({ ...payload, email: payload.email || user?.email || 'anonymous@geoni.ai', lang: language, turnstile_token: turnstileToken }),
       })
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || t('error_request_failed'))
       const data = await res.json()
@@ -356,7 +356,7 @@ function AppInner() {
     } catch (err) { setError(err.message || t('error_connection')); pushView('landing') }
   }
 
-  const handleSocialCheck = async ({ handle, niche, email }) => {
+  const handleSocialCheck = async ({ handle, niche, email, turnstile_token = '' }) => {
     // Anonim sosyal gorunurluk taramasi (giris gerekmez). /api/social-check
     // marka-recall motorunu @handle + nis ile calistirir; sonuc brand-check
     // sekliyle doner, ayni ekranlarda gosterilir.
@@ -367,7 +367,7 @@ function AppInner() {
       const res = await fetch(`${API_URL}/api/social-check`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ handle, niche, email, lang: language }),
+        body: JSON.stringify({ handle, niche, email, lang: language, turnstile_token }),
       })
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || t('error_request_failed'))
       const data = await res.json()

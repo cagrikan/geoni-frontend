@@ -133,6 +133,14 @@ const TX_DESCRIPTION_KEYS = {
 }
 
 function txLabel(tx, t) {
+  // O7 (Fable 2026-07-19): yeni format "[service_key] ad" → key'i i18n'e çevir
+  // (EN kullanıcı TR hizmet adı görmesin). i18n yoksa açıklamadaki ada düş.
+  const m = tx.description?.match(/^\[([a-z_]+)\]\s*(.*)$/i)
+  if (m) {
+    const i18nKey = `svc_name_${m[1]}`
+    const localized = t(i18nKey)
+    return `${t('dash_tx_service')}: ${localized === i18nKey ? m[2] : localized}`
+  }
   if (tx.type === 'purchase') return t('dash_tx_purchase')
   const key = TX_DESCRIPTION_KEYS[tx.description]
   if (key) return t(key)

@@ -322,8 +322,11 @@ function ServiceCatalogSection({ t, profile }) {
                 {isWebOnly(tt) && (
                   <span className="dash-service-card__webonly">{t('svc_web_only')}</span>
                 )}
-                {tt.fulfillment_mode === 'auto' && (
+                {tt.fulfillment_mode === 'auto' ? (
                   <span className="dash-service-card__auto">{t('dash_service_auto_note')}</span>
+                ) : (
+                  /* O6 (Fable): semi/human hizmette teslim beklentisi yoktu */
+                  <span className="dash-service-card__eta">{t('svc_expert_eta')}</span>
                 )}
                 {FOUNDATION_KEYS.includes(tt.key) ? (
                   <span className="dash-service-card__foundation">{t('dash_service_foundation')}</span>

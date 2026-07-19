@@ -2741,6 +2741,13 @@ body {
 .dash-service-card__auto::before {
   content: ''; width: 6px; height: 6px; border-radius: var(--r-full); background: var(--warn);
 }
+.dash-service-card__eta {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .75rem; color: var(--text-muted, #8a8594);
+}
+.dash-service-card__eta::before {
+  content: ''; width: 6px; height: 6px; border-radius: var(--r-full); background: var(--accent, #7c5cff);
+}
 .dash-service-card__foundation {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: .75rem; font-weight: 600; color: var(--accent);

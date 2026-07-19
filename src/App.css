@@ -2769,6 +2769,10 @@ body {
   border: 1px solid color-mix(in srgb, var(--danger, #d64545) 30%, transparent);
   border-radius: var(--r-sm, 8px); padding: 6px 8px; margin-top: 2px;
 }
+.dash-service-card__insufficient {
+  font-size: .72rem; line-height: 1.4; color: var(--text-muted, #8a8594);
+  margin-top: 6px; text-align: center;
+}
 .tdo__impact-delta { display: flex; align-items: center; gap: 10px; }
 .tdo__impact-scores { font-size: 1.1rem; font-weight: 600; font-variant-numeric: tabular-nums; }
 .tdo__impact-badge {

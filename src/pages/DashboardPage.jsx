@@ -345,6 +345,11 @@ function ServiceCatalogSection({ t, profile }) {
                   disabled={buyingId === tt.id || !(targets[tt.id] || '').trim() || mismatch || (profile?.credit_balance ?? 0) < tt.token_cost}
                   onClick={() => buy(tt.id)}
                 >{justBoughtId === tt.id ? t('dash_tickets_bought') : t('dash_tickets_buy')}</button>
+                {/* O2 (Fable 2026-07-19): token yetersizken buton sessizce soluyordu —
+                    neden + çözüm gösterilmiyordu (dönüşüm kaybı). */}
+                {(targets[tt.id] || '').trim() && !mismatch && (profile?.credit_balance ?? 0) < tt.token_cost && (
+                  <div className="dash-service-card__insufficient">{t('svc_insufficient')}</div>
+                )}
               </div>
             )
           })}

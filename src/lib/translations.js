@@ -408,6 +408,10 @@ export const translations = {
     // ── Kilitli (token ile açılan) içerik ──
     problur_default_label: 'Kilitli',
     problur_upgrade: 'Tam raporu aç →',
+    // Sosyal (influencer) sonuç varyantı
+    social_ai_knows_you: 'AI seni şöyle tanıyor',
+    social_needs_niche: 'Asıl skorun kategori görünürlüğü (AI seni öneriyor mu). Bunu ölçmek için nişini gir — hangi konuda takip edilmek istiyorsun?',
+    social_add_niche: 'Nişini gir & ölç →',
 
     // ── Hatalar ──
     error_audit_failed: 'Tarama başarısız',
@@ -1085,6 +1089,10 @@ export const translations = {
     // ── Locked (token-unlocked) content ──
     problur_default_label: 'Locked',
     problur_upgrade: 'Unlock full report →',
+    // Social (influencer) result variant
+    social_ai_knows_you: 'Here is how AI knows you',
+    social_needs_niche: 'Your real score is category visibility (does AI recommend you). To measure it, add your niche — what topic do you want to be followed for?',
+    social_add_niche: 'Add your niche & measure →',
 
     // ── Errors ──
     error_audit_failed: 'Scan failed',

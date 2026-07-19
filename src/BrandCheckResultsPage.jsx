@@ -127,7 +127,11 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
     performing_topics = [],
     opportunity_topics = [],
     created_at,
+    resolved_identity = null,   // sosyal: {name, platform} (backend cozdu) veya null
+    needs_niche = false,        // sosyal: nis yok -> SOV olculemedi
   } = result
+
+  const isSocial = type === 'social'
 
   const locale = language === 'en' ? 'en-US' : 'tr-TR'
   const formattedDate = created_at
@@ -188,8 +192,22 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
           </div>
         </div>
 
-        <ShareResult jobId={jobId} text={t('share_brand_text', { name: capitalizedName, score })} />
-        <EmbedBadge jobId={jobId} score={score} />
+        {/* Sosyal: "AI seni şöyle tanıyor" (viral) + niş yoksa asıl metrik (SOV) uyarısı */}
+        {isSocial && resolved_identity?.name && (
+          <div className="social-identity">
+            <span className="social-identity__eyebrow">{t('social_ai_knows_you')}</span>
+            <div className="social-identity__name">
+              {resolved_identity.name}
+              {resolved_identity.platform && <span className="social-identity__platform"> · {resolved_identity.platform}</span>}
+            </div>
+          </div>
+        )}
+        {isSocial && needs_niche && (
+          <div className="social-niche">
+            <span className="social-niche__text">{t('social_needs_niche')}</span>
+            <a href="https://app.geoni.ai" className="social-niche__btn" target="_blank" rel="noopener">{t('social_add_niche')}</a>
+          </div>
+        )}
 
         <div className="results__top">
           <div className="results__gauge-col">
@@ -210,12 +228,8 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
           </ProBlur>
         </div>
 
-        <div className="results__cta-compact">
-          <span className="results__cta-compact-text">{t('results_upgrade_question')}</span>
-          <a href={`https://app.geoni.ai/dashboard?tab=tickets&target=${encodeURIComponent(result?.name || '')}`} className="results__cta-compact-btn" target="_blank" rel="noopener">
-            {t('results_view_packages')}
-          </a>
-        </div>
+        <ShareResult jobId={jobId} text={t('share_brand_text', { name: capitalizedName, score })} />
+        <EmbedBadge jobId={jobId} score={score} />
 
         <div className={`results__stats ${model_results?.perplexity ? 'results__stats--six' : 'results__stats--five'}`}>
           <div className="results__stat">
@@ -302,14 +316,16 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
         </div>
       </div>
 
-      <div className="results__sticky-bar">
-        <span className="results__sticky-text">
-          {recognition_count > 0 ? `${recognition_count}/${total} ${t('results_brand_sticky_recognized')}` : t('results_brand_sticky_none')}
-        </span>
-        <a href={`https://app.geoni.ai/dashboard?tab=tickets&target=${encodeURIComponent(result?.name || '')}`} className="results__sticky-btn" target="_blank" rel="noopener">
-          {t('results_view_packages')}
-        </a>
-      </div>
+      {!isPro && (
+        <div className="results__sticky-bar">
+          <span className="results__sticky-text">
+            {recognition_count > 0 ? `${recognition_count}/${total} ${t('results_brand_sticky_recognized')}` : t('results_brand_sticky_none')}
+          </span>
+          <a href={`https://app.geoni.ai/dashboard?tab=tickets&target=${encodeURIComponent(result?.name || '')}`} className="results__sticky-btn" target="_blank" rel="noopener">
+            {t('results_view_packages')}
+          </a>
+        </div>
+      )}
     </>
   )
 }

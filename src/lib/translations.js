@@ -169,6 +169,8 @@ export const translations = {
     sov_own_cited_prefix: 'Siteniz',
     sov_own_cited_suffix: 'yanıtta kaynak gösterildi.',
     sov_own_not_cited: 'Siteniz bu yanıtların hiçbirinde kaynak gösterilmedi — aşağıdaki sitelerde yer almak AI yanıtlarına girmenin en kısa yoludur.',
+    sov_gap_title: 'Atıf fırsatı — rakiplerini anlatan ama seni anmayan kaynaklar:',
+    sov_gap_sub: 'AI bu sitelerde rakiplerini görüyor, seni değil. Buralarda yer almak görünürlüğe en hızlı yol.',
 
     // ── Örnek rapor banner ──
     sample_banner_text: 'Bu bir',
@@ -852,6 +854,8 @@ export const translations = {
     sov_own_cited_prefix: 'Your site was cited in',
     sov_own_cited_suffix: 'answers.',
     sov_own_not_cited: 'Your site was not cited in any of these answers — getting listed on the sites below is the shortest path into AI answers.',
+    sov_gap_title: 'Citation opportunity — sources that cite your competitors but not you:',
+    sov_gap_sub: 'AI sees your competitors on these sites, not you. Getting listed here is the fastest path to visibility.',
 
     // ── Sample report banner ──
     sample_banner_text: 'This is a',

@@ -92,6 +92,24 @@ export default function SovSection({ sov, t, isPro = false }) {
             </div>
           </div>
         )}
+
+        {/* Atif firsati (citation_gap): rakipleri AI'ya anlatan ama seni anmayan
+            kaynaklar — "su siteler rakiplerini soyluyor, sen yoksun" aksiyon listesi.
+            Backend uretiyordu ama hicbir client gostermiyordu (QA 2026-07-19). */}
+        {(sov.citation_gap || []).length > 0 && (
+          <div className="sov__competitors sov__gap">
+            <span className="sov__competitors-label">{t('sov_gap_title')}</span>
+            <p className="sov__own-cited">{t('sov_gap_sub')}</p>
+            <div className="sov__competitors-list">
+              {sov.citation_gap.map((g, i) => (
+                <span className="sov__competitor" key={i}>
+                  {g.domain}
+                  {g.mentions > 1 && <em>×{g.mentions}</em>}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </ProBlur>
     </div>
   )

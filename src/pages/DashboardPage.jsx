@@ -239,6 +239,28 @@ function WalletSection({ t, profile, language, refreshProfile }) {
   )
 }
 
+// FAZ-2 (QA 2026-07-19): mobildeki domain-kapisi web'de de uygulanir. Backend
+// zaten reddediyordu ama SPA hedef-uymazligini onceden gostermiyordu (platform
+// tutarsizligi). detectTargetType backend applicable_targets ile hizali.
+function detectTargetType(s) {
+  const v = (s || '').trim().toLowerCase()
+  if (!v) return 'person'
+  if (v.startsWith('@')) return 'social'
+  const host = v.replace(/^https?:\/\//, '').split('/')[0]
+  if (!v.includes(' ') && !v.includes('@') && /^[a-z0-9.-]+\.[a-z]{2,}$/.test(host)) return 'domain'
+  return 'person'
+}
+function svcApplicable(tt, targetStr) {
+  const at = tt.applicable_targets
+  if (!at || at.length === 0) return true
+  if (!(targetStr || '').trim()) return true
+  return at.includes(detectTargetType(targetStr))
+}
+function isWebOnly(tt) {
+  const at = tt.applicable_targets
+  return !!at && at.length === 1 && at[0] === 'domain'
+}
+
 function ServiceCatalogSection({ t, profile }) {
   const [types, setTypes] = useState(null)
   const [buyingId, setBuyingId] = useState(null)
@@ -287,6 +309,7 @@ function ServiceCatalogSection({ t, profile }) {
         <div className="dash-service-grid">
           {types.map((tt) => {
             const Icon = TICKET_TYPE_ICONS[tt.key] || Wrench
+            const mismatch = !!(targets[tt.id] || '').trim() && !svcApplicable(tt, targets[tt.id])
             return (
               <div key={tt.id} className="dash-service-card">
                 <div className="dash-service-card__top">
@@ -295,6 +318,9 @@ function ServiceCatalogSection({ t, profile }) {
                 </div>
                 <div className="dash-service-card__name">{tt.name}</div>
                 <p className="dash-service-card__desc">{tt.description}</p>
+                {isWebOnly(tt) && (
+                  <span className="dash-service-card__webonly">{t('svc_web_only')}</span>
+                )}
                 {tt.key === 'llms_robots' && (
                   <span className="dash-service-card__auto">{t('dash_service_auto_note')}</span>
                 )}
@@ -310,9 +336,12 @@ function ServiceCatalogSection({ t, profile }) {
                   value={targets[tt.id] || ''}
                   onChange={(e) => setTargets((d) => ({ ...d, [tt.id]: e.target.value }))}
                 />
+                {mismatch && (
+                  <div className="dash-service-card__mismatch">{t('svc_target_mismatch')}</div>
+                )}
                 <button
                   className="dash-buy-btn dash-buy-btn--full"
-                  disabled={buyingId === tt.id || !(targets[tt.id] || '').trim() || (profile?.credit_balance ?? 0) < tt.token_cost}
+                  disabled={buyingId === tt.id || !(targets[tt.id] || '').trim() || mismatch || (profile?.credit_balance ?? 0) < tt.token_cost}
                   onClick={() => buy(tt.id)}
                 >{justBoughtId === tt.id ? t('dash_tickets_bought') : t('dash_tickets_buy')}</button>
               </div>

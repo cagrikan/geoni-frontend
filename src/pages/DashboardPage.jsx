@@ -321,7 +321,7 @@ function ServiceCatalogSection({ t, profile }) {
                 {isWebOnly(tt) && (
                   <span className="dash-service-card__webonly">{t('svc_web_only')}</span>
                 )}
-                {tt.key === 'llms_robots' && (
+                {tt.fulfillment_mode === 'auto' && (
                   <span className="dash-service-card__auto">{t('dash_service_auto_note')}</span>
                 )}
                 {FOUNDATION_KEYS.includes(tt.key) ? (

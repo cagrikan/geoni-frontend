@@ -40,7 +40,7 @@ function ScoreGauge({ score, label }) {
   )
 }
 
-function Breakdown({ breakdown, t }) {
+function Breakdown({ breakdown, t, shadowEngines = [] }) {
   const labels = {
     claude: 'Claude',
     chatgpt: 'ChatGPT',
@@ -55,7 +55,10 @@ function Breakdown({ breakdown, t }) {
       {Object.entries(breakdown || {}).map(([key, value]) => (
         <div className="breakdown__row" key={key}>
           <div className="breakdown__row-top">
-            <span className="breakdown__row-label">{labels[key] || key}</span>
+            <span className="breakdown__row-label">
+              {labels[key] || key}
+              {shadowEngines.includes(key) && <span className="breakdown__shadow"> · {t('res_shadow_engine')}</span>}
+            </span>
             <span className="breakdown__row-value">{value}</span>
           </div>
           <div className="breakdown__bar-track">
@@ -130,6 +133,7 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
     resolved_identity = null,   // sosyal: {name, platform} (backend cozdu) veya null
     needs_niche = false,        // sosyal: nis yok -> SOV olculemedi
     cached = false,             // A2-1: 24h idempotent cache'ten geldi mi
+    shadow_engines = [],        // A3-1: golge-mod motorlar (skora katkisiz)
   } = result
 
   const isSocial = type === 'social'
@@ -228,7 +232,7 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
             />
           </div>
           <ProBlur isPro={isPro} onUpgrade={onUpgrade} label={t('results_brand_breakdown_label')}>
-            <Breakdown breakdown={score_breakdown} t={t} />
+            <Breakdown breakdown={score_breakdown} t={t} shadowEngines={shadow_engines} />
           </ProBlur>
         </div>
 

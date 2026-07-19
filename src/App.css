@@ -2760,6 +2760,9 @@ body {
   border: 1px solid color-mix(in srgb, var(--danger, #d64545) 30%, transparent);
   border-radius: var(--r-sm, 8px); padding: 6px 8px; margin-top: 2px;
 }
+.breakdown__shadow {
+  font-size: .72rem; font-weight: 400; color: var(--text-muted); font-style: italic;
+}
 .results__cached-note {
   font-size: .8rem; font-style: italic; color: var(--text-muted);
   margin: 4px 0 12px; line-height: 1.5;

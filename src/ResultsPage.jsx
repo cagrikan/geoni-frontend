@@ -93,7 +93,7 @@ function TopicCard({ topic, isOpportunity }) {
 /* Tarama -> hizmet koprusu: raporun kendi verisinden somut eksikleri
    cikarir ve her birini app'teki ilgili hizmete baglar (hedef on-dolu).
    Urunun ana hunisi bu: "tara, eksigi gor, duzelttir". */
-function FixSuggestions({ result, t }) {
+function FixSuggestions({ result, t, onUpgrade }) {
   const { domain, platforms = {}, llms_txt, score_breakdown = {} } = result
   const fixes = []
   const blockedEngines = [
@@ -120,19 +120,18 @@ function FixSuggestions({ result, t }) {
     fixes.push({ key: 'sov', title: t('fix_sov_title'), why: `${t('fix_sov_why')} ${result.sov.mention_count}/${result.sov.query_count}` })
   }
   if (fixes.length === 0) return null
-  const href = `https://app.geoni.ai/dashboard?tab=tickets&target=${encodeURIComponent(domain || '')}`
   return (
     <div className="fixes">
       <h3 className="fixes__title"><Wrench size={15} strokeWidth={1.5} /> {t('fix_section_title')}</h3>
       <div className="fixes__list">
         {fixes.map((f) => (
-          <a key={f.key} className="fixes__item" href={href}>
+          <button key={f.key} type="button" className="fixes__item" onClick={() => onUpgrade?.(domain || '')}>
             <div className="fixes__item-body">
               <div className="fixes__item-title">{f.title}</div>
               <div className="fixes__item-why">{f.why}</div>
             </div>
             <span className="fixes__item-cta">{t('fix_cta')} <ArrowRight size={13} strokeWidth={1.75} /></span>
-          </a>
+          </button>
         ))}
       </div>
     </div>
@@ -259,7 +258,7 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
         <SovSection sov={result.sov} t={t} isPro={isPro} />
 
         {/* Eksik -> hizmet koprusu (ornek raporda gosterilmez) */}
-        {!isSample && <FixSuggestions result={result} t={t} />}
+        {!isSample && <FixSuggestions result={result} t={t} onUpgrade={onUpgrade} />}
 
         {/* Topics */}
         <div className="topics">
@@ -296,9 +295,9 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
             <p className="results__cta-eyebrow">{t('results_next_step')}</p>
             <h2 className="results__cta-title">{t('results_upgrade_question')}</h2>
             <p className="results__cta-sub">{t('results_cta_sub_site')}</p>
-            <a href={`https://app.geoni.ai/dashboard?tab=tickets&target=${encodeURIComponent(domain || '')}`} className="results__cta-btn" target="_blank" rel="noopener">
+            <button type="button" onClick={() => onUpgrade(domain || '')} className="results__cta-btn">
               {t('results_view_packages')}
-            </a>
+            </button>
           </div>
         </div>
       </div>
@@ -306,9 +305,9 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
       {!isPro && (
         <div className="results__sticky-bar">
           <span className="results__sticky-text">{t('results_sticky_upgrade')}</span>
-          <a href={`https://app.geoni.ai/dashboard?tab=tickets&target=${encodeURIComponent(domain || '')}`} className="results__sticky-btn" target="_blank" rel="noopener">
+          <button type="button" onClick={() => onUpgrade(domain || '')} className="results__sticky-btn">
             {t('results_view_packages')}
-          </a>
+          </button>
         </div>
       )}
     </>

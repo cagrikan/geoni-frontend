@@ -3388,6 +3388,10 @@ body {
   padding: 14px 16px; transition: border-color .15s ease;
 }
 .fixes__item:hover { border-color: var(--border-mid); }
+/* O4 (Fable): result CTA'ları <a>→<button> oldu (app-içi geçiş); native button
+   görünümünü sıfırla ki eski link/buton görünümü korunsun. */
+.fixes__item, .results__cta-btn, .results__sticky-btn, .social-niche__btn { font: inherit; cursor: pointer; }
+button.fixes__item { width: 100%; text-align: left; }
 .fixes__item-body { flex: 1; min-width: 0; }
 .fixes__item-title { font-size: .875rem; font-weight: 500; color: var(--text); }
 .fixes__item-why { font-size: .8125rem; color: var(--warn); margin-top: 2px; }

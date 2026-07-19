@@ -213,7 +213,7 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
         {isSocial && needs_niche && (
           <div className="social-niche">
             <span className="social-niche__text">{t('social_needs_niche')}</span>
-            <a href="https://app.geoni.ai" className="social-niche__btn" target="_blank" rel="noopener">{t('social_add_niche')}</a>
+            <button type="button" onClick={onReset} className="social-niche__btn">{t('social_add_niche')}</button>
           </div>
         )}
 
@@ -317,9 +317,9 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
             <p className="results__cta-eyebrow">{t('results_next_step')}</p>
             <h2 className="results__cta-title">{t('results_upgrade_question')}</h2>
             <p className="results__cta-sub">{t('results_cta_sub_brand')}</p>
-            <a href={`https://app.geoni.ai/dashboard?tab=tickets&target=${encodeURIComponent(result?.name || '')}`} className="results__cta-btn" target="_blank" rel="noopener">
+            <button type="button" onClick={() => onUpgrade(result?.name || '')} className="results__cta-btn">
               {t('results_view_packages')}
-            </a>
+            </button>
           </div>
         </div>
       </div>
@@ -329,9 +329,9 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
           <span className="results__sticky-text">
             {recognition_count > 0 ? `${recognition_count}/${total} ${t('results_brand_sticky_recognized')}` : t('results_brand_sticky_none')}
           </span>
-          <a href={`https://app.geoni.ai/dashboard?tab=tickets&target=${encodeURIComponent(result?.name || '')}`} className="results__sticky-btn" target="_blank" rel="noopener">
+          <button type="button" onClick={() => onUpgrade(result?.name || '')} className="results__sticky-btn">
             {t('results_view_packages')}
-          </a>
+          </button>
         </div>
       )}
     </>

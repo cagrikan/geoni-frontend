@@ -434,8 +434,14 @@ function AppInner() {
   // ProBlur "yukselt": kullaniciyi pazarlama sitesine (geoni.ai#paketler)
   // atmak yerine uygulama ici kredi sekmesine goturur. Giris yapmamissa once
   // login'e; geoni_pending_tab DashboardPage acilinca 'credits' sekmesini acar.
-  const handleUpgrade = () => {
-    try { localStorage.setItem('geoni_pending_tab', 'credits') } catch { /* ignore */ }
+  // O4 (Fable 2026-07-19): target verilirse Hizmetler (tickets) sekmesine hedef
+  // ön-dolu app-İÇİ geçiş; eskiden result CTA'ları https://app.geoni.ai'ye
+  // target=_blank ile gidiyordu (yeni sekme + state kaybı + preview'da prod'a sıçrama).
+  const handleUpgrade = (target) => {
+    try {
+      localStorage.setItem('geoni_pending_tab', typeof target === 'string' && target ? 'tickets' : 'credits')
+      if (typeof target === 'string' && target) localStorage.setItem('geoni_pending_target', target)
+    } catch { /* ignore */ }
     navigateTo(user ? 'dashboard' : 'login')
   }
 

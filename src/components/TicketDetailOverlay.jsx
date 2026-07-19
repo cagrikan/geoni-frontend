@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { ArrowLeft, Copy, Check, FileText, FileEdit, Wrench, Braces, Bot, Landmark, Link2 } from 'lucide-react'
 import TicketThread from './TicketThread'
 import TicketChecklist from './TicketChecklist'
@@ -15,6 +15,37 @@ const TICKET_TYPE_ICONS = {
 /* Iki kolonlu bilet detayi (onaylanan v2 onizlemesi, Jira/Linear deseni):
    solda konusma, sagda surec zaman cizelgesi + is kirilimi + dosyalar +
    detaylar. Rol aksiyonlari (extraActions) Durum blogunun hemen altinda. */
+// B3-1: teslim edilen hizmetin ETKISI — baseline (satin alindiginda) vs son tarama.
+// "dosya urettik" -> "gorunurlugun artti" koprusu; hizmetin ROI kaniti.
+function ImpactBlock({ ticketId, authedFetch, t }) {
+  const [data, setData] = useState(null)
+  useEffect(() => {
+    let cancelled = false
+    authedFetch(`/api/tickets/${ticketId}/impact`)
+      .then((d) => { if (!cancelled) setData(d) })
+      .catch(() => { /* sessiz: impact opsiyonel */ })
+    return () => { cancelled = true }
+  }, [ticketId])
+  if (!data || !data.baseline || typeof data.baseline.score !== 'number') return null
+  const { baseline, latest, delta } = data
+  const up = delta != null && delta >= 0
+  return (
+    <div className="tdo__block tdo__impact">
+      <h3>{t('ticket_impact_title')}</h3>
+      {latest && delta != null ? (
+        <div className="tdo__impact-delta">
+          <span className="tdo__impact-scores">{baseline.score} → {latest.score}</span>
+          <span className={`tdo__impact-badge ${up ? 'up' : 'down'}`}>{up ? '+' : ''}{delta}</span>
+        </div>
+      ) : (
+        <p className="tdo__impact-hint">
+          {t('ticket_impact_rescan')} <span className="tdo__impact-base">({t('ticket_impact_baseline')}: {baseline.score})</span>
+        </p>
+      )}
+    </div>
+  )
+}
+
 export default function TicketDetailOverlay({ ticket, canEdit, currentUserId, authedFetch, t, language, onBack, extraActions, contextLabel }) {
   const locale = language === 'en' ? 'en-US' : 'tr-TR'
   const fmt = (d) => (d ? new Date(d).toLocaleDateString(locale, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : null)
@@ -136,6 +167,10 @@ export default function TicketDetailOverlay({ ticket, canEdit, currentUserId, au
               ))}
             </div>
           </div>
+
+          {['submitted', 'verified', 'disputed'].includes(ticket.status) && (
+            <ImpactBlock ticketId={ticket.id} authedFetch={authedFetch} t={t} />
+          )}
 
           {canEdit ? (
             <div className="tdo__block">

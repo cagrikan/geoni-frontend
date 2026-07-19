@@ -2760,6 +2760,15 @@ body {
   border: 1px solid color-mix(in srgb, var(--danger, #d64545) 30%, transparent);
   border-radius: var(--r-sm, 8px); padding: 6px 8px; margin-top: 2px;
 }
+.tdo__impact-delta { display: flex; align-items: center; gap: 10px; }
+.tdo__impact-scores { font-size: 1.1rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.tdo__impact-badge {
+  font-size: .85rem; font-weight: 700; padding: 2px 8px; border-radius: var(--r-full, 999px);
+}
+.tdo__impact-badge.up { color: var(--good, #2e9e5b); background: color-mix(in srgb, var(--good, #2e9e5b) 14%, transparent); }
+.tdo__impact-badge.down { color: var(--danger, #d64545); background: color-mix(in srgb, var(--danger, #d64545) 14%, transparent); }
+.tdo__impact-hint { font-size: .82rem; line-height: 1.5; color: var(--text-muted); }
+.tdo__impact-base { opacity: .8; }
 .breakdown__shadow {
   font-size: .72rem; font-weight: 400; color: var(--text-muted); font-style: italic;
 }

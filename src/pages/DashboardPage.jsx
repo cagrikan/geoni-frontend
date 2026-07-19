@@ -262,6 +262,7 @@ function isWebOnly(tt) {
 }
 
 function ServiceCatalogSection({ t, profile }) {
+  const { language } = useLanguage()
   const [types, setTypes] = useState(null)
   const [buyingId, setBuyingId] = useState(null)
   const [error, setError] = useState(null)
@@ -269,7 +270,7 @@ function ServiceCatalogSection({ t, profile }) {
   const [targets, setTargets] = useState({})
 
   useEffect(() => {
-    fetch(`${API_URL}/api/ticket-types`).then((r) => r.json()).then((list) => {
+    fetch(`${API_URL}/api/ticket-types?lang=${language}`).then((r) => r.json()).then((list) => {
       setTypes(list)
       // Rapor sayfasindan "bu eksigi giderin" ile gelindiyse hedef on-dolu
       try {
@@ -280,7 +281,7 @@ function ServiceCatalogSection({ t, profile }) {
         }
       } catch { /* ignore */ }
     }).catch(() => setTypes([]))
-  }, [])
+  }, [language])
 
   const buy = async (ticketTypeId) => {
     const target = (targets[ticketTypeId] || '').trim()

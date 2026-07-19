@@ -14,7 +14,7 @@ const PERSON_LAST_STEP = 3
 const BRAND_LAST_STEP = 2
 
 export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, onSubmitSocial, loading = false, statusText = '', error, user, onDashboard, onLogin, onViewSample }) {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   // Worker'i onceden isit: landing ekrani = tarama niyeti. Kullanici formu
   // doldururken worker cold-start'i (0->1) arka planda gecer (backend'de 25sn
   // global cooldown var, spam olmaz).
@@ -244,7 +244,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, onSubmi
           <span className="hero-eyeline__pulse" />
           <span key={eyelineCountReady && scanCount > 0 ? 'count' : 'eyebrow'} className="eyeline-swap">
             {eyelineCountReady && scanCount > 0
-              ? <>{t('eyeline_today_prefix')}<b>{scanCount.toLocaleString('tr-TR')}</b> {t('hero_eyeline_scans')}</>
+              ? <>{t('eyeline_today_prefix')}<b>{scanCount.toLocaleString(language === 'tr' ? 'tr-TR' : 'en-US')}</b> {t('hero_eyeline_scans')}</>
               : t('hero_eyebrow')}
           </span>
         </div>

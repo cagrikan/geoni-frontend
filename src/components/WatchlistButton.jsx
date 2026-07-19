@@ -1,7 +1,13 @@
 import { useState, useEffect } from 'react'
 import { Bookmark, BookmarkCheck } from 'lucide-react'
-import { supabase } from '../lib/supabase'
 import { useLanguage } from '../lib/LanguageContext'
+
+// Supabase'i static import etmek, bu buton ResultsPage (eager) icinden
+// geldigi icin ~52KB gz supabase'i anonim ziyaretcinin ilk bundle'ina
+// tasiyordu. Buton zaten yalnizca oturum acmis kullaniciya render oluyor;
+// supabase'i tembel yukle, anonim landing'e hic inmesin.
+let _sbPromise = null
+const getSupabase = () => (_sbPromise ||= import('../lib/supabase').then((m) => m.supabase))
 
 export default function WatchlistButton({ user, type, label, target }) {
   const { t } = useLanguage()
@@ -11,7 +17,7 @@ export default function WatchlistButton({ user, type, label, target }) {
   useEffect(() => {
     if (!user || !label) { setChecking(false); return }
     let cancelled = false
-    supabase
+    getSupabase().then((supabase) => supabase
       .from('watchlist')
       .select('id')
       .eq('user_id', user.id)
@@ -21,7 +27,7 @@ export default function WatchlistButton({ user, type, label, target }) {
       .then(({ data, error }) => {
         if (error) console.error('Watchlist check failed:', error)
         if (!cancelled) { setAdded(!!data); setChecking(false) }
-      })
+      }))
     return () => { cancelled = true }
   }, [user, type, label])
 
@@ -30,6 +36,7 @@ export default function WatchlistButton({ user, type, label, target }) {
   const handleClick = async () => {
     if (added || checking) return
     setAdded(true)
+    const supabase = await getSupabase()
     const { error } = await supabase.from('watchlist').insert({ user_id: user.id, type, label, target })
     if (error) {
       if (error.code !== '23505') { setAdded(false); console.error('Watchlist insert failed:', error) }

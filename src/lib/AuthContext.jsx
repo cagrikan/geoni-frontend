@@ -1,7 +1,15 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { supabase } from './supabase'
 
 const AuthContext = createContext(null)
+
+// Supabase (~52KB gz) anonim landing ziyaretcisine pesin inmesin diye dinamik
+// import ile tembel yukleniyor. Ilk cagirana kadar chunk hic cekilmez; sonraki
+// cagrilar ayni promise'i paylasir (createClient tek kez calisir).
+let _sbPromise = null
+function getSupabase() {
+  if (!_sbPromise) _sbPromise = import('./supabase').then((m) => m.supabase)
+  return _sbPromise
+}
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
@@ -9,24 +17,48 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
-      if (session?.user) fetchProfile(session.user.id)
-      else setLoading(false)
+    // Zaten oturumu olan (localStorage'da sb-*-auth-token) kullanici ya da OAuth
+    // donusu (/auth/callback, ya da URL'de access_token/code) haric anonim
+    // ziyaretci icin supabase HIC yuklenmez — sadece landing gorur.
+    let hasToken = false
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i)
+        if (k && k.startsWith('sb-') && k.endsWith('-auth-token')) { hasToken = true; break }
+      }
+    } catch { /* localStorage erisilemezse anonim varsay */ }
+    const onAuthRoute =
+      window.location.pathname.startsWith('/auth/callback') ||
+      /access_token|refresh_token/.test(window.location.hash) ||
+      /[?&]code=/.test(window.location.search)
+
+    if (!hasToken && !onAuthRoute) {
+      setLoading(false)
+      return
+    }
+
+    let active = true
+    let unsub = null
+    getSupabase().then((supabase) => {
+      if (!active) return
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        setUser(session?.user ?? null)
+        if (session?.user) fetchProfile(session.user.id)
+        else setLoading(false)
+      })
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        setUser(session?.user ?? null)
+        if (session?.user) fetchProfile(session.user.id)
+        else { setProfile(null); setLoading(false) }
+      })
+      unsub = () => subscription.unsubscribe()
     })
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-      if (session?.user) fetchProfile(session.user.id)
-      else { setProfile(null); setLoading(false) }
-    })
-
-    return () => subscription.unsubscribe()
+    return () => { active = false; if (unsub) unsub() }
   }, [])
 
   const fetchProfile = async (userId) => {
+    const supabase = await getSupabase()
     const { data } = await supabase
       .from('profiles')
       .select('*')
@@ -47,6 +79,7 @@ export function AuthProvider({ children }) {
       const raw = localStorage.getItem('geoni_acquisition')
       if (!raw) return
       const acq = JSON.parse(raw)
+      const supabase = await getSupabase()
       await supabase.from('profiles').update({
         utm_source: acq.utm_source,
         utm_medium: acq.utm_medium,
@@ -57,24 +90,24 @@ export function AuthProvider({ children }) {
     } catch { /* ignore */ }
   }
 
-  const signInWithGoogle = () => supabase.auth.signInWithOAuth({
+  const signInWithGoogle = async () => (await getSupabase()).auth.signInWithOAuth({
     provider: 'google',
     options: { redirectTo: `${window.location.origin}/auth/callback` }
   })
 
-  const signInWithApple = () => supabase.auth.signInWithOAuth({
+  const signInWithApple = async () => (await getSupabase()).auth.signInWithOAuth({
     provider: 'apple',
     options: { redirectTo: `${window.location.origin}/auth/callback` }
   })
 
-  const signInWithLinkedIn = () => supabase.auth.signInWithOAuth({
+  const signInWithLinkedIn = async () => (await getSupabase()).auth.signInWithOAuth({
     provider: 'linkedin_oidc',
     options: { redirectTo: `${window.location.origin}/auth/callback` }
   })
 
   // Cikis sonrasi login ekrani degil pazarlama sitesi acilir
   const signOut = async () => {
-    try { await supabase.auth.signOut() } catch { /* oturum zaten dusmus olabilir */ }
+    try { const supabase = await getSupabase(); await supabase.auth.signOut() } catch { /* oturum zaten dusmus olabilir */ }
     window.location.href = 'https://geoni.ai'
   }
 

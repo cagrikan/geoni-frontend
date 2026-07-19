@@ -76,7 +76,7 @@ export default function ScanningScreen({ kind, target, statusKey, progressLog = 
         </h1>
         <p className="scan-screen__sub">Claude, ChatGPT, Gemini{kind === 'brand' ? ' + Perplexity' : ''} {t('scan_sub')}</p>
 
-        <div className="scan-steps">
+        <div className="scan-steps" role="status" aria-live="polite">
           {steps.length > 0
             ? steps.map((s, i) => <StepRow key={i} label={s.label} state={s.state} />)
             : <StepRow label={t('scan_starting')} state="active" />}

@@ -3465,6 +3465,58 @@ button.fixes__item { width: 100%; text-align: left; }
 }
 .landing-close p { font-size: .875rem; color: var(--text-sub); margin-bottom: 14px; }
 .landing-close p b { color: var(--text); }
+
+/* AI Görünürlük Ligi — sosyal kanıt + FOMO */
+.league-band {
+  border-top: 1px solid var(--border);
+  padding: 28px 24px 34px;
+  max-width: 560px;
+  margin: 0 auto;
+  text-align: center;
+}
+.league__title {
+  font-family: var(--display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.league__sub { font-size: .82rem; color: var(--text-sub); margin-bottom: 18px; }
+.league__list { list-style: none; margin: 0 0 20px; padding: 0; text-align: left; }
+.league__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 8px;
+  background: var(--surface);
+}
+.league__rank {
+  flex: 0 0 22px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: .85rem;
+  color: var(--text-sub);
+}
+.league__domain {
+  flex: 1 1 auto;
+  font-weight: 600;
+  font-size: .92rem;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.league__score {
+  flex: 0 0 auto;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 1.15rem;
+  font-variant-numeric: tabular-nums;
+}
+.league__cta { margin: 0 auto; }
 .landing-footer {
   display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
   padding: 16px 24px; border-top: 1px solid var(--border);

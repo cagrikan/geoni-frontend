@@ -110,6 +110,15 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, onSubmi
       .catch(() => {})
   }, [])
 
+  // AI Görünürlük Ligi (sosyal kanıt + FOMO): AI'ın en iyi tanıdığı siteler.
+  const [leaders, setLeaders] = useState([])
+  useEffect(() => {
+    fetch(`${API_URL}/api/ai-friendly`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => Array.isArray(d?.items) && setLeaders(d.items.filter(x => x?.domain && x?.score >= 50).slice(0, 8)))
+      .catch(() => {})
+  }, [])
+
   // site
   const [domain, setDomain]     = useState('')
   const [siteEmail, setSiteEmail] = useState('')
@@ -482,6 +491,26 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, onSubmi
           ))}
         </div>
       </section>
+
+      {/* ══ AI GÖRÜNÜRLÜK LİGİ: sosyal kanıt + FOMO (≥4 giriş yoksa gizli) ══ */}
+      {leaders.length >= 4 && (
+        <section className="league-band">
+          <h2 className="league__title">{t('league_title')}</h2>
+          <p className="league__sub">{t('league_sub')}</p>
+          <ol className="league__list">
+            {leaders.map((it, i) => (
+              <li className="league__row" key={it.domain}>
+                <span className="league__rank">{i + 1}</span>
+                <span className="league__domain">{it.domain}</span>
+                <span className="league__score" style={{ color: it.score >= 70 ? '#2fbd84' : '#F5A623' }}>{Math.round(it.score)}</span>
+              </li>
+            ))}
+          </ol>
+          <button type="button" className="landing__submit league__cta" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            {t('league_cta')}
+          </button>
+        </section>
+      )}
 
       {/* Kapanis: sayfa "Nasil calisir"dan sonra aniden bitiyordu */}
       <section className="landing-close">

@@ -99,6 +99,9 @@ export const translations = {
 
     // ── Nasıl çalışır ──
     how_title: 'Nasıl çalışır',
+    league_title: 'AI Görünürlük Ligi',
+    league_sub: "Yapay zekânın şu an en iyi tanıdığı siteler. Peki ya seninki?",
+    league_cta: 'Skorunu öğren →',
     how_step1_title: 'Sorgula',
     how_step1_desc: "Sitenizi tarar, adınızı veya markanızı Claude, ChatGPT, Gemini ve Perplexity'ye gerçek zamanlı sorarız.",
     how_step2_title: 'Karşılaştır',
@@ -798,6 +801,9 @@ export const translations = {
 
     // ── How it works ──
     how_title: 'How it works',
+    league_title: 'AI Visibility League',
+    league_sub: 'The sites AI knows best right now. And yours?',
+    league_cta: 'Get your score →',
     how_step1_title: 'Query',
     how_step1_desc: 'We scan your site and ask Claude, ChatGPT, Gemini and Perplexity about your name or brand in real time.',
     how_step2_title: 'Compare',

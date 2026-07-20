@@ -49,7 +49,10 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, onSubmi
       try {
         widgetIdRef.current = window.turnstile.render(turnstileRef.current, {
           sitekey: TURNSTILE_SITE_KEY,
-          // Site temasına uydur (yoksa "auto" OS'a bakar → koyu temada beyaz "Başarılı" barı çirkin)
+          // Görünmez: normalde hiç bar gösterme, YALNIZCA anomali/interaktif challenge
+          // gerekirse çık (koyu temada beyaz "Başarılı" barı çirkindi + gereksizdi).
+          appearance: 'interaction-only',
+          // Anomali anında çıkarsa site temasına uysun.
           theme: document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark',
           callback: (tok) => { turnstileTokenRef.current = tok || '' },
           'error-callback': () => { turnstileTokenRef.current = '' },

@@ -155,6 +155,7 @@ function getProviderMeta(t) {
     openai: { label: 'OpenAI', color: 'var(--chart-1)' },
     google: { label: 'Gemini', color: 'var(--chart-2)' },
     perplexity: { label: 'Perplexity', color: 'var(--chart-4)' },
+    brave: { label: 'Brave', color: 'var(--chart-2)' },
     'tavily-1': { label: t('admin_provider_tavily1'), color: 'var(--chart-5)' },
     'tavily-2': { label: t('admin_provider_tavily2'), color: 'var(--chart-6)' },
   }
@@ -613,6 +614,14 @@ function OverviewTab() {
           </>
         )
       }} />
+
+      {/* Brave Search API — sonradan eklendi (SoV web araması). Kullanıma dayalı;
+          maliyet API'si yok, manuel bakiye/top-up takibi. */}
+      <div className="admin-widget">
+        <h3 className="admin-section__title">Brave Search API</h3>
+        <p className="admin-hint">SoV web araması. Manuel bakiye/top-up takibi (maliyet API'si yok).</p>
+        <TopupSection provider="brave" spentAllTime={0} />
+      </div>
 
       <Widget
         title={t('admin_title_tavily')}

@@ -15,6 +15,7 @@ import {
   Plus, Minus, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ArrowLeft,
   UserPlus, RotateCcw, Globe, User, Tag, ShoppingCart, TrendingDown, TrendingUp, Gift, ShieldAlert,
   CalendarDays, CalendarRange, Calendar, History, Wallet, PiggyBank, Database, Megaphone, Copy, Check, Wrench, Sparkles,
+  AlertTriangle, CheckCircle2, ExternalLink,
 } from 'lucide-react'
 
 const COST_TILE_ICONS = { today: CalendarDays, week: CalendarRange, month: Calendar, allTime: History }
@@ -2020,6 +2021,82 @@ function PayoutsTab() {
   )
 }
 
+const SENTRY_LEVEL_COLOR = { fatal: '#b4232a', error: '#e5484d', warning: '#e8a33d', info: '#5b7cfa', debug: '#8a94a6' }
+
+function SentryTab() {
+  const [data, setData] = useState(null)
+  const [error, setError] = useState(null)
+
+  const load = useCallback(() => {
+    setData(null); setError(null)
+    authedFetch('/api/admin/sentry').then(setData).catch((e) => setError(e.message))
+  }, [])
+  useEffect(() => { load() }, [load])
+
+  const fmt = (s) => (s ? new Date(s).toLocaleString() : '—')
+
+  return (
+    <div>
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 18 }}>
+        <h3 className="admin-section__title" style={{ margin: 0 }}>Hata izleme (Sentry)</h3>
+        <button className="admin-back" onClick={load} style={{ marginLeft: 'auto' }}>
+          <RotateCcw size={14} strokeWidth={1.5} /> Yenile
+        </button>
+      </div>
+
+      {error && <div className="admin-error">{error}</div>}
+      {!data && !error && <div className="admin-loading">Yükleniyor…</div>}
+      {data && !data.configured && <p className="admin-hint">Sentry token bağlı değil (SENTRY_AUTH_TOKEN). Bağlanınca hatalar burada görünür.</p>}
+
+      {data?.configured && (
+        <>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 22 }}>
+            <StatTile label="Açık hata" value={data.open_count} icon={AlertTriangle} />
+            <StatTile label="Çözüldü (14g)" value={data.resolved_count} icon={CheckCircle2} />
+          </div>
+          {data.error && <div className="admin-error">{data.error}</div>}
+          {data.open_count === 0 ? (
+            <p className="admin-hint">Açık hata yok — her şey yolunda. ✅</p>
+          ) : (
+            <div className="admin-table-wrap">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th className="admin-table__left">Seviye</th>
+                    <th className="admin-table__left">Hata</th>
+                    <th className="admin-table__num">Adet</th>
+                    <th className="admin-table__num">Kullanıcı</th>
+                    <th className="admin-table__num">Son görülme</th>
+                    <th className="admin-table__num"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.open.map((i) => (
+                    <tr key={i.id}>
+                      <td className="admin-table__left">
+                        <span style={{ padding: '2px 8px', borderRadius: 6, fontSize: '.72rem', fontWeight: 700, color: '#fff', background: SENTRY_LEVEL_COLOR[i.level] || '#8a94a6' }}>{i.level}</span>
+                      </td>
+                      <td className="admin-table__left admin-table__ellipsis" title={i.title}>{i.title}</td>
+                      <td className="admin-table__num">{i.count}</td>
+                      <td className="admin-table__num">{i.userCount}</td>
+                      <td className="admin-table__num admin-table__muted">{fmt(i.lastSeen)}</td>
+                      <td className="admin-table__num">
+                        <a href={i.permalink} target="_blank" rel="noreferrer" aria-label="Sentry'de aç" title="Sentry'de aç" style={{ color: 'var(--accent)' }}>
+                          <ExternalLink size={13} strokeWidth={1.5} />
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
+
 function ImprovementTab() {
   const [data, setData] = useState(null)
   const [error, setError] = useState(null)
@@ -2229,6 +2306,9 @@ export default function AdminPage({ onBack }) {
             <button className={`dash-nav__item ${tab === 'improvement' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('improvement')}>
               <Sparkles size={16} strokeWidth={1.5} /> Öz-gelişim
             </button>
+            <button className={`dash-nav__item ${tab === 'sentry' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('sentry')}>
+              <AlertTriangle size={16} strokeWidth={1.5} /> İzleme
+            </button>
           </nav>
         </aside>
 
@@ -2241,6 +2321,7 @@ export default function AdminPage({ onBack }) {
           {tab === 'tickets' && <TicketsAdminTab />}
           {tab === 'payouts' && <PayoutsTab />}
           {tab === 'improvement' && <ImprovementTab />}
+          {tab === 'sentry' && <SentryTab />}
         </main>
       </div>
     </div>

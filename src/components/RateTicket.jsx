@@ -14,6 +14,7 @@ export default function RateTicket({ ticketId, authedFetch, promptKey }) {
   const [comment, setComment] = useState('')
   const [busy, setBusy] = useState(false)
   const [done, setDone] = useState(false)
+  const [err, setErr] = useState('')
 
   useEffect(() => {
     let alive = true
@@ -44,12 +45,16 @@ export default function RateTicket({ ticketId, authedFetch, promptKey }) {
   const submit = async () => {
     if (!stars) return
     setBusy(true)
+    setErr('')
     try {
       await authedFetch(`/api/tickets/${ticketId}/rate`, {
         method: 'POST', body: JSON.stringify({ stars, comment: comment.trim() }),
       })
       setDone(true)
-    } catch { /* kullanici tekrar deneyebilir */ }
+    } catch {
+      // Sessizce yutma: kullanici puaninin gitmedigini bilmeli, tekrar deneyebilsin.
+      setErr(t('rate_error') || 'Puan gönderilemedi, lütfen tekrar deneyin.')
+    }
     setBusy(false)
   }
 
@@ -60,7 +65,8 @@ export default function RateTicket({ ticketId, authedFetch, promptKey }) {
       <div className="rate-box__stars rate-box__stars--input" onMouseLeave={() => setHover(0)}>
         {[1, 2, 3, 4, 5].map((n) => (
           <button key={n} type="button" className="rate-box__star-btn"
-            onMouseEnter={() => setHover(n)} onClick={() => setStars(n)} aria-label={`${n}`}>
+            onMouseEnter={() => setHover(n)} onClick={() => setStars(n)}
+            aria-label={`${n} / 5`} aria-pressed={n <= stars}>
             <Star size={22} strokeWidth={1.5}
               fill={n <= (hover || stars) ? '#F5A623' : 'none'}
               color={n <= (hover || stars) ? '#F5A623' : 'var(--text-muted)'} />
@@ -73,6 +79,7 @@ export default function RateTicket({ ticketId, authedFetch, promptKey }) {
       <button type="button" className="rate-box__submit" disabled={busy || !stars} onClick={submit}>
         {t('rate_submit') || 'Puanı gönder'}
       </button>
+      {err && <p className="rate-box__error" role="alert">{err}</p>}
     </div>
   )
 }

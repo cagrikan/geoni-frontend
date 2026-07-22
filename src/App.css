@@ -263,6 +263,9 @@ body {
   transition: border-color .2s, background .2s;
 }
 .landing__field input:focus { border-color: var(--accent); background: var(--surface-2); }
+/* Klavye odagi gorunur olmali (a11y): fare focus'ta gorsel yeter, ama klavye
+   kullanicisi icin acik bir odak halkasi sart. */
+.landing__field input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .landing__field input::placeholder { color: #57607A; font-family: inherit; font-weight: 400; font-style: italic; }
 
 /* Adım 1 (tek gerekli alan) — sayfanın odak noktası, ama hala acikca "kutu" */
@@ -3409,6 +3412,7 @@ button.fixes__item { width: 100%; text-align: left; }
 .rate-box__comment:focus { outline: 2px solid rgba(124,134,245,.4); outline-offset: -1px; border-color: transparent; }
 .rate-box__submit { align-self: flex-start; padding: 8px 18px; border-radius: 8px; border: none; background: #7C86F5; color: #fff; font-weight: 600; font-size: .85rem; cursor: pointer; }
 .rate-box__submit:disabled { opacity: .5; cursor: default; }
+.rate-box__error { color: #e5484d; font-size: .8rem; margin: 6px 0 0; }
 .rate-box--done, .rate-box--rep { flex-direction: row; align-items: center; justify-content: space-between; }
 .rate-box__label { font-size: .85rem; color: var(--text-muted); }
 .rate-box__rep-val { font-size: .95rem; font-weight: 700; color: #F5A623; }

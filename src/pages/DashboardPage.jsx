@@ -532,12 +532,14 @@ function ExpertPanelSection({ t, userId, language }) {
   const [submittingId, setSubmittingId] = useState(null)
   const [selected, setSelected] = useState(null)
   const [search, setSearch] = useState('')
+  const [actionError, setActionError] = useState(null)
 
   const load = () => authedFetch('/api/expert/tickets').then(setTickets).catch(() => setTickets([]))
   useEffect(() => { load() }, [])
 
   const openTicket = (tk) => {
     setSelected(tk)
+    setActionError(null)
     setTickets((list) => list?.map((t) => (t.id === tk.id ? { ...t, has_unread: false } : t)))
   }
   useAutoOpenTicket(tickets, openTicket)
@@ -546,6 +548,7 @@ function ExpertPanelSection({ t, userId, language }) {
     const form = forms[ticketId] || {}
     if (!form.evidence_url) return
     setSubmittingId(ticketId)
+    setActionError(null)
     try {
       await authedFetch(`/api/expert/tickets/${ticketId}/submit`, {
         method: 'POST',
@@ -553,17 +556,23 @@ function ExpertPanelSection({ t, userId, language }) {
       })
       await load()
       setSelected(null)
-    } catch { /* kullanici tekrar deneyebilir */ }
+    } catch (e) {
+      // Sessizce yutma: kanit gonderimi basarisizsa uzman bunu gormeli.
+      setActionError(e.message || t('dash_action_error') || 'İşlem başarısız, tekrar deneyin.')
+    }
     setSubmittingId(null)
   }
 
   const start = async (ticketId) => {
     setSubmittingId(ticketId)
+    setActionError(null)
     try {
       await authedFetch(`/api/expert/tickets/${ticketId}/start`, { method: 'POST' })
       await load()
       setSelected(null)
-    } catch { /* kullanici tekrar deneyebilir */ }
+    } catch (e) {
+      setActionError(e.message || t('dash_action_error') || 'İşlem başarısız, tekrar deneyin.')
+    }
     setSubmittingId(null)
   }
 
@@ -593,6 +602,7 @@ function ExpertPanelSection({ t, userId, language }) {
             <button disabled={submittingId === selected.id || !forms[selected.id]?.evidence_url} onClick={() => submit(selected.id)}>{t('dash_expert_submit')}</button>
           </div>
         )}
+        {actionError && <div className="dash-buy-error" role="alert">{actionError}</div>}
         {selected.status === 'rejected' && selected.reject_reason && <div className="ticket-reject-reason">{selected.reject_reason}</div>}
         {/* Musteri itibari (uzman gorur) + is bitince musteriyi puanla */}
         <CustomerReputation ticketId={selected.id} authedFetch={authedFetch} t={t} />

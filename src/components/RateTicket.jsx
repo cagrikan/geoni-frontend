@@ -18,6 +18,10 @@ export default function RateTicket({ ticketId, authedFetch, promptKey }) {
 
   useEffect(() => {
     let alive = true
+    // ticketId degisince kendi state'imizi sifirla: ust bilesen her bilet
+    // gecisinde tam remount ediyor (bugun guvenli) ama bu, remount'a bagimli
+    // kalmadan stale done/err/stars sizmasini engeller (kalici saglamlastirma).
+    setErr(''); setDone(false); setStars(0)
     authedFetch(`/api/tickets/${ticketId}/rating`)
       .then((r) => { if (alive) setState(r || {}) })
       .catch(() => { if (alive) setState({}) })
@@ -62,11 +66,12 @@ export default function RateTicket({ ticketId, authedFetch, promptKey }) {
   return (
     <div className="rate-box">
       <p className="rate-box__prompt">{t(prompt) || 'Bu teslimatı puanla'}</p>
-      <div className="rate-box__stars rate-box__stars--input" onMouseLeave={() => setHover(0)}>
+      <div className="rate-box__stars rate-box__stars--input" onMouseLeave={() => setHover(0)}
+        role="radiogroup" aria-label={t('rate_submit') || 'Puan'}>
         {[1, 2, 3, 4, 5].map((n) => (
           <button key={n} type="button" className="rate-box__star-btn"
             onMouseEnter={() => setHover(n)} onClick={() => setStars(n)}
-            aria-label={`${n} / 5`} aria-pressed={n <= stars}>
+            role="radio" aria-checked={n === stars} aria-label={`${n} / 5`}>
             <Star size={22} strokeWidth={1.5}
               fill={n <= (hover || stars) ? '#F5A623' : 'none'}
               color={n <= (hover || stars) ? '#F5A623' : 'var(--text-muted)'} />

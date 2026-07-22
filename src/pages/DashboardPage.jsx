@@ -719,7 +719,7 @@ function WatchlistQueryEditor({ item, t, onSaved }) {
       {queries.map((q, i) => (
         <div className="watch-queries__row" key={i}>
           <span>{q}</span>
-          <button type="button" disabled={saving} onClick={() => save(queries.filter((_, j) => j !== i))} title={t('dash_delete_title')}>
+          <button type="button" disabled={saving} onClick={() => save(queries.filter((_, j) => j !== i))} title={t('dash_delete_title')} aria-label={t('dash_delete_title')}>
             <X size={12} strokeWidth={1.75} />
           </button>
         </div>
@@ -1098,7 +1098,7 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                 <>
                   {selectedIds.size > 0 && (
                     <div className="dash-bulk-bar">
-                      <input type="checkbox" className="dash-audit-checkbox" checked={selectedIds.size === audits.length} onChange={toggleSelectAll} title={t('dash_select_all')} />
+                      <input type="checkbox" className="dash-audit-checkbox" checked={selectedIds.size === audits.length} onChange={toggleSelectAll} title={t('dash_select_all')} aria-label={t('dash_select_all')} />
                       <span className="dash-bulk-bar__count">{t('dash_bulk_selected', { count: selectedIds.size })}</span>
                       <span className="dash-bulk-bar__spacer" />
                       <button type="button" onClick={bulkAddToWatchlist}><Bookmark size={13} strokeWidth={1.5} /> {t('watchlist_add')}</button>
@@ -1154,6 +1154,7 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                           onClick={(e) => deleteAudit(e, audit.id)}
                           className="dash-audit-delete"
                           title={t('dash_delete_title')}
+                          aria-label={t('dash_delete_title')}
                         ><X size={13} strokeWidth={1.5} /></button>
                       </div>
                     </div>
@@ -1231,6 +1232,8 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                             onClick={(e) => { e.stopPropagation(); setQueryEditor(queryEditor === item.id ? null : item.id) }}
                             className={`dash-audit-delete ${queryEditor === item.id ? 'dash-audit-delete--active' : ''}`}
                             title={t('watchlist_queries_btn')}
+                            aria-label={t('watchlist_queries_btn')}
+                            aria-expanded={queryEditor === item.id}
                           ><MessageSquareText size={13} strokeWidth={1.5} /></button>
                           <button
                             onClick={(e) => { e.stopPropagation(); rescanItem(item) }}
@@ -1241,6 +1244,7 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                             onClick={(e) => removeWatchlistItem(e, item.id)}
                             className="dash-audit-delete"
                             title={t('dash_delete_title')}
+                            aria-label={t('dash_delete_title')}
                           ><X size={13} strokeWidth={1.5} /></button>
                         </div>
                       </div>

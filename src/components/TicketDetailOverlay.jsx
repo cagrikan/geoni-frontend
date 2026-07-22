@@ -54,6 +54,14 @@ export default function TicketDetailOverlay({ ticket, canEdit, currentUserId, au
   const [progress, setProgress] = useState(null)
   const threadRef = useRef(null)
 
+  // a11y/UX: Escape ile overlay'i kapat (klavye kullanicisi ArrowLeft'e ulasmadan cikabilsin).
+  useEffect(() => {
+    if (!onBack) return
+    const onKey = (e) => { if (e.key === 'Escape') onBack() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onBack])
+
   const Icon = TICKET_TYPE_ICONS[ticket.ticket_type_key] || Wrench
 
   const refCode = ticket.ref_code || `BILET-${ticket.id}`

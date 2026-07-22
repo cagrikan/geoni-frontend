@@ -14,12 +14,12 @@
   --surface-2: #161926;
   --border: rgba(255, 255, 255, .07);
   --border-mid: rgba(255, 255, 255, .13);
-  --accent: #7C86F5;
-  --accent-dim: rgba(124, 134, 245, .12);
-  --accent-2: #7C86F5;
+  --accent: #616BDA;             /* WCAG AA: beyaz-üstü buton 4.54 (eski #7C86F5=3.19 kalıyordu) */
+  --accent-dim: rgba(97, 107, 218, .14);
+  --accent-2: #616BDA;
   --text: #EDEFF5;
   --text-sub: #9BA3B5;
-  --text-muted: #697083;
+  --text-muted: #7B8397;         /* WCAG AA: bg üstünde 5.18 (eski #697083=3.97 kalıyordu) */
   --good: #3FB950;
   --warn: #D29922;
   --bad: #F85149;
@@ -60,7 +60,7 @@
   --accent-2: #5B63E8;
   --text: #16181D;
   --text-sub: #4D5464;
-  --text-muted: #8A90A0;
+  --text-muted: #6C7280;         /* WCAG AA: bg üstünde 4.54 (eski #8A90A0=3.0 kalıyordu) */
   --good: #1A7F37;
   --warn: #9A6700;
   --bad: #CF222E;

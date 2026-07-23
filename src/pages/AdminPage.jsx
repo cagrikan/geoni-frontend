@@ -299,7 +299,7 @@ function TotalCostWidget() {
   if (error) return <div className="admin-widget"><h3 className="admin-section__title">{t('admin_title_total_cost')}</h3><div className="admin-error">{error}</div></div>
   if (!data) return <div className="admin-widget"><h3 className="admin-section__title">{t('admin_title_total_cost')}</h3><div className="admin-loading admin-loading--widget">{t('admin_loading')}</div></div>
 
-  const providerLabels = { anthropic: 'Anthropic', openai: 'OpenAI', aws: 'AWS', perplexity: 'Perplexity', gemini_usd: 'Gemini', supabase: 'Supabase' }
+  const providerLabels = { anthropic: 'Anthropic', openai: 'OpenAI', aws: 'AWS', perplexity: 'Perplexity', grok: 'Grok', gemini_usd: 'Gemini', supabase: 'Supabase' }
   const byProviderItems = Object.entries(data.by_provider_this_month || {})
     .sort((a, b) => b[1] - a[1])
     .map(([key, value]) => ({ label: providerLabels[key] || key, value, color: 'var(--chart-1)' }))

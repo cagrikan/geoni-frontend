@@ -156,6 +156,8 @@ function getProviderMeta(t) {
     openai: { label: 'OpenAI', color: 'var(--chart-1)' },
     google: { label: 'Gemini', color: 'var(--chart-2)' },
     perplexity: { label: 'Perplexity', color: 'var(--chart-4)' },
+    grok: { label: 'Grok', color: 'var(--chart-6)' },
+    grok_web: { label: 'Grok-web', color: 'var(--chart-5)' },
     brave: { label: 'Brave', color: 'var(--chart-2)' },
     'tavily-1': { label: t('admin_provider_tavily1'), color: 'var(--chart-5)' },
     'tavily-2': { label: t('admin_provider_tavily2'), color: 'var(--chart-6)' },
@@ -413,6 +415,51 @@ function PerplexityCostWidget() {
   )
 }
 
+function GrokCostWidget() {
+  const { t, language } = useLanguage()
+  const { data: cost, error: costError } = useAdminFetch('/api/admin/stats/grok-cost')
+
+  if (costError || !cost) {
+    return (
+      <div className="admin-widget">
+        <h3 className="admin-section__title">{t('admin_title_grok')}</h3>
+        {costError ? <div className="admin-error">{costError}</div> : <div className="admin-loading admin-loading--widget">{t('admin_loading')}</div>}
+      </div>
+    )
+  }
+  if (cost.usd_today == null) {
+    return (
+      <div className="admin-widget">
+        <h3 className="admin-section__title">{t('admin_title_grok')}</h3>
+        <div className="admin-empty">{t('admin_empty_no_data')}</div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="admin-widget">
+      <h3 className="admin-section__title">{t('admin_title_grok')}</h3>
+      <p className="admin-hint">{t('admin_hint_grok')}</p>
+      <div className="admin-stats-grid admin-stats-grid--compact">
+        <StatTile icon={COST_TILE_ICONS.today} label={t('admin_range_today')} range="USD" value={`$${cost.usd_today.toFixed(2)}`} />
+        <StatTile icon={COST_TILE_ICONS.week} label={t('admin_range_week')} range="USD" value={`$${cost.usd_week.toFixed(2)}`} />
+        <StatTile icon={COST_TILE_ICONS.month} label={t('admin_stat_month')} range="USD" value={`$${cost.usd_month.toFixed(2)}`} />
+        <StatTile icon={COST_TILE_ICONS.allTime} label={t('admin_stat_all_time')} range="USD" value={`$${cost.usd_all_time.toFixed(2)}`} />
+      </div>
+      {cost.daily?.length > 0 && (
+        <BarChart
+          data={cost.daily}
+          series={[{ key: 'usd', label: t('admin_series_cost_usd_est'), color: 'var(--chart-6)' }]}
+          dateFormatter={getShortDate(language)}
+          valueFormatter={(v) => `$${v.toFixed(2)}`}
+        />
+      )}
+      <AsOfNote asOf={cost.as_of} />
+      <TopupSection provider="grok" spentAllTime={cost.usd_all_time} />
+    </div>
+  )
+}
+
 function UsageBar({ label, used, limit, color }) {
   if (limit == null) return null
   const pct = Math.min(100, (used / limit) * 100)
@@ -557,6 +604,7 @@ function OverviewTab() {
       <OpenAiCostWidget />
 
       <PerplexityCostWidget />
+      <GrokCostWidget />
 
       <SupabaseCostWidget />
 

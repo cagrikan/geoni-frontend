@@ -503,6 +503,8 @@ export const translations = {
 
     admin_title_perplexity: 'Perplexity gerçek maliyet (tahmini)',
     admin_hint_perplexity: "Perplexity'nin ne kalan bakiye ne de maliyet API'si var — her isteğin token sayısından ve yayınlanan fiyatlandırmadan GEONI kendisi hesaplıyor. Kredi yüklemenizi aşağıya kaydedin, kalanı buradan tahmin ederiz.",
+    admin_title_grok: 'Grok (xAI) maliyet (tahmini)',
+    admin_hint_grok: "xAI'nin sorgulanabilir harcama API'si yok — GEONI çağrı sayısından tahmin ediyor: parametrik grok (gölge, ~$0.0007/çağrı) + grok-web (X+web arama, ~$0.05/çağrı). Yüklediğin krediyi aşağıya kaydet; kalan bakiye buradan tahmin edilir ve $5 altına düşünce e-posta uyarısı gelir.",
     admin_empty_no_data: 'Henüz veri yok.',
 
     admin_title_aws: 'AWS gerçek maliyet',
@@ -1207,6 +1209,8 @@ export const translations = {
 
     admin_title_perplexity: 'Perplexity real cost (estimated)',
     admin_hint_perplexity: "Perplexity has neither a remaining-balance nor a cost API — GEONI computes it itself from each request's token count and published pricing. Log your credit top-ups below and we estimate the remainder from there.",
+    admin_title_grok: 'Grok (xAI) cost (estimated)',
+    admin_hint_grok: "xAI has no queryable spend API — GEONI estimates from call counts: parametric grok (shadow, ~$0.0007/call) + grok-web (X+web search, ~$0.05/call). Log your credit top-up below; the remaining balance is estimated from there and you get an email alert when it drops below $5.",
     admin_empty_no_data: 'No data yet.',
 
     admin_title_aws: 'AWS real cost',

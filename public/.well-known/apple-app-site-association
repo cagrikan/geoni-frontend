@@ -4,7 +4,7 @@
     "details": [
       {
         "appID": "2Y6PBTM588.ai.geoni.app",
-        "paths": ["/r/*", "/s/*"]
+        "paths": ["/r/*"]
       }
     ]
   }

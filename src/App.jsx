@@ -7,7 +7,6 @@ import ScanningScreen from './components/ScanningScreen'
 import ResultsPage from './ResultsPage'
 import BrandCheckResultsPage from './BrandCheckResultsPage'
 import IdentityMismatchPage from './IdentityMismatchPage'
-import SharePage from './SharePage'
 import './App.css'
 
 // Giris/panel sayfalari sadece giris yapmis kullanicilar (ve AdminPage
@@ -198,18 +197,11 @@ function AppInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
 
-  // Viral paylasim linki geoni.ai/s/<jobId> -> job id'yi pathname'den al.
-  const readShareId = () => {
-    const m = window.location.pathname.match(/^\/s\/([^/?#]+)/)
-    return m ? decodeURIComponent(m[1]) : null
-  }
-  const [shareId, setShareId] = useState(readShareId)
   const [view, setView] = useState(() => {
     if (window.location.pathname === '/auth/callback') return 'auth_callback'
     if (window.location.pathname === '/dashboard') return 'dashboard'
     if (window.location.pathname === '/admin') return 'admin'
     if (window.location.pathname === '/login') return 'login'
-    if (window.location.pathname.startsWith('/s/')) return 'share'
     return 'landing'
   })
   const [result, setResult] = useState(null)
@@ -236,7 +228,6 @@ function AppInner() {
   useEffect(() => {
     const onPopState = () => {
       const path = window.location.pathname
-      if (path.startsWith('/s/')) { setShareId(readShareId()); setView('share'); return }
       if (path === '/auth/callback') { setView('auth_callback'); return }
       if (path === '/dashboard') { setView(user ? 'dashboard' : 'login'); return }
       if (path === '/admin') { setView(user ? 'admin' : 'login'); return }
@@ -496,9 +487,6 @@ function AppInner() {
         {view === 'dashboard' && <DashboardPage onReset={handleReset} onNewScan={() => navigateTo('landing')} onViewAudit={handleViewAudit} onRescanWeb={handleAudit} onRescanBrand={handleBrandCheck} onAdmin={profile?.is_admin ? () => navigateTo('admin') : null} />}
         {view === 'admin' && <AdminPage onBack={() => navigateTo('dashboard')} />}
       </Suspense>
-      {view === 'share' && shareId && (
-        <SharePage shareId={shareId} onScanOwn={() => navigateTo('landing')} onHome={() => navigateTo('landing')} />
-      )}
       {view === 'landing' && (
         <LandingPage
           onSubmitAudit={handleAudit}

@@ -151,7 +151,9 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
     ? name.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
     : name
 
-  const total = Object.keys(model_results).length || 3
+  // Golge motorlar (grok) "x/toplam" paydasina KATILMAZ: skora katkisiz olduklari
+  // gibi tanima sayacinda da gorunmezler ("3/4" -> yanlislikla "3/5" olmasin).
+  const total = Object.keys(model_results).filter((k) => !shadow_engines.includes(k)).length || 3
 
   const freePerforming = performing_topics.slice(0, 2)
   const paidPerforming = performing_topics.slice(2)

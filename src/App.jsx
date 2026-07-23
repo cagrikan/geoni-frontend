@@ -262,7 +262,7 @@ function AppInner() {
     // cold-start: worker 0'dan ayağa kalkarken (~3dk) iş SQS'te bekler; eski
     // 60×3sn=3dk tavan TAM bu pencerede pes ediyordu. 100×3sn = 5 dk (cold-start
     // + tarama sığar; askıda kalan sorgu da 5dk'da bırakılır, e-posta fallback var).
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 200; i++) {  // Fable 2026-07-23: 5dk->10dk; buyuk JS-agir siteler (trendyol/stripe) 5dk'yi asip yanlis "timeout" gosteriyordu
       await new Promise(r => setTimeout(r, 3000))
       if (scanGenRef.current !== gen) return  // iptal edildi / yeni tarama basladi
       try {

@@ -438,9 +438,9 @@ export const translations = {
 
     // ── Hatalar ──
     error_audit_failed: 'Tarama başarısız',
-    error_audit_timeout: 'Tarama zaman aşımına uğradı.',
+    error_audit_timeout: 'Tarama beklenenden uzun sürüyor (büyük siteler dakikalar alabilir). Arka planda devam ediyor — sonuç hazır olunca e-postana göndereceğiz.',
     error_query_failed: 'Sorgu başarısız',
-    error_query_timeout: 'Sorgu zaman aşımına uğradı.',
+    error_query_timeout: 'Sorgu beklenenden uzun sürüyor. Arka planda devam ediyor — sonuç hazır olunca e-postana göndereceğiz.',
     error_request_failed: 'İstek başarısız',
     error_connection: 'Bağlantı hatası',
 
@@ -1144,9 +1144,9 @@ export const translations = {
 
     // ── Errors ──
     error_audit_failed: 'Scan failed',
-    error_audit_timeout: 'Scan timed out.',
+    error_audit_timeout: 'The scan is taking longer than expected (large sites can take minutes). It continues in the background — we\'ll email you the result when it\'s ready.',
     error_query_failed: 'Query failed',
-    error_query_timeout: 'Query timed out.',
+    error_query_timeout: 'The query is taking longer than expected. It continues in the background — we\'ll email you the result when it\'s ready.',
     error_request_failed: 'Request failed',
     error_connection: 'Connection error',
 

@@ -204,6 +204,15 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
           </div>
         </div>
 
+        {/* Progressive result (2026-07-24): SOV hala arka planda hesaplaniyor —
+            skor gecerli ama tam degil, kisa surede guncellenebilir. */}
+        {result.sov_pending && (
+          <div className="results__sov-pending" role="status">
+            <span className="results__sov-pending-spinner" aria-hidden="true" />
+            {t('results_sov_pending')}
+          </div>
+        )}
+
         {/* Skor + Breakdown (breakdown blur) */}
         <div className="results__top">
           <div className="results__gauge-col">

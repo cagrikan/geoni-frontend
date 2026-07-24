@@ -262,6 +262,13 @@ function AppInner() {
 
   const pollAuditJob = async (jobId, gen) => {
     let errStreak = 0
+    // Progressive result (2026-07-24): backend SOV (en yavas olcum, ~60-70sn)
+    // bitmeden crawl+recall'a dayali bir ara skor gonderebilir (status='partial').
+    // Ilk partial/complete'te view'i BIR KEZ degistiriyoruz (resultShown) — her
+    // 3sn'lik partial tick'inde pushView tekrar cagrilirsa browser history
+    // (pushState) her seferinde yeni giris ekler, geri tusu bozulurdu. Sonraki
+    // tick'ler sadece result state'ini GUNCELLER (view sabit kalir).
+    let resultShown = false
     // cold-start: worker 0'dan ayağa kalkarken (~3dk) iş SQS'te bekler; eski
     // 60×3sn=3dk tavan TAM bu pencerede pes ediyordu. 100×3sn = 5 dk (cold-start
     // + tarama sığar; askıda kalan sorgu da 5dk'da bırakılır, e-posta fallback var).
@@ -274,7 +281,20 @@ function AppInner() {
         const data = await res.json()
         errStreak = 0
         if (scanGenRef.current !== gen) return
-        if (data.status === 'complete') { setResult(data.result); setLastJobId(jobId); pushView('results'); if (refreshProfile) refreshProfile(); return }
+        if (data.status === 'complete') {
+          setResult(data.result); setLastJobId(jobId)
+          if (!resultShown) { pushView('results'); resultShown = true }
+          if (refreshProfile) refreshProfile()
+          return
+        }
+        if (data.status === 'partial') {
+          // SOV hala arka planda hesaplaniyor; skor SOV'suz ama gecerli.
+          // result.sov_pending=true -> ResultsView kendi rozetini gosterir.
+          setResult(data.result); setLastJobId(jobId)
+          if (!resultShown) { pushView('results'); resultShown = true }
+          setStatusKey(data.status)
+          continue
+        }
         if (data.status === 'failed') { setError(t('error_audit_failed')); pushView('landing'); return }
         setStatusKey(data.status)
       } catch (err) {

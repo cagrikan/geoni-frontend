@@ -530,6 +530,33 @@ body {
   margin-bottom: 32px;
 }
 
+/* Progressive result (2026-07-24): SOV hala hesaplaniyorken gosterilen kucuk,
+   rahatsiz etmeyen bilgi rozeti. --accent-dim zaten light/dark tema icin
+   :root[data-theme] altinda tanimli, ayrica dark-mode media query GEREKMEZ. */
+.results__sov-pending {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  border-radius: 10px;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent);
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.results__sov-pending-spinner {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  border-radius: 50%;
+  border: 2px solid var(--accent-dim);
+  border-top-color: var(--accent);
+  animation: results-sov-spin .8s linear infinite;
+}
+@keyframes results-sov-spin { to { transform: rotate(360deg); } }
+
 /* Score gauge */
 .score-gauge {
   background: var(--surface);

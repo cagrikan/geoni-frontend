@@ -125,6 +125,7 @@ export const translations = {
 
     // ── Results (paylaşılan) ──
     results_score_label: 'AI Görünürlük Skoru',
+    results_sov_pending: 'Kategori görünürlüğü hâlâ hesaplanıyor — skor birazdan güncellenebilir.',
     results_upgrade_question: 'Bu skoru nasıl yükseltiriz?',
     results_view_packages: 'Eksikleri Sizin İçin Giderelim →',
     results_strong_topics: 'Güçlü Olduğunuz Konular',
@@ -831,6 +832,7 @@ export const translations = {
 
     // ── Results (shared) ──
     results_score_label: 'AI Visibility Score',
+    results_sov_pending: 'Still measuring category visibility — your score may update shortly.',
     results_upgrade_question: 'How do we raise this score?',
     results_view_packages: 'Let Us Fix the Gaps →',
     results_strong_topics: 'Topics You Own',

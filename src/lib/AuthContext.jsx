@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 
 const AuthContext = createContext(null)
+const API_URL = import.meta.env.VITE_API_URL || 'https://api.geoni.ai'
 
 // Supabase (~52KB gz) anonim landing ziyaretcisine pesin inmesin diye dinamik
 // import ile tembel yukleniyor. Ilk cagirana kadar chunk hic cekilmez; sonraki
@@ -86,6 +87,21 @@ export function AuthProvider({ children }) {
         utm_campaign: acq.utm_campaign,
         signup_referrer: acq.signup_referrer,
       }).eq('id', userId)
+      // Referral: referred_by client tarafindan YAZILMAZ (spoof engeli) -> backend
+      // ?ref kodunu server-authoritative dogrular (kod->referrer, self-ref + tek-atim).
+      if (acq.ref_code) {
+        try {
+          const { data: { session } } = await supabase.auth.getSession()
+          const token = session?.access_token
+          if (token) {
+            await fetch(`${API_URL}/api/me/referred-by`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+              body: JSON.stringify({ ref_code: acq.ref_code }),
+            })
+          }
+        } catch { /* referral basarisizsa signup'i etkilemesin */ }
+      }
       localStorage.removeItem('geoni_acquisition')
     } catch { /* ignore */ }
   }

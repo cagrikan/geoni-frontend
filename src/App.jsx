@@ -59,8 +59,11 @@ function captureAcquisition() {
       utm_medium: params.get('utm_medium') || null,
       utm_campaign: params.get('utm_campaign') || null,
       signup_referrer: document.referrer || null,
+      // Viral cekirdek: paylasim kartlari ?ref=<kod> tasir; first-touch yakala,
+      // signup'ta AuthContext backend'e (server-authoritative) uygular.
+      ref_code: params.get('ref') || null,
     }
-    if (data.utm_source || data.utm_medium || data.utm_campaign || data.signup_referrer) {
+    if (data.utm_source || data.utm_medium || data.utm_campaign || data.signup_referrer || data.ref_code) {
       localStorage.setItem('geoni_acquisition', JSON.stringify(data))
     }
     localStorage.setItem('geoni_acq_captured', '1')

@@ -222,13 +222,16 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
               driverLabel={(language === 'en' ? BREAKDOWN_LABELS_EN : BREAKDOWN_LABELS_TR)[result.stability?.driver]}
               t={t}
             />
+            {/* Paylas skor kutusunun ICINDE: paylasilan sey skor. Dusuk skorda
+                HIC cikmaz (canShare) — kimse kotu skorunu paylasmaz, gostermek
+                urunu "kotu haber dagitan sey" yapar. */}
+            <ShareResult jobId={jobId} score={score} text={t('share_site_text', { domain, score })} />
           </div>
           <ProBlur isPro={isPro} onUpgrade={onUpgrade} label={t('results_site_breakdown_label')}>
             <Breakdown breakdown={score_breakdown} language={language} />
           </ProBlur>
         </div>
 
-        <ShareResult jobId={jobId} text={t('share_site_text', { domain, score })} />
         <EmbedBadge jobId={jobId} score={score} />
 
         {/* Stats */}

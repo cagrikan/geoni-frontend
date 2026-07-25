@@ -20,3 +20,17 @@ export function isPaidUser(profile) {
   if (profile.is_admin) return true
   return (profile.total_credits_spent || 0) > 0 || (profile.total_credits_purchased || 0) > 0
 }
+
+/**
+ * Paylas dugmesi bu skorun altinda GORUNMEZ.
+ *
+ * NEDEN: kimse dusuk skorunu paylasmaz; dugmeyi yine de gostermek hem bos yer
+ * kaplar hem de urunu "kotu haber dagitan sey" gibi gosterir (kurucu karari
+ * 2026-07-25). Esik, skorun YESIL gorundugu esikle ayni tutuldu (scoreColor:
+ * >=65 good) — tek kural: "skorun yesilse paylasabilirsin".
+ */
+export const SHARE_MIN_SCORE = 65
+
+export function canShare(score) {
+  return typeof score === 'number' && score >= SHARE_MIN_SCORE
+}

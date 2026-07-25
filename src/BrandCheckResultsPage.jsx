@@ -232,13 +232,14 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
               }[result.stability?.driver]}
               t={t}
             />
+            {/* Paylas skor kutusunun ICINDE + dusuk skorda gizli (bkz. lib/access canShare) */}
+            <ShareResult jobId={jobId} score={score} text={t('share_brand_text', { name: capitalizedName, score })} />
           </div>
           <ProBlur isPro={isPro} onUpgrade={onUpgrade} label={t('results_brand_breakdown_label')}>
             <Breakdown breakdown={score_breakdown} t={t} shadowEngines={shadow_engines} />
           </ProBlur>
         </div>
 
-        <ShareResult jobId={jobId} text={t('share_brand_text', { name: capitalizedName, score })} />
         <EmbedBadge jobId={jobId} score={score} />
 
         <div className={`results__stats ${model_results?.perplexity ? 'results__stats--six' : 'results__stats--five'}`}>

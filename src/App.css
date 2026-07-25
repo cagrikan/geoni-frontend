@@ -1316,68 +1316,67 @@ body {
 
 
 /* ===== PRO BLUR ===== */
-.pro-blur {
-  position: relative;
-  border-radius: 14px;
-  overflow: hidden;
-}
-.pro-blur__content {
-  filter: blur(7px);
+/* ── Ucretli icerik kapisi: ASAMALI SOLUKLASMA (blur YOK) ──────────────────
+   Ilk 2 satir/kart tam gorunur; sonrakiler kademeli soluklasir. Puanlar
+   okunmaz (text-shadow ile dagitilir) ama BAR UZUNLUKLARI durur — kullanici
+   zayif tarafi oldugunu sezer. Eski .pro-blur (blur(7px) + ortadaki rozet)
+   kaldirildi: bulaniklik "ekran bozuk" gibi okunuyordu ve kullaniciya ne
+   satin alacagini anlatmiyordu. */
+.pro-reveal { position: relative; }
+
+/* Kademeler: 3. satirdan itibaren. data-reveal ileride 1/3 yapilabilsin diye
+   ayri secicilerle yazildi (tek yerden degistirilir). */
+.pro-reveal__list[data-reveal="2"] > *:nth-child(3) { opacity: .62; }
+.pro-reveal__list[data-reveal="2"] > *:nth-child(4) { opacity: .46; }
+.pro-reveal__list[data-reveal="2"] > *:nth-child(5) { opacity: .32; }
+.pro-reveal__list[data-reveal="2"] > *:nth-child(n+6) { opacity: .22; }
+.pro-reveal__list[data-reveal="2"] > *:nth-child(n+3) {
   user-select: none;
   pointer-events: none;
-  opacity: 0.45;
 }
-.pro-blur__overlay {
-  position: absolute;
-  inset: 0;
+/* Okunmasin ama VAR oldugu belli olsun: rakam/baslik dagitilir, cizgi kalir. */
+.pro-reveal__list[data-reveal="2"] > *:nth-child(n+3) .breakdown__row-value,
+.pro-reveal__list[data-reveal="2"] > *:nth-child(n+3) .topic-card__title,
+.pro-reveal__list[data-reveal="2"] > *:nth-child(n+3) .topic-badge {
+  color: transparent;
+  text-shadow: 0 0 9px var(--text);
+}
+.pro-reveal__list[data-reveal="2"] > *:nth-child(n+3) .breakdown__bar-fill {
+  background: var(--text);
+  opacity: .5;
+}
+
+/* Alt serit: ne kaldigini SOYLER (eskiden ortadaki rozet icerigi kapatiyordu). */
+.pro-reveal__gate {
   display: flex;
   align-items: center;
-  justify-content: center;
-  /* alttan yukari yumusak kararma: blur icerik ustte hafif gorunur (frosted) */
-  background: linear-gradient(180deg, rgba(18,14,28,.10) 0%, rgba(18,14,28,.55) 100%);
-  border-radius: 14px;
-}
-/* kilit rozeti: frosted cam cip — koyu/acik iki temada da okunur */
-.pro-blur__badge {
-  display: inline-flex;
-  align-items: center;
   gap: 10px;
-  padding: 10px 14px 10px 12px;
-  background: rgba(24, 20, 38, 0.72);
-  border: 1px solid rgba(192, 132, 252, 0.28);
-  border-radius: 100px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.32);
-  backdrop-filter: blur(10px);
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--accent-border);
+  background: var(--accent-bg);
+  border-radius: 11px;
 }
-.pro-blur__lock {
-  color: var(--accent);
-  background: rgba(192, 132, 252, 0.14);
-  border-radius: 50%;
-  padding: 6px;
-  box-sizing: content-box;
-  flex-shrink: 0;
-}
-.pro-blur__label {
-  font-size: .82rem;
-  font-weight: 600;
-  color: #e8e2f5;
-  letter-spacing: 0;
-}
-.pro-blur__btn {
+.pro-reveal__lock { color: var(--accent); flex-shrink: 0; }
+.pro-reveal__label { font-size: .85rem; font-weight: 600; color: var(--text-h); }
+.pro-reveal__btn {
+  margin-left: auto;
   background: linear-gradient(135deg, #c084fc, #7c3aed);
   color: #fff;
   border: none;
   border-radius: 100px;
-  padding: 8px 16px;
-  font-size: .85rem;
+  padding: 9px 17px;
+  font-size: .84rem;
   font-weight: 700;
   text-decoration: none;
   cursor: pointer;
-  transition: transform .15s, box-shadow .15s;
   white-space: nowrap;
   box-shadow: 0 4px 16px rgba(139, 63, 252, 0.35);
+  transition: transform .15s, box-shadow .15s;
 }
-.pro-blur__btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(139, 63, 252, 0.5); }
+.pro-reveal__btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(139, 63, 252, 0.5); }
+.pro-reveal__btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
 /* Sosyal (influencer) sonuc varyanti */
 .social-identity {
@@ -3668,7 +3667,11 @@ button.fixes__item { width: 100%; text-align: left; }
 }
 .ticket-lightbox__close:hover { background: rgba(255,255,255,.2); }
 
-/* Sonuc paylasim butonu (viral skor karti linkiyle) */
+/* Sonuc paylasim butonu (viral skor karti + ?ref davet linkiyle).
+   2026-07-25: sayfanin ORTASINDAN skor kutusunun ICINE tasindi — paylasilan sey
+   skor, dugme de skorun yaninda olmali. Dolu mor DEGIL hayalet pill: sagdaki
+   "Tam raporu ac" gelir kapisiyla yarismasin (iki ayni agirlikta mor buton
+   koyunca goz hangisinin asil eylem oldugunu secemiyor). */
 .share-result-btn {
   display: inline-flex; align-items: center; gap: 8px;
   margin: 14px 0 4px; padding: 10px 20px;
@@ -3676,6 +3679,25 @@ button.fixes__item { width: 100%; text-align: left; }
   font-size: .875rem; font-weight: 600; cursor: pointer;
 }
 .share-result-btn:hover { opacity: .9; }
+
+.share-result-btn--card {
+  width: 100%;
+  justify-content: center;
+  margin: 16px 0 0;
+  padding: 11px 16px;
+  border-radius: 100px;
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  color: var(--accent);
+  font-weight: 700;
+  transition: background .15s, transform .15s;
+}
+.share-result-btn--card:hover {
+  opacity: 1;
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  transform: translateY(-1px);
+}
+.share-result-btn--card:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
 /* Rozet gomme kutusu */
 .embed-badge { margin: 10px 0 4px; }

@@ -11,6 +11,7 @@ import ConfirmDialog from '../components/ConfirmDialog'
 import TicketBoard from '../components/TicketBoard'
 import TicketDetailOverlay from '../components/TicketDetailOverlay'
 import RateTicket from '../components/RateTicket'
+import InviteCard from '../components/InviteCard'
 
 /* Uzmanin, atandigi biletin MUSTERISININ itibarini gormesi - sorunlu
    musteriyi onceden tanimak icin. Musteri tarafinda hic cagrilmaz. */
@@ -1266,6 +1267,8 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
             <div className="dash-section">
               <h2 className="dash-section__title">{t('dash_credits_title')}</h2>
               <WalletSection t={t} profile={profile} language={language} refreshProfile={refreshProfile} />
+              {/* Viral dongu: token satin alma yaninda BEDAVA token yolu. */}
+              <InviteCard />
             </div>
           )}
 

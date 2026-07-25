@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { Globe, User, Building2, ScanSearch, GitCompareArrows, Award, EyeOff, Wrench, AtSign } from 'lucide-react'
 import GeoniMark from './GeoniMark'
 import LanguageSwitcher from './components/LanguageSwitcher'
@@ -144,6 +144,18 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, onSubmi
   const [brandWebsite, setBrandWebsite] = useState('')
   const [brandEmail, setBrandEmail]   = useState('')
 
+  // Davetle mi geldi: URL'de ?ref VEYA first-touch'ta yakalanmis ref_code
+  // (App.jsx captureAcquisition localStorage'a yazar; kullanici sekmede
+  // gezinip geri donse de vaat gorunur kalsin).
+  const inviteRef = useMemo(() => {
+    try {
+      if (user) return null   // zaten uye - davet vaadi ona gosterilmez
+      if (new URLSearchParams(window.location.search).get('ref')) return true
+      const acq = JSON.parse(localStorage.getItem('geoni_acquisition') || '{}')
+      return acq?.ref_code ? true : null
+    } catch { return null }
+  }, [user])
+
   // social (tek adim, anonim - giris gerekmez, funnel)
   const [socialHandle, setSocialHandle] = useState('')
   const [socialNiche, setSocialNiche]   = useState('')
@@ -262,6 +274,15 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, onSubmi
               : t('hero_eyebrow')}
           </span>
         </div>
+
+        {/* Davetle gelen ziyaretcinin GORDUGU tek yer: linkte ?ref var ama vaat
+            hicbir yerde yaziyla soylenmiyordu -> kayit motivasyonu sifirdi.
+            Odul davetlinin ILK TARAMASINDA odendigi icin metin de oyle diyor. */}
+        {inviteRef && (
+          <div className="invite-banner">
+            🎁 {t('invite_welcome').replace('{n}', '10')}
+          </div>
+        )}
 
         <div className="scan-app">
           <div className="scan-app__head">

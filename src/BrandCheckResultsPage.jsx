@@ -5,6 +5,7 @@ import SovSection from './components/SovSection'
 import StabilityNote from './components/StabilityNote'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import ShareResult from './components/ShareResult'
+import CreatorInvite from './components/CreatorInvite'
 import EmbedBadge from './components/EmbedBadge'
 import WatchlistButton from './components/WatchlistButton'
 import { useLanguage } from './lib/LanguageContext'
@@ -325,6 +326,8 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
             </button>
           </div>
         </div>
+
+        <CreatorInvite type={type} />
       </div>
 
       {!isPro && (

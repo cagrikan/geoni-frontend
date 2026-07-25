@@ -3757,3 +3757,25 @@ button.fixes__item { width: 100%; text-align: left; }
   border-radius: 11px; font-size: .875rem; line-height: 1.5; color: var(--text);
   text-align: center;
 }
+
+/* ── Creator daveti (sosyal/kisi sonucunda) ────────────────────────────────
+   Amber: satin-alma CTA'lari mor. Bu ARZ tarafina sesleniyor, gelir kapisiyla
+   yarismamali — bu yuzden dolu buton degil, sessiz bir serit. */
+.creator-invite {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  margin-top: 18px; padding: 16px 18px; border-radius: 14px;
+  border: 1px solid rgba(245, 166, 35, .22); background: rgba(245, 166, 35, .05);
+}
+.creator-invite__icon { color: #F5A623; flex: none; }
+.creator-invite__body { flex: 1 1 260px; min-width: 0; }
+.creator-invite__title { font-size: .95rem; font-weight: 600; }
+.creator-invite__sub { font-size: .875rem; color: var(--text-sub); margin-top: 3px; }
+.creator-invite__btn {
+  flex: none; font-size: .875rem; font-weight: 500; text-decoration: none;
+  color: var(--text); padding: 9px 16px; border-radius: 100px;
+  border: 1px solid rgba(245, 166, 35, .42); transition: background .2s, border-color .2s;
+}
+.creator-invite__btn:hover { background: rgba(245, 166, 35, .12); border-color: rgba(245, 166, 35, .7); }
+@media (max-width: 560px) {
+  .creator-invite__btn { flex: 1 1 100%; text-align: center; }
+}

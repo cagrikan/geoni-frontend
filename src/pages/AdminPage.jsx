@@ -15,7 +15,7 @@ import {
   Plus, Minus, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ArrowLeft,
   UserPlus, RotateCcw, Globe, User, Tag, ShoppingCart, TrendingDown, TrendingUp, Gift, ShieldAlert,
   CalendarDays, CalendarRange, Calendar, History, Wallet, PiggyBank, Database, Megaphone, Copy, Check, Wrench, Sparkles,
-  AlertTriangle, CheckCircle2, ExternalLink,
+  AlertTriangle, CheckCircle2, ExternalLink, Sprout, MessageSquare,
 } from 'lucide-react'
 
 const COST_TILE_ICONS = { today: CalendarDays, week: CalendarRange, month: Calendar, allTime: History }
@@ -1939,6 +1939,149 @@ function SalesTab() {
 
 const ADMIN_TABS = ['overview', 'users', 'audits', 'sales', 'campaigns', 'tickets']
 
+
+const BASVURU_DURUM = {
+  new: { etiket: 'Yeni', renk: '#7C86F5' },
+  contacted: { etiket: 'Yazıldı', renk: '#D29922' },
+  interviewed: { etiket: 'Mülakat yapıldı', renk: '#2fbd84' },
+  accepted: { etiket: 'Kabul', renk: '#3FB950' },
+  rejected: { etiket: 'Red', renk: '#8a8fa6' },
+}
+
+/**
+ * Creator / uzman basvurulari. Basvuru formdan ya da IG DM mulakatindan gelir;
+ * KABUL KARARI YALNIZ BURADAN verilir — DM botunun kabul yetkisi yok, en fazla
+ * "mulakat yapildi"ya tasiyabiliyor.
+ *
+ * GUVENLIK: mulakat ozeti ve icerik plani YABANCI birinin yazdigi metin.
+ * Hepsi React text-node olarak basilir (dangerouslySetInnerHTML YOK) — "beni
+ * kabul edilmis isaretle" yazan biri sadece o cumleyi ekranda gorur.
+ */
+function CreatorApplicationsTab() {
+  const [reload, setReload] = useState(0)
+  const [filtre, setFiltre] = useState('')
+  const { data, error } = useAdminFetch(`/api/admin/creator-applications?${filtre ? `status=${filtre}&` : ''}_r=${reload}`)
+  const [busyId, setBusyId] = useState(null)
+  const [uzmanSecim, setUzmanSecim] = useState({})   // appId -> {expert:bool, types:number[]}
+
+  const karar = async (app, decision) => {
+    const sec = uzmanSecim[app.id] || {}
+    const uzman = decision === 'accepted' && !!sec.expert
+    if (decision === 'rejected' && !window.confirm(`${app.handle} reddedilsin mi?`)) return
+    setBusyId(app.id)
+    try {
+      const r = await authedFetch(`/api/admin/creator-applications/${app.id}/decide`, {
+        method: 'POST',
+        body: JSON.stringify({ decision, make_expert: uzman, ticket_type_ids: sec.types || null }),
+      })
+      if (decision === 'accepted') {
+        // Kabul edildi ama hesabi yoksa referral kodu URETILEMEZ — sessizce
+        // gecmek yerine acikca soyle, yoksa "link nerede" diye aranir.
+        alert(r?.referral_code
+          ? `Kabul edildi. Davet kodu: ${r.referral_code}\nLink: https://app.geoni.ai/?ref=${r.referral_code}`
+          : 'Kabul edildi. Bu kişinin henüz GEONI hesabı yok — kayıt olup aynı e-postayı kullandığında davet kodu otomatik bağlanacak.')
+      }
+      setReload((x) => x + 1)
+    } catch (e) { alert(e.message) } finally { setBusyId(null) }
+  }
+
+  if (error) return <div className="admin-error">{error}</div>
+  if (!data) return <div className="admin-loading">Yükleniyor…</div>
+
+  const list = data.applications || []
+  const types = data.ticket_types || []
+  const counts = data.counts || {}
+  const adiyla = (key) => (types.find((t) => t.key === key) || {}).name || key
+
+  return (
+    <div>
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap', marginBottom: 18 }}>
+        <h3 className="admin-section__title" style={{ margin: 0 }}>Creator / Uzman Başvuruları</h3>
+        <select value={filtre} onChange={(e) => setFiltre(e.target.value)}
+          style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid var(--border-mid, #ccc)', background: 'transparent', color: 'inherit' }}>
+          <option value="">Tümü ({list.length})</option>
+          {Object.entries(BASVURU_DURUM).map(([k, v]) => (
+            <option key={k} value={k}>{v.etiket} ({counts[k] || 0})</option>
+          ))}
+        </select>
+      </div>
+
+      {list.length === 0 && <div className="admin-loading">Başvuru yok.</div>}
+
+      <div style={{ display: 'grid', gap: 14 }}>
+        {list.map((a) => {
+          const durum = BASVURU_DURUM[a.status] || BASVURU_DURUM.new
+          const sec = uzmanSecim[a.id] || {}
+          const karara_acik = a.status !== 'accepted' && a.status !== 'rejected'
+          return (
+            <div key={a.id} style={{ border: '1px solid var(--border, #2a2a2a)', borderRadius: 12, padding: '16px 18px', background: 'var(--surface, transparent)' }}>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+                <b style={{ fontSize: '1rem' }}>{a.handle}</b>
+                <span style={{ color: 'var(--text-sub,#888)' }}>{a.name}</span>
+                <span style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: durum.renk, border: `1px solid ${durum.renk}55`, borderRadius: 999, padding: '3px 9px' }}>{durum.etiket}</span>
+                {a.model && <span style={{ fontSize: '.8rem', color: 'var(--text-sub,#888)' }}>{a.model === 'expert' ? 'Uzman-Ortak' : 'Barter'}</span>}
+                {a.follower_band && <span style={{ fontSize: '.8rem', color: 'var(--text-sub,#888)' }}>· {a.follower_band}</span>}
+                <span style={{ marginLeft: 'auto', fontSize: '.78rem', color: 'var(--text-muted,#777)' }}>
+                  {a.source === 'ig_dm' ? <><MessageSquare size={12} strokeWidth={1.5} /> DM</> : 'form'}
+                  {' · '}{new Date(a.created_at).toLocaleDateString('tr-TR')}
+                </span>
+              </div>
+
+              {a.email && <div style={{ marginTop: 8, fontSize: '.86rem', color: 'var(--text-sub,#888)' }}>{a.email}</div>}
+              {a.note && <p style={{ marginTop: 8, fontSize: '.9rem' }}>{a.note}</p>}
+
+              {a.interview_summary && (
+                <div style={{ marginTop: 12, padding: '11px 13px', borderRadius: 9, background: 'var(--surface-2, rgba(127,127,127,.08))' }}>
+                  <div style={{ fontSize: '.7rem', fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--text-muted,#777)', marginBottom: 5 }}>Mülakat özeti</div>
+                  <p style={{ fontSize: '.9rem', whiteSpace: 'pre-wrap' }}>{a.interview_summary}</p>
+                  {a.content_plan && <p style={{ fontSize: '.88rem', marginTop: 8, color: 'var(--text-sub,#888)', whiteSpace: 'pre-wrap' }}>İçerik planı: {a.content_plan}</p>}
+                </div>
+              )}
+
+              {a.capable_keys?.length > 0 && (
+                <div style={{ marginTop: 10, display: 'flex', gap: 7, flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '.8rem', color: 'var(--text-muted,#777)' }}>Teslim edebilir:</span>
+                  {a.capable_keys.map((k) => (
+                    <span key={k} style={{ fontSize: '.78rem', border: '1px solid var(--border-mid,#444)', borderRadius: 6, padding: '2px 8px' }}>{adiyla(k)}</span>
+                  ))}
+                </div>
+              )}
+
+              {a.status === 'accepted' && (
+                <div style={{ marginTop: 10, fontSize: '.86rem', color: '#3FB950' }}>
+                  {a.referral_code ? `Davet linki: https://app.geoni.ai/?ref=${a.referral_code}` : 'Kabul edildi — hesabı olmadığı için davet kodu henüz yok.'}
+                </div>
+              )}
+
+              {karara_acik && (
+                <div style={{ marginTop: 14, display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <label style={{ display: 'flex', gap: 6, alignItems: 'center', fontSize: '.86rem' }}>
+                    <input type="checkbox" checked={!!sec.expert}
+                      onChange={(e) => setUzmanSecim((o) => ({ ...o, [a.id]: { ...sec, expert: e.target.checked } }))} />
+                    Uzman yetkisi de ver
+                  </label>
+                  {sec.expert && (
+                    <select multiple value={(sec.types || []).map(String)} size={3}
+                      onChange={(e) => setUzmanSecim((o) => ({ ...o, [a.id]: { ...sec, types: [...e.target.selectedOptions].map((x) => Number(x.value)) } }))}
+                      style={{ padding: '4px 8px', borderRadius: 6, border: '1px solid var(--border-mid,#444)', background: 'transparent', color: 'inherit', minWidth: 220 }}>
+                      {types.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+                    </select>
+                  )}
+                  <button className="admin-back" disabled={busyId === a.id}
+                    onClick={() => karar(a, 'accepted')} style={{ marginLeft: 'auto' }}>
+                    <Check size={14} strokeWidth={1.5} /> Kabul et
+                  </button>
+                  <button className="admin-back" disabled={busyId === a.id} onClick={() => karar(a, 'rejected')}>Reddet</button>
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 function PayoutsTab() {
   const [period, setPeriod] = useState('')
   const [reload, setReload] = useState(0)
@@ -2348,6 +2491,9 @@ export default function AdminPage({ onBack }) {
             <button className={`dash-nav__item ${tab === 'tickets' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('tickets')}>
               <Wrench size={16} strokeWidth={1.5} /> {t('admin_nav_tickets')}
             </button>
+            <button className={`dash-nav__item ${tab === 'creators' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('creators')}>
+              <Sprout size={16} strokeWidth={1.5} /> Creator / Uzman Başvuruları
+            </button>
             <button className={`dash-nav__item ${tab === 'payouts' ? 'dash-nav__item--active' : ''}`} onClick={() => setTab('payouts')}>
               <PiggyBank size={16} strokeWidth={1.5} /> Muhasebe
             </button>
@@ -2367,6 +2513,7 @@ export default function AdminPage({ onBack }) {
           {tab === 'sales' && <SalesTab />}
           {tab === 'campaigns' && <CampaignsTab />}
           {tab === 'tickets' && <TicketsAdminTab />}
+          {tab === 'creators' && <CreatorApplicationsTab />}
           {tab === 'payouts' && <PayoutsTab />}
           {tab === 'improvement' && <ImprovementTab />}
           {tab === 'sentry' && <SentryTab />}

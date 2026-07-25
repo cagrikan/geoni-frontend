@@ -74,7 +74,17 @@ export default function ScanningScreen({ kind, target, statusKey, progressLog = 
             <><em>{target}</em> {t('scan_title_brand_prefix')}</>
           )}
         </h1>
-        <p className="scan-screen__sub">Claude, ChatGPT, Gemini{kind === 'brand' ? ' + Perplexity' : ''} {t('scan_sub')}</p>
+        {/* Motor listesi ARTIK GERCEGI SOYLUYOR. Eskiden site taramasinda
+            Perplexity yaziLMIYORDU (yalniz 'brand' icin ekleniyordu) — oysa site
+            taramasi PerplexityBot/Perplexity-User erisimini de olcuyor
+            (indexing.py SEARCH_CRAWLER_AGENTS). Ayrica site taramasinda modellere
+            SORU SORULMAZ, botlarinin siteye erisimi kontrol edilir; o yuzden alt
+            metin de kind'a gore ayrisiyor ("erisim kontrol ediliyor" vs "gercek
+            zamanli calisiyor"). Grok BILEREK yok: golge modda, WEIGHTS'te agirligi
+            0.0, yani skoru etkilemiyor — sayarsak yanlis vaat olur. */}
+        <p className="scan-screen__sub">
+          Claude, ChatGPT, Gemini, Perplexity {kind === 'site' ? t('scan_sub_site') : t('scan_sub')}
+        </p>
 
         <div className="scan-steps" role="status" aria-live="polite">
           {steps.length > 0

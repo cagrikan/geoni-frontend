@@ -2091,7 +2091,9 @@ function PayoutsTab() {
   useEffect(() => { setRows(data?.payouts ?? null) }, [data])
 
   const money = (n) => `$${(Number(n) || 0).toFixed(2)}`
-  const kindLabel = (k) => (k === 'delivery' ? 'Hizmet (%33)' : 'Referral (%10)')
+  // Yuzde DEGIL: onaylanan teslim basina SABIT ucret (kurucu karari 2026-07-25).
+  // Etiket "%33" diyordu; defterde artik yuzde yok, sabit tutar var.
+  const kindLabel = (k) => (k === 'delivery' ? 'Teslim (sabit)' : 'Referral')
 
   const markPaid = async (id, paid) => {
     setBusyId(id)

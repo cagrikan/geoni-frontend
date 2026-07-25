@@ -2833,6 +2833,7 @@ body {
 .dash-service-card__target::placeholder { color: var(--text-muted); }
 .dash-service-card__target:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
 .dash-service-card__price { font-size: .875rem; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
+.dash-service-card__usd { display: block; font-size: .75rem; font-weight: 400; color: var(--text-muted); margin-top: 1px; }
 .dash-buy-btn--full { width: 100%; }
 .ticket-list { display: flex; flex-direction: column; gap: 10px; }
 .ticket-row {

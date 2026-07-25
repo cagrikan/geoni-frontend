@@ -325,7 +325,15 @@ function ServiceCatalogSection({ t, profile }) {
               <div key={tt.id} className="dash-service-card">
                 <div className="dash-service-card__top">
                   <div className="dash-service-card__icon"><Icon size={16} strokeWidth={1.5} /></div>
-                  <div className="dash-service-card__price">{tt.token_cost} <span className="dash-credit-unit">{t('dash_credit_unit')}</span></div>
+                  {/* Tek basina "1200 token" olcek vermiyordu (kurucu geri
+                      bildirimi 2026-07-25). USD karsiligi YAKLASIK: paket kuru
+                      $0.0999-$0.0600 arasi degisir, backend orta noktadan
+                      (TOKEN_REFERENCE_USD) hesaplayip usd_value ile gonderir —
+                      web ve mobil ayni rakami gostersin diye tek kaynak. */}
+                  <div className="dash-service-card__price">
+                    {tt.token_cost} <span className="dash-credit-unit">{t('dash_credit_unit')}</span>
+                    {tt.usd_value > 0 && <span className="dash-service-card__usd">≈ ${tt.usd_value}</span>}
+                  </div>
                 </div>
                 <div className="dash-service-card__name">{tt.name}</div>
                 <p className="dash-service-card__desc">{tt.description}</p>

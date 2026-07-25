@@ -12,6 +12,7 @@ import TicketBoard from '../components/TicketBoard'
 import TicketDetailOverlay from '../components/TicketDetailOverlay'
 import RateTicket from '../components/RateTicket'
 import InviteCard from '../components/InviteCard'
+import { isPaidUser } from '../lib/access'
 
 /* Uzmanin, atandigi biletin MUSTERISININ itibarini gormesi - sorunlu
    musteriyi onceden tanimak icin. Musteri tarafinda hic cagrilmaz. */
@@ -1312,12 +1313,12 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                     <div className="dash-setting-val">
                       {profile?.is_admin
                         ? t('dash_settings_admin_plan')
-                        : (profile?.total_credits_purchased > 0)
+                        : isPaidUser(profile)
                           ? t('dash_settings_pro_plan')
                           : t('dash_settings_free_plan')}
                     </div>
                   </div>
-                  {!profile?.is_admin && !(profile?.total_credits_purchased > 0) && (
+                  {!isPaidUser(profile) && (
                     <button type="button" className="dash-upgrade-btn" onClick={() => setTab('credits')}>{t('dash_settings_upgrade')}</button>
                   )}
                 </div>

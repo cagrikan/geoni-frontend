@@ -4,6 +4,7 @@ import { LanguageProvider, useLanguage } from './lib/LanguageContext'
 import { ThemeProvider } from './lib/ThemeContext'
 import LandingPage from './LandingPage'
 import ScanningScreen from './components/ScanningScreen'
+import { isPaidUser } from './lib/access'
 import ResultsPage from './ResultsPage'
 import BrandCheckResultsPage from './BrandCheckResultsPage'
 import IdentityMismatchPage from './IdentityMismatchPage'
@@ -531,9 +532,9 @@ function AppInner() {
           onCancel={handleReset}
         />
       )}
-      {view === 'results' && result && <ResultsPage result={result} jobId={isPrivateResult || isSample ? null : lastJobId} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} onUpgrade={handleUpgrade} isPro={isSample || profile?.is_admin || (profile?.credit_balance > 0 && profile?.total_credits_purchased > 0)} isSample={isSample} isPrivate={isPrivateResult} />}
+      {view === 'results' && result && <ResultsPage result={result} jobId={isPrivateResult || isSample ? null : lastJobId} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} onUpgrade={handleUpgrade} isPro={isSample || isPaidUser(profile)} isSample={isSample} isPrivate={isPrivateResult} />}
       {view === 'brand_results' && brandResult && !brandResult.identity_mismatch && (
-        <BrandCheckResultsPage result={brandResult} jobId={isPrivateResult ? null : lastJobId} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} onUpgrade={handleUpgrade} isPro={profile?.is_admin || (profile?.credit_balance > 0 && profile?.total_credits_purchased > 0)} isPrivate={isPrivateResult} />
+        <BrandCheckResultsPage result={brandResult} jobId={isPrivateResult ? null : lastJobId} onReset={handleReset} user={user} onLogin={() => navigateTo('login')} onDashboard={user ? handleDashboard : null} onUpgrade={handleUpgrade} isPro={isPaidUser(profile)} isPrivate={isPrivateResult} />
       )}
       {view === 'brand_results' && brandResult?.identity_mismatch && (
         <IdentityMismatchPage result={brandResult} onReset={handleReset} />

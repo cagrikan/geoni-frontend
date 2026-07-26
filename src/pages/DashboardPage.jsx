@@ -293,13 +293,29 @@ function ServiceCatalogSection({ t, profile }) {
     }).catch(() => setTypes([]))
   }, [language])
 
+  // Tekrar-deneme korumasi: ayni satin alma DENEMESI icin ayni kimlik.
+  // Hata alip tekrar denendiginde eskiden IKINCI KEZ kontor dusuyordu
+  // (en pahali hizmet 1500 kontor). Kimlik yalnizca BASARIDA tazelenir —
+  // hata sonrasi tekrar deneme ayni kimligi tasir, sunucu mevcut bileti doner.
+  const buyKeys = useRef({})
   const buy = async (ticketTypeId) => {
     const target = (targets[ticketTypeId] || '').trim()
     if (!target) return
+    if (!buyKeys.current[ticketTypeId]) {
+      buyKeys.current[ticketTypeId] =
+        (crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`)
+    }
     setBuyingId(ticketTypeId)
     setError(null)
     try {
-      await authedFetch('/api/tickets', { method: 'POST', body: JSON.stringify({ ticket_type_id: ticketTypeId, target }) })
+      await authedFetch('/api/tickets', {
+        method: 'POST',
+        body: JSON.stringify({
+          ticket_type_id: ticketTypeId, target,
+          request_id: buyKeys.current[ticketTypeId],
+        }),
+      })
+      delete buyKeys.current[ticketTypeId]   // basarili: bir sonraki alim YENI kimlik alsin
       setJustBoughtId(ticketTypeId)
       setTargets((d) => ({ ...d, [ticketTypeId]: '' }))
       setTimeout(() => setJustBoughtId(null), 2500)

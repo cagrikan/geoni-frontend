@@ -6,6 +6,7 @@ import StabilityNote from './components/StabilityNote'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import ShareResult from './components/ShareResult'
 import CreatorInvite from './components/CreatorInvite'
+import EngineNotice from './components/EngineNotice'
 import EmbedBadge from './components/EmbedBadge'
 import WatchlistButton from './components/WatchlistButton'
 import { useLanguage } from './lib/LanguageContext'
@@ -135,6 +136,7 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
     needs_niche = false,        // sosyal: nis yok -> SOV olculemedi
     cached = false,             // A2-1: 24h idempotent cache'ten geldi mi
     shadow_engines = [],        // A3-1: golge-mod motorlar (skora katkisiz)
+    engines_unavailable = [],   // olculemeyen motorlar -> rapor basinda uyari
   } = result
 
   const isSocial = type === 'social'
@@ -219,6 +221,8 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
             <button type="button" onClick={onReset} className="social-niche__btn">{t('social_add_niche')}</button>
           </div>
         )}
+
+        <EngineNotice engines={engines_unavailable} />
 
         <div className="results__top">
           <div className="results__gauge-col">

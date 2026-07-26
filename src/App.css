@@ -3780,3 +3780,14 @@ button.fixes__item { width: 100%; text-align: left; }
 @media (max-width: 560px) {
   .creator-invite__btn { flex: 1 1 100%; text-align: center; }
 }
+
+/* ── Motor uyarisi (olculemeyen AI motoru) ─────────────────────────────────
+   Amber, kirmizi DEGIL: skor gecerli, sadece EKSIK olculdu. Kirmizi "raporun
+   bozuk" derdi; asil mesaj "bir motor bu taramada disarida kaldi". */
+.engine-notice {
+  display: flex; align-items: flex-start; gap: 10px;
+  margin-bottom: 18px; padding: 11px 14px; border-radius: 10px;
+  border: 1px solid rgba(210, 153, 34, .28); background: rgba(210, 153, 34, .07);
+}
+.engine-notice__icon { color: var(--warn); flex: none; margin-top: 1px; }
+.engine-notice__text { font-size: .875rem; line-height: 1.45; color: var(--text-sub); }

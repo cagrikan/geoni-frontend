@@ -1411,6 +1411,8 @@ function CampaignsTab() {
   }
 
   const deleteCampaign = async (id) => {
+    // Tiklama gecmisi + UTM verisi geri GELMEZ; onay iste (2026-07-26 denetimi).
+    if (!window.confirm('Bu kampanya silinsin mi? Tıklama geçmişi ve UTM verisi geri getirilemez.')) return
     try {
       await authedFetch(`/api/admin/campaigns/${id}`, { method: 'DELETE' })
       setLocal((prev) => prev.filter((c) => c.id !== id))
@@ -1567,7 +1569,11 @@ function TicketsAdminTab() {
             ) : (selected.expert_email || '—')}
           </span>
         </div>
-        {selected.status === 'submitted' && (
+        {/* 'disputed' de dahil: musteri itiraz edince bilet 'disputed'a geciyordu
+            ve bu blok gorunmedigi icin admin bileti UI'dan ILERLETEMIYORDU —
+            yalniz mesaj yazabiliyor, cozmek icin curl gerekiyordu (2026-07-26
+            denetimi). Backend (admin_verify_ticket) ikisini de zaten isliyor. */}
+        {(selected.status === 'submitted' || selected.status === 'disputed') && (
           <div className="admin-ticket-verify">
             <button disabled={busyId === selected.id} onClick={() => verify(selected.id, true)}>{t('admin_tickets_approve')}</button>
             <input
@@ -1937,7 +1943,12 @@ function SalesTab() {
   )
 }
 
-const ADMIN_TABS = ['overview', 'users', 'audits', 'sales', 'campaigns', 'tickets']
+// Hash'ten sekme okumak icin GECERLI sekme listesi. 4 sekme (creators, payouts,
+// improvement, sentry) eklendiginde buraya yazilmamisti: F5 ya da #creators
+// linkiyle giren sessizce "overview"a dusuyordu (2026-07-26 denetimi).
+// YENI SEKME EKLERKEN BURAYI DA GUNCELLE.
+const ADMIN_TABS = ['overview', 'users', 'audits', 'sales', 'campaigns', 'tickets',
+  'creators', 'payouts', 'improvement', 'sentry']
 
 
 const BASVURU_DURUM = {

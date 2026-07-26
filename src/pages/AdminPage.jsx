@@ -2093,6 +2093,127 @@ function CreatorApplicationsTab() {
   )
 }
 
+
+const SOZLESME_DURUM = {
+  active: { etiket: 'Aktif', renk: '#3FB950' },
+  expired: { etiket: 'Süresi doldu', renk: '#D29922' },
+  cancelled: { etiket: 'İptal', renk: '#8a8fa6' },
+}
+
+/**
+ * Uzman/elçi sözleşmeleri — NDA imza tarihi + belge bağlantıları.
+ *
+ * NEDEN AYRI BÖLÜM: sözleşme daha önce yalnızca "Kişi özeti" tablosunda,
+ * ÖDEME KAYDI OLAN uzmanlar için görünüyordu — 0 ödeme varken hiçbir sözleşme
+ * görünmüyordu (2026-07-26 denetimi). Sözleşme finansal değil HUKUKİ kayıt;
+ * ödemeden bağımsız listelenir.
+ *
+ * İmza tarihini KOD ATAMAZ, admin girer. Belge bağlantıları yalnız https.
+ */
+function ContractsSection() {
+  const [reload, setReload] = useState(0)
+  const { data, error } = useAdminFetch(`/api/admin/contracts?_r=${reload}`)
+  const [taslak, setTaslak] = useState({})
+  const [busyId, setBusyId] = useState(null)
+
+  const kaydet = async (c) => {
+    const d = taslak[c.id] || {}
+    if (Object.keys(d).length === 0) return
+    setBusyId(c.id)
+    try {
+      await authedFetch(`/api/admin/contracts/${c.id}`, { method: 'POST', body: JSON.stringify(d) })
+      setTaslak((t) => ({ ...t, [c.id]: {} }))
+      setReload((r) => r + 1)
+    } catch (e) {
+      // Backend invalid_url:<alan> gibi makine kodu döner; admin'e okunur mesaj ver.
+      alert(String(e.message).startsWith('invalid_url')
+        ? 'Belge bağlantısı https:// ile başlamalı.'
+        : e.message)
+    } finally { setBusyId(null) }
+  }
+
+  const yaz = (id, alan, deger) =>
+    setTaslak((t) => ({ ...t, [id]: { ...(t[id] || {}), [alan]: deger } }))
+
+  if (error) return <div className="admin-error">{error}</div>
+  if (!data) return <div className="admin-loading">Yükleniyor…</div>
+  const list = data.contracts || []
+
+  return (
+    <div style={{ marginTop: 30 }}>
+      <h3 className="admin-section__title">Sözleşmeler (NDA / yıllık)</h3>
+      {list.length === 0 && (
+        <div className="admin-loading">
+          Sözleşme yok. Creator/uzman başvurusu kabul edildiğinde 1 yıllık kayıt otomatik açılır.
+        </div>
+      )}
+      <div style={{ display: 'grid', gap: 12 }}>
+        {list.map((c) => {
+          const d = taslak[c.id] || {}
+          const du = SOZLESME_DURUM[c.status] || SOZLESME_DURUM.active
+          const deger = (alan) => (d[alan] !== undefined ? d[alan] : (c[alan] || ''))
+          return (
+            <div key={c.id} style={{ border: '1px solid var(--border, #2a2a2a)', borderRadius: 12, padding: '14px 16px' }}>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+                <b>{c.expert_name}</b>
+                {c.expert_email && <span style={{ color: 'var(--text-sub,#888)', fontSize: '.86rem' }}>{c.expert_email}</span>}
+                <span style={{ fontSize: '.78rem', color: 'var(--text-sub,#888)' }}>
+                  {c.mode === 'service' ? 'Uzman-Ortak' : 'Barter / Elçi'}
+                </span>
+                <span style={{ fontSize: '.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em',
+                               color: du.renk, border: `1px solid ${du.renk}55`, borderRadius: 999, padding: '3px 9px' }}>{du.etiket}</span>
+                <span style={{ marginLeft: 'auto', fontSize: '.78rem', color: 'var(--text-muted,#777)' }}>
+                  {formatDate(c.starts_at)} → {formatDate(c.ends_at)}
+                </span>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(210px,1fr))', gap: 10, marginTop: 12 }}>
+                <label style={{ fontSize: '.8rem', display: 'grid', gap: 4 }}>NDA imza tarihi
+                  <input type="date" value={(deger('nda_signed_at') || '').slice(0, 10)}
+                    onChange={(e) => yaz(c.id, 'nda_signed_at', e.target.value || null)}
+                    style={{ padding: '6px 9px', borderRadius: 6, border: '1px solid var(--border-mid,#444)', background: 'transparent', color: 'inherit' }} />
+                </label>
+                <label style={{ fontSize: '.8rem', display: 'grid', gap: 4 }}>NDA belgesi (https)
+                  <input type="url" placeholder="https://…" value={deger('nda_doc_url')}
+                    onChange={(e) => yaz(c.id, 'nda_doc_url', e.target.value)}
+                    style={{ padding: '6px 9px', borderRadius: 6, border: '1px solid var(--border-mid,#444)', background: 'transparent', color: 'inherit' }} />
+                </label>
+                <label style={{ fontSize: '.8rem', display: 'grid', gap: 4 }}>Sözleşme belgesi (https)
+                  <input type="url" placeholder="https://…" value={deger('contract_url')}
+                    onChange={(e) => yaz(c.id, 'contract_url', e.target.value)}
+                    style={{ padding: '6px 9px', borderRadius: 6, border: '1px solid var(--border-mid,#444)', background: 'transparent', color: 'inherit' }} />
+                </label>
+                <label style={{ fontSize: '.8rem', display: 'grid', gap: 4 }}>Bitiş (yenileme)
+                  <input type="date" value={(deger('ends_at') || '').slice(0, 10)}
+                    onChange={(e) => yaz(c.id, 'ends_at', e.target.value)}
+                    style={{ padding: '6px 9px', borderRadius: 6, border: '1px solid var(--border-mid,#444)', background: 'transparent', color: 'inherit' }} />
+                </label>
+                <label style={{ fontSize: '.8rem', display: 'grid', gap: 4 }}>Durum
+                  <select value={deger('status') || 'active'} onChange={(e) => yaz(c.id, 'status', e.target.value)}
+                    style={{ padding: '6px 9px', borderRadius: 6, border: '1px solid var(--border-mid,#444)', background: 'transparent', color: 'inherit' }}>
+                    {Object.entries(SOZLESME_DURUM).map(([k, v]) => <option key={k} value={k}>{v.etiket}</option>)}
+                  </select>
+                </label>
+              </div>
+
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 12, flexWrap: 'wrap' }}>
+                {c.nda_signed_at
+                  ? <span style={{ fontSize: '.82rem', color: '#3FB950' }}>NDA imzalı · {formatDate(c.nda_signed_at)}</span>
+                  : <span style={{ fontSize: '.82rem', color: '#D29922' }}>NDA imzası bekliyor</span>}
+                {c.nda_doc_url && <a href={c.nda_doc_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '.82rem' }}>NDA belgesi ↗</a>}
+                {c.contract_url && <a href={c.contract_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '.82rem' }}>Sözleşme ↗</a>}
+                <button className="admin-back" style={{ marginLeft: 'auto' }}
+                  disabled={busyId === c.id || Object.keys(d).length === 0}
+                  onClick={() => kaydet(c)}>Kaydet</button>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 function PayoutsTab() {
   const [period, setPeriod] = useState('')
   const [reload, setReload] = useState(0)
@@ -2159,7 +2280,9 @@ function PayoutsTab() {
         <StatTile label="Kalan (borç)" value={money(totals.outstanding)} icon={Wallet} />
       </div>
 
-      <h3 className="admin-section__title">Kişi özeti</h3>
+      <ContractsSection />
+
+      <h3 className="admin-section__title" style={{ marginTop: 30 }}>Kişi özeti</h3>
       <div className="admin-table-wrap">
         <table className="admin-table">
           <thead>

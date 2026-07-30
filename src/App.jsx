@@ -270,11 +270,14 @@ function AppInner() {
     // (pushState) her seferinde yeni giris ekler, geri tusu bozulurdu. Sonraki
     // tick'ler sadece result state'ini GUNCELLER (view sabit kalir).
     let resultShown = false
-    // cold-start: worker 0'dan ayağa kalkarken (~3dk) iş SQS'te bekler; eski
-    // 60×3sn=3dk tavan TAM bu pencerede pes ediyordu. 100×3sn = 5 dk (cold-start
-    // + tarama sığar; askıda kalan sorgu da 5dk'da bırakılır, e-posta fallback var).
-    for (let i = 0; i < 200; i++) {  // Fable 2026-07-23: 5dk->10dk; buyuk JS-agir siteler (trendyol/stripe) 5dk'yi asip yanlis "timeout" gosteriyordu
-      await new Promise(r => setTimeout(r, 3000))
+    // Poll penceresi — ÖLÇÜMLE belirlendi (21 gün, n=104 site taraması):
+    // p50 291sn, p90 1494sn, p95 1913sn, max 2655sn. Taramaların %29'u 10 dakikayı,
+    // %6,7'si 30 dakikayı aşıyor. Eski 200×3sn=10dk tavan, her ÜÇ kullanıcIDAN
+    // BİRİNİ sonuç hazır değilken "e-postayla göndeririz" ekranına düşürüyordu.
+    // Şimdi ~35 dk: ilk 40 tick 3sn'de bir (kullanıcı ekrana bakıyor), sonrası
+    // 10sn'de bir — pencere 3,5 katına çıkarken istek sayısı 200→240'ta kalıyor.
+    for (let i = 0; i < 240; i++) {
+      await new Promise(r => setTimeout(r, i < 40 ? 3000 : 10000))
       if (scanGenRef.current !== gen) return  // iptal edildi / yeni tarama basladi
       try {
         const res = await fetch(`${API_URL}/api/audit/${jobId}`)

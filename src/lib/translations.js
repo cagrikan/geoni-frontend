@@ -14,11 +14,11 @@ export const translations = {
     hero_eyebrow: 'AI Görünürlük Taraması',
     hero_headline_1: 'Rakibiniz her AI yanıtında var.',
     hero_headline_2: 'Siz yoksunuz.',
-    hero_subhead: "ChatGPT, Claude, Gemini ve Perplexity'nin sizi nasıl gördüğünü birkaç dakikada ölçün — eksikleri tek tıkla uzmanlara devredin.",
+    hero_subhead: "ChatGPT, Claude, Gemini ve Perplexity'nin sizi nasıl gördüğünü dakikalar içinde ölçün — eksikleri tek tıkla uzmanlara devredin.",
     hero_eyeline_scans: 'tarama tamamlandı',
     scan_card_title: 'Ücretsiz AI Görünürlük Taraması',
-    scan_card_eta: '⏱ birkaç dakika',
-    scan_peek_text: '<b>Birkaç dakika içinde göreceğiniz:</b> skorunuz, motor motor erişim durumu ve size özel eksik listesi.',
+    scan_card_eta: '⏱ ~5 dakika',
+    scan_peek_text: '<b>Tarama bitince göreceğiniz:</b> skorunuz, motor motor erişim durumu ve size özel eksik listesi.',
     hero_sample_btn: 'Önce örnek raporu görün →',
     hero_trust: 'Kredi kartı gerekmez · Sonuç dakikalar içinde',
     app_slogan_1: 'AI sizi görmüyorsa, kimse görmüyor.',
@@ -121,7 +121,7 @@ export const translations = {
     scan_sub: 'gerçek zamanlı çalışıyor',
     scan_sub_site: 'botlarının sitenize erişimi kontrol ediliyor',
     scan_starting: 'Başlatılıyor…',
-    scan_eta: 'Genelde birkaç dakika sürer — yoğunlukta daha uzun sürebilir',
+    scan_eta: 'Genelde ~5 dakika sürer; büyük sitelerde 30 dakikayı bulabilir — sonuç hazır olunca e-postanıza da gönderilir',
     scan_cancel: 'Vazgeç',
 
     // ── Results (paylaşılan) ──
@@ -739,8 +739,8 @@ export const translations = {
     hero_subhead: 'Measure how ChatGPT, Claude, Gemini and Perplexity see you in minutes — then hand the gaps to our experts in one click.',
     hero_eyeline_scans: 'scans completed today',
     scan_card_title: 'Free AI Visibility Scan',
-    scan_card_eta: '⏱ a few minutes',
-    scan_peek_text: "<b>What you'll see in a few minutes:</b> your score, engine-by-engine access status and your personal gap list.",
+    scan_card_eta: '⏱ ~5 minutes',
+    scan_peek_text: "<b>What you'll see when the scan finishes:</b> your score, engine-by-engine access status and your personal gap list.",
     hero_sample_btn: 'See a sample report first →',
     hero_trust: 'No credit card required · Results in minutes',
     app_slogan_1: "If AI can't see you, no one can.",
@@ -843,7 +843,7 @@ export const translations = {
     scan_sub: 'running in real time',
     scan_sub_site: 'bot access to your site is being checked',
     scan_starting: 'Starting…',
-    scan_eta: 'Usually a few minutes — can take longer when busy',
+    scan_eta: 'Usually ~5 minutes; up to 30 for large sites — we also email you the result when it\'s ready',
     scan_cancel: 'Cancel',
 
     // ── Results (shared) ──

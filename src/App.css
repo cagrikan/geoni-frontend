@@ -3508,3 +3508,10 @@ button.fixes__item { width: 100%; text-align: left; }
 }
 .engine-notice__icon { color: var(--warn); flex: none; margin-top: 1px; }
 .engine-notice__text { font-size: .875rem; line-height: 1.45; color: var(--text-sub); }
+
+/* Token oranlari: "kac taramaya yeter" sorusunu paket kartlarindan ONCE cevaplar. */
+.dash-buy-credits__rates {
+  font-size: .82rem;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}

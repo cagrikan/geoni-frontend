@@ -103,6 +103,11 @@ function BuyCreditsSection({ t }) {
   return (
     <div className="dash-buy-credits">
       {error && <div className="dash-buy-error">{error}</div>}
+      {/* "20 token kac taramaya yeter?" sorusunun cevabi hicbir yerde
+          yazmiyordu; kullanici ancak harcadiktan SONRA islem gecmisinden
+          goruyordu (UI/UX denetimi 2026-07-30). Degerler backend'de sabit:
+          web taramasi 5 (db.py save_audit), kisi/marka/sosyal 10 (db.py:239). */}
+      <div className="dash-buy-credits__rates">{t('dash_credits_rates')}</div>
       <div className="dash-buy-credits__grid">
         {packages.map((pkg) => (
           <div key={pkg.id} className="dash-buy-credits__card">

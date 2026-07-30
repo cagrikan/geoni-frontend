@@ -205,6 +205,11 @@ export const translations = {
     identity_match_score: 'Eşleşme Skoru:',
     identity_hint: 'Daha doğru sonuç için unvan, şirket veya şehir bilgilerinizi ekleyip tekrar deneyin.',
     identity_retry: 'Tekrar Dene →',
+    // Ag hatasi ile "veri yok" AYRI seyler: eskiden gecici bir hata da bos
+    // durum gibi gorunuyordu ("henuz tarama yok") ve tekrar-dene yolu yoktu.
+    dash_load_error: 'Veriler yüklenemedi — bağlantınızı kontrol edip tekrar deneyin.',
+    dash_load_retry: 'Tekrar dene',
+    dash_profile_error: 'Hesap bilgileriniz yüklenemedi. Gösterilen plan ve bakiye güncel olmayabilir.',
 
     // ── Login ──
     login_title: 'Hesabınıza Giriş Yapın',
@@ -927,6 +932,9 @@ export const translations = {
     identity_match_score: 'Match Score:',
     identity_hint: 'For a more accurate result, add your title, company or city and try again.',
     identity_retry: 'Try Again →',
+    dash_load_error: 'Could not load your data — check your connection and try again.',
+    dash_load_retry: 'Try again',
+    dash_profile_error: 'We could not load your account details. The plan and balance shown may be out of date.',
 
     // ── Login ──
     login_title: 'Sign In to Your Account',

@@ -68,17 +68,37 @@ async function authedFetch(path, options = {}) {
   return res.json()
 }
 
+/** Ag hatasi ile "veri yok" AYRI seylerdir. Eskiden gecici bir hata da bos
+ *  durum gibi gorunuyordu ("henuz tarama yok", "paket yok") ve kullanicinin
+ *  tekrar denemek icin sayfayi yenilemekten baska yolu yoktu. */
+function LoadError({ t, onRetry }) {
+  return (
+    <div className="dash-empty dash-empty--error">
+      <p>{t('dash_load_error')}</p>
+      <button className="dash-new-scan" onClick={onRetry}>{t('dash_load_retry')}</button>
+    </div>
+  )
+}
+
 function BuyCreditsSection({ t }) {
   const [packages, setPackages] = useState(null)
   const [error, setError] = useState(null)
+  const [yuklemeHatasi, setYuklemeHatasi] = useState(false)
   const [buyingId, setBuyingId] = useState(null)
 
-  useEffect(() => {
+  const fetchPackages = () => {
+    setYuklemeHatasi(false)
+    setPackages(null)
     fetch(`${API_URL}/api/credit-packages`)
-      .then((r) => r.json())
+      .then((r) => { if (!r.ok) throw new Error(r.status); return r.json() })
       .then(setPackages)
-      .catch(() => setPackages([]))
-  }, [])
+      // Eskiden hata da setPackages([]) yapiyordu -> bolum SESSIZCE kayboluyordu
+      // (asagida `length === 0` -> null). Yani odeme yapmak isteyen kullanici
+      // bos ekran goruyor, hicbir aciklama yok.
+      .catch(() => { setYuklemeHatasi(true); setPackages([]) })
+  }
+
+  useEffect(fetchPackages, [])
 
   const buy = async (packageId) => {
     setBuyingId(packageId)
@@ -98,6 +118,7 @@ function BuyCreditsSection({ t }) {
   }
 
   if (packages === null) return <div className="dash-loading">{t('dash_loading')}</div>
+  if (yuklemeHatasi) return <LoadError t={t} onRetry={fetchPackages} />
   if (packages.length === 0) return null
 
   return (
@@ -781,13 +802,16 @@ function targetKey(audit) {
 }
 
 export default function DashboardPage({ onReset, onNewScan, onViewAudit, onRescanWeb, onRescanBrand, onAdmin }) {
-  const { user, profile, signOut, refreshProfile } = useAuth()
+  const { user, profile, profileError, signOut, refreshProfile } = useAuth()
   const { t, language } = useLanguage()
   const { theme } = useTheme()
   const [audits, setAudits] = useState([])
+  // Ag hatasi bayraklari: bos liste ile ayirt edilebilsin (bkz. LoadError).
+  const [auditsError, setAuditsError] = useState(false)
   const [loading, setLoading] = useState(true)
   const [watchlist, setWatchlist] = useState([])
   const [watchlistLoading, setWatchlistLoading] = useState(true)
+  const [watchlistError, setWatchlistError] = useState(false)
   const [selectedIds, setSelectedIds] = useState(new Set())
   const [confirmState, setConfirmState] = useState(null)
   const [queryEditor, setQueryEditor] = useState(null) // acik ozel-sorgu editorunun watchlist id'si
@@ -824,23 +848,30 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
     if (user) { fetchAudits(); fetchWatchlist() }
   }, [user])
 
+  // NOT: hata durumunda ONCEKI liste KORUNUR (setAudits cagrilmaz). Eskiden
+  // `data || []` yaziliyordu; gecici bir ag hatasi dolu bir gecmisi "henuz
+  // tarama yok" bos durumuna cevirebiliyordu.
   const fetchAudits = async () => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('audits')
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(20)
+    if (error) { setAuditsError(true); setLoading(false); return }
+    setAuditsError(false)
     setAudits(data || [])
     setLoading(false)
   }
 
   const fetchWatchlist = async () => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('watchlist')
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
+    if (error) { setWatchlistError(true); setWatchlistLoading(false); return }
+    setWatchlistError(false)
     setWatchlist(data || [])
     setWatchlistLoading(false)
   }
@@ -1038,6 +1069,15 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
         </div>
       </header>
 
+      {/* Profil cekilemediyse plan/bakiye ESKI olabilir. Sessizce "Ucretsiz"
+          gostermek yerine acikca soyle ve tekrar-dene sun (denetim #5). */}
+      {profileError && (
+        <div className="dash-stale-banner" role="status">
+          <span>{t('dash_profile_error')}</span>
+          <button className="dash-stale-banner__retry" onClick={refreshProfile}>{t('dash_load_retry')}</button>
+        </div>
+      )}
+
       <div className="dashboard__body">
         {/* Sidebar */}
         <aside className="dashboard__sidebar">
@@ -1120,6 +1160,8 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                 <div className="dash-audit-list">
                   {Array.from({ length: 4 }).map((_, i) => <SkeletonRow key={i} />)}
                 </div>
+              ) : auditsError ? (
+                <LoadError t={t} onRetry={fetchAudits} />
               ) : audits.length === 0 ? (
                 <div className="dash-empty">
                   <p>{t('dash_history_empty')}</p>
@@ -1205,6 +1247,8 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                 <div className="dash-audit-list">
                   {Array.from({ length: 3 }).map((_, i) => <SkeletonRow key={i} />)}
                 </div>
+              ) : watchlistError ? (
+                <LoadError t={t} onRetry={fetchWatchlist} />
               ) : watchlist.length === 0 ? (
                 <div className="dash-empty">
                   <p>{t('dash_watchlist_empty')}</p>

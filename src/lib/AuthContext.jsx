@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 
 const AuthContext = createContext(null)
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.geoni.ai'
@@ -16,6 +16,9 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
+  // Profil cekimi gecici olarak basarisiz mi? (bos profil ile ayirt edilir)
+  const [profileError, setProfileError] = useState(false)
+  const retryTimer = useRef(null)
 
   useEffect(() => {
     // Zaten oturumu olan (localStorage'da sb-*-auth-token) kullanici ya da OAuth
@@ -55,20 +58,41 @@ export function AuthProvider({ children }) {
       unsub = () => subscription.unsubscribe()
     })
 
-    return () => { active = false; if (unsub) unsub() }
+    return () => { active = false; if (unsub) unsub(); clearTimeout(retryTimer.current) }
   }, [])
 
-  const fetchProfile = async (userId) => {
+  // Profil cekimi basarisiz oldugunda ONCEKI profil KORUNUR. Eskiden `data`
+  // (hata durumunda null) dogrudan yaziliyordu: gecici bir ag hatasi ODEYEN
+  // musteriyi "Ucretsiz Plan"a dusuruyor, rapor bolumlerini kilitliyordu —
+  // ustelik ne hata mesaji ne de tekrar-dene vardi (2026-07-30 denetimi #5).
+  const fetchProfile = async (userId, deneme = 0) => {
     const supabase = await getSupabase()
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', userId)
       .single()
+
+    // PGRST116 = "satir donmedi": profil GERCEKTEN yok (yeni hesapta trigger
+    // henuz yazmamis olabilir). Bu bir hata degil, bos durumdur.
+    if (error && error.code !== 'PGRST116') {
+      setProfileError(true)
+      setLoading(false)
+      if (deneme < 3) {
+        clearTimeout(retryTimer.current)
+        retryTimer.current = setTimeout(
+          () => fetchProfile(userId, deneme + 1),
+          1000 * 2 ** deneme,  // 1sn, 2sn, 4sn
+        )
+      }
+      return
+    }
+
+    setProfileError(false)
     if (data && !data.utm_source && !data.signup_referrer) {
       recordAcquisitionOnce(userId)
     }
-    setProfile(data)
+    setProfile(data ?? null)
     setLoading(false)
   }
 
@@ -131,7 +155,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={{
-      user, profile, loading,
+      user, profile, loading, profileError,
       signInWithGoogle, signInWithApple, signInWithLinkedIn,
       signOut, refreshProfile
     }}>

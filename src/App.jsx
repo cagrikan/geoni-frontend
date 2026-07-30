@@ -5,6 +5,7 @@ import { ThemeProvider } from './lib/ThemeContext'
 import LandingPage from './LandingPage'
 import ScanningScreen from './components/ScanningScreen'
 import { isPaidUser } from './lib/access'
+import { langHeaders } from './lib/apiLang'
 import ResultsPage from './ResultsPage'
 import BrandCheckResultsPage from './BrandCheckResultsPage'
 import IdentityMismatchPage from './IdentityMismatchPage'
@@ -280,7 +281,7 @@ function AppInner() {
       await new Promise(r => setTimeout(r, i < 40 ? 3000 : 10000))
       if (scanGenRef.current !== gen) return  // iptal edildi / yeni tarama basladi
       try {
-        const res = await fetch(`${API_URL}/api/audit/${jobId}`)
+        const res = await fetch(`${API_URL}/api/audit/${jobId}`, { headers: langHeaders() })
         if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || t('error_audit_failed'))
         const data = await res.json()
         errStreak = 0
@@ -318,7 +319,7 @@ function AppInner() {
       await new Promise(r => setTimeout(r, 2000))
       if (scanGenRef.current !== gen) return
       try {
-        const res = await fetch(`${API_URL}/api/brand-check/${jobId}`)
+        const res = await fetch(`${API_URL}/api/brand-check/${jobId}`, { headers: langHeaders() })
         if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || t('error_query_failed'))
         const data = await res.json()
         errStreak = 0
@@ -341,7 +342,7 @@ function AppInner() {
       const token = session?.data?.session?.access_token || ''
       const res = await fetch(`${API_URL}/api/audit/quick`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
+        headers: { 'Content-Type': 'application/json', ...langHeaders(), ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
         body: JSON.stringify({ domain, email: email || user?.email || 'anonymous@geoni.ai', competitors: [], lang: language, private: isPrivate, custom_queries: customQueries, turnstile_token: turnstileToken }),
       })
       if (!res.ok) throw await apiErrorFrom(res, t('error_request_failed'))
@@ -386,7 +387,7 @@ function AppInner() {
       const token2 = session2?.data?.session?.access_token || ''
       const res = await fetch(`${API_URL}/api/brand-check`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(token2 ? { 'Authorization': `Bearer ${token2}` } : {}) },
+        headers: { 'Content-Type': 'application/json', ...langHeaders(), ...(token2 ? { 'Authorization': `Bearer ${token2}` } : {}) },
         body: JSON.stringify({ ...payload, email: payload.email || user?.email || 'anonymous@geoni.ai', lang: language, turnstile_token: turnstileToken }),
       })
       if (!res.ok) throw await apiErrorFrom(res, t('error_request_failed'))
@@ -429,7 +430,7 @@ function AppInner() {
     try {
       const res = await fetch(`${API_URL}/api/social-check`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...langHeaders() },
         body: JSON.stringify({ handle, niche, email, lang: language, turnstile_token }),
       })
       if (!res.ok) throw await apiErrorFrom(res, t('error_request_failed'))

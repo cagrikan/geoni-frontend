@@ -13,6 +13,7 @@ import TicketDetailOverlay from '../components/TicketDetailOverlay'
 import RateTicket from '../components/RateTicket'
 import InviteCard from '../components/InviteCard'
 import { isPaidUser } from '../lib/access'
+import { langHeaders } from '../lib/apiLang'
 
 /* Uzmanin, atandigi biletin MUSTERISININ itibarini gormesi - sorunlu
    musteriyi onceden tanimak icin. Musteri tarafinda hic cagrilmaz. */
@@ -60,6 +61,8 @@ async function authedFetch(path, options = {}) {
     ...options,
     headers: {
       'Content-Type': 'application/json',
+      // Backend hata metnini BU dile gore uretiyor (api_errors.coz_dil).
+      ...langHeaders(),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers || {}),
     },

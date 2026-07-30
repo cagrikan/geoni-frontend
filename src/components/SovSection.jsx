@@ -1,12 +1,36 @@
 import { Radar, CheckCircle2, XCircle } from 'lucide-react'
 import ProBlur from '../ProBlur'
 
-const ENGINE_LABELS = { perplexity: 'Perplexity', google: 'Google AI' }
+/* Motor anahtari -> gosterim adi. claude/chatgpt eksikti: uretimde bu iki motor
+   da SOV sorgusu yanitliyor (dogrulandi 2026-07-30, son 10 gun) ve etiketsiz
+   kalinca raporda ham anahtar olarak "chatgpt ✓" diye cikiyordu. */
+const ENGINE_LABELS = {
+  perplexity: 'Perplexity', google: 'Google AI', claude: 'Claude', chatgpt: 'ChatGPT',
+}
 
 /* Share of Voice (v3): markayi bilmeyen kullanicinin kategori sorgularinda
    marka oneriliyor mu? Ozet satiri herkese acik (satisin kancasi), sorgu
    detaylari ve rakip listesi Pro'ya. */
-export default function SovSection({ sov, t, isPro = false }) {
+export default function SovSection({ sov, t, isPro = false, pending = false }) {
+  /* SOV hala arka planda olculuyor (status=partial): bolumu gizlemek yerine
+     yerinde tut ve ozet sayinin yerine donen animasyon koy. Bos/0 bir sayi
+     "hic anilmadin" diye okunur, oysa olcum daha bitmedi.
+     (Cagri, 2026-07-30 — "islem yapiyorsa sifir yerine animasyon".) */
+  if (pending) {
+    return (
+      <div className="sov">
+        <div className="sov__head">
+          <h3 className="sov__title"><Radar size={15} strokeWidth={1.5} /> {t('sov_title')}</h3>
+          <span className="sov__summary sov__summary--pending" role="status" aria-label={t('sov_measuring')}>
+            <span className="results__sov-pending-spinner" aria-hidden="true" />
+            {t('sov_measuring')}
+          </span>
+        </div>
+        <p className="sov__sub">{t('sov_subtitle')}</p>
+      </div>
+    )
+  }
+
   if (!sov || !sov.checked || sov.score === null || sov.score === undefined) return null
 
   const color = sov.score >= 65 ? 'var(--good)' : sov.score >= 40 ? 'var(--warn)' : 'var(--bad)'

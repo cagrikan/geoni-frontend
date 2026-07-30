@@ -3019,6 +3019,9 @@ body {
   font-size: 1rem; font-weight: 600; color: var(--text); margin: 0;
 }
 .sov__summary { font-size: .875rem; font-weight: 600; white-space: nowrap; }
+/* SOV olculurken ozet sayinin yerini alan donen animasyon (spinner kurali
+   .results__sov-pending-spinner'da; burada yalnizca yerlesim). */
+.sov__summary--pending { display: inline-flex; align-items: center; gap: 8px; color: var(--text-muted); }
 .sov__sub { font-size: .8125rem; color: var(--text-muted); margin: 6px 0 14px; line-height: 1.5; }
 .sov__queries { display: flex; flex-direction: column; gap: 8px; }
 .sov__query {

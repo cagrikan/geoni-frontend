@@ -2038,7 +2038,29 @@ function CreatorApplicationsTab() {
                 </span>
               </div>
 
-              {a.email && <div style={{ marginTop: 8, fontSize: '.86rem', color: 'var(--text-sub,#888)' }}>{a.email}</div>}
+              {/* E-posta dogrulama rozeti (2026-07-30): /api/creator-apply kimliksiz
+                  ve upsert on_conflict=handle -> baskasinin @handle'ina POST atip
+                  e-postayi degistirmek mumkundu. Kabul akisi user_id'yi TAM DA bu
+                  adresten esledigi icin karari veren kisi dogrulanip dogrulanmadigini
+                  GORMELI; dogrulanmamisken kabul edilirse hesap eslemesi yapilmaz. */}
+              {a.email && (
+                <div style={{ marginTop: 8, fontSize: '.86rem', color: 'var(--text-sub,#888)', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <span>{a.email}</span>
+                  <span style={{
+                    fontSize: '.68rem', fontWeight: 700, letterSpacing: '.05em', textTransform: 'uppercase',
+                    borderRadius: 999, padding: '2px 8px',
+                    color: a.email_verified ? 'var(--good, #3fb27f)' : 'var(--warn, #e8a33d)',
+                    border: `1px solid ${a.email_verified ? 'var(--good, #3fb27f)' : 'var(--warn, #e8a33d)'}55`,
+                  }}>
+                    {a.email_verified ? '✓ doğrulandı' : '⚠ doğrulanmadı'}
+                  </span>
+                  {!a.email_verified && (
+                    <span style={{ fontSize: '.78rem', color: 'var(--text-muted,#777)' }}>
+                      kabul edilse bile hesap/davet kodu bağlanmaz
+                    </span>
+                  )}
+                </div>
+              )}
               {a.note && <p style={{ marginTop: 8, fontSize: '.9rem' }}>{a.note}</p>}
 
               {a.interview_summary && (

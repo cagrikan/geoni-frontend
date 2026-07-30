@@ -267,7 +267,7 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
         </div>
 
         {/* Share of Voice: kategori sorgularinda gorunurluk (v3) */}
-        <SovSection sov={result.sov} t={t} isPro={isPro} />
+        <SovSection sov={result.sov} t={t} isPro={isPro} pending={!!result.sov_pending} />
 
         {/* Eksik -> hizmet koprusu (ornek raporda gosterilmez) */}
         {!isSample && <FixSuggestions result={result} t={t} onUpgrade={onUpgrade} />}

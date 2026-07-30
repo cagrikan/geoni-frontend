@@ -488,11 +488,20 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, onSubmi
 
           {error && <p className="landing__error">{error}</p>}
 
-          <label className="app-priv">
-            <input type="checkbox" checked={isPrivate} onChange={togglePrivate} />
-            <EyeOff size={13} strokeWidth={1.5} />
-            {t('private_scan_label')}
-          </label>
+          {/* Ozel tarama SOSYAL modda YOK: backend SocialCheckRequest'te `private`
+              alani hic yok ve akis private=False sabitliyor (geoni-scanner/
+              main.py:1114-1122). Kutu her modda gorunuyordu; sosyalde
+              isaretlenince "sonucun gecmise kaydedilmeyecek" toast'i cikiyor
+              ama payload'a hicbir sey gitmiyordu -> tutulamayan soz
+              (UI/UX denetimi 2026-07-30). Destek eklenene kadar gostermiyoruz;
+              olmayan bir vaadi satmaktansa hic vaat etmemek dogru. */}
+          {mode !== 'social' && (
+            <label className="app-priv">
+              <input type="checkbox" checked={isPrivate} onChange={togglePrivate} />
+              <EyeOff size={13} strokeWidth={1.5} />
+              {t('private_scan_label')}
+            </label>
+          )}
           <div className="app-trust"><b>{t('trust_free')}</b> · {t('scan_trust_line')}</div>
         </div>
 

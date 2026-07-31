@@ -83,6 +83,62 @@ function LoadError({ t, onRetry }) {
   )
 }
 
+function PromoCodeSection({ t, onRedeemed }) {
+  const [kod, setKod] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [hata, setHata] = useState(null)
+  const [basari, setBasari] = useState(null)
+
+  const gonder = async (e) => {
+    e.preventDefault()
+    const temiz = kod.trim()
+    if (!temiz || busy) return
+    setBusy(true); setHata(null); setBasari(null)
+    try {
+      const r = await authedFetch('/api/promo/redeem', {
+        method: 'POST', body: JSON.stringify({ code: temiz }),
+      })
+      setBasari(r.credits)
+      setKod('')
+      // Bakiye rozeti/plan aninda guncellensin — kullanici "yattı mı?" diye sormasin.
+      if (onRedeemed) onRedeemed()
+    } catch (err) {
+      setHata(err.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <form className="dash-promo" onSubmit={gonder}>
+      <label className="dash-promo__label" htmlFor="promo-kod">{t('dash_promo_title')}</label>
+      <div className="dash-promo__row">
+        <input
+          id="promo-kod"
+          className="dash-promo__input"
+          value={kod}
+          onChange={(e) => setKod(e.target.value)}
+          placeholder={t('dash_promo_placeholder')}
+          autoComplete="off"
+          autoCapitalize="characters"
+          spellCheck="false"
+          maxLength={40}
+          disabled={busy}
+        />
+        <button className="dash-promo__btn" type="submit" disabled={busy || !kod.trim()}>
+          {busy ? t('dash_loading') : t('dash_promo_submit')}
+        </button>
+      </div>
+      {hata && <div className="dash-promo__msg dash-promo__msg--err" role="alert">{hata}</div>}
+      {basari !== null && (
+        <div className="dash-promo__msg dash-promo__msg--ok" role="status">
+          {t('dash_promo_ok', { n: basari })}
+        </div>
+      )}
+    </form>
+  )
+}
+
 function BuyCreditsSection({ t }) {
   const [packages, setPackages] = useState(null)
   const [error, setError] = useState(null)
@@ -246,6 +302,8 @@ function WalletSection({ t, profile, language, refreshProfile }) {
           </span>
         </div>
       </div>
+
+      <PromoCodeSection t={t} onRedeemed={refreshProfile} />
 
       <BuyCreditsSection t={t} />
 

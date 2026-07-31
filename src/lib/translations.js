@@ -208,6 +208,10 @@ export const translations = {
     // Ag hatasi ile "veri yok" AYRI seyler: eskiden gecici bir hata da bos
     // durum gibi gorunuyordu ("henuz tarama yok") ve tekrar-dene yolu yoktu.
     dash_load_error: 'Veriler yüklenemedi — bağlantınızı kontrol edip tekrar deneyin.',
+    dash_promo_title: 'Promosyon kodun var mı?',
+    dash_promo_placeholder: 'Kodu buraya yaz',
+    dash_promo_submit: 'Kullan',
+    dash_promo_ok: '{n} token hesabına eklendi.',
     dash_load_retry: 'Tekrar dene',
     dash_profile_error: 'Hesap bilgileriniz yüklenemedi. Gösterilen plan ve bakiye güncel olmayabilir.',
 
@@ -933,6 +937,10 @@ export const translations = {
     identity_hint: 'For a more accurate result, add your title, company or city and try again.',
     identity_retry: 'Try Again →',
     dash_load_error: 'Could not load your data — check your connection and try again.',
+    dash_promo_title: 'Have a promo code?',
+    dash_promo_placeholder: 'Enter your code',
+    dash_promo_submit: 'Redeem',
+    dash_promo_ok: '{n} tokens added to your account.',
     dash_load_retry: 'Try again',
     dash_profile_error: 'We could not load your account details. The plan and balance shown may be out of date.',
 

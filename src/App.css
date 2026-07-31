@@ -3516,6 +3516,23 @@ button.fixes__item { width: 100%; text-align: left; }
   margin-bottom: 10px;
 }
 
+/* Bakiyenin altinda "~N tarama" — buyuk sayinin anlamini hemen yaninda ver. */
+.dash-wallet__scans {
+  font-size: .78rem;
+  color: var(--text-muted);
+  margin-top: -2px;
+  margin-bottom: 6px;
+}
+
+/* Paket kartinda "~N tarama": fiyatin hemen ustunde, ikincil tonda —
+   asil karar sayisi kredi adedi, bu onu somutlastiran yardimci bilgi. */
+.dash-buy-credits__scans {
+  font-size: .74rem;
+  color: var(--text-muted);
+  margin: 2px 0 6px;
+  line-height: 1.3;
+}
+
 /* Ag hatasi ile "veri yok" ayrimi (denetim #5) — bos durum notr, hata uyari
    rengiyle ve tekrar-dene ile gelir. */
 .dash-empty--error p {

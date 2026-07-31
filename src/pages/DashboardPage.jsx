@@ -139,11 +139,30 @@ function PromoCodeSection({ t, onRedeemed }) {
   )
 }
 
+/**
+ * Tarama bedelleri (public uc). Sabit YAZILMAZ: fiyat degisince kullaniciya
+ * sessizce yanlis sayi gosterilir ve fark ancak sikayetle anlasilir.
+ * Cekilemezse null doner -> cagiran taraf ilgili satiri hic cizmez.
+ */
+function useScanCosts() {
+  const [costs, setCosts] = useState(null)
+  useEffect(() => {
+    let iptal = false
+    fetch(`${API_URL}/api/scan-costs`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (!iptal) setCosts(d) })
+      .catch(() => { /* satir gizli kalir */ })
+    return () => { iptal = true }
+  }, [])
+  return costs
+}
+
 function BuyCreditsSection({ t }) {
   const [packages, setPackages] = useState(null)
   const [error, setError] = useState(null)
   const [yuklemeHatasi, setYuklemeHatasi] = useState(false)
   const [buyingId, setBuyingId] = useState(null)
+  const costs = useScanCosts()
 
   const fetchPackages = () => {
     setYuklemeHatasi(false)
@@ -185,14 +204,28 @@ function BuyCreditsSection({ t }) {
       {error && <div className="dash-buy-error">{error}</div>}
       {/* "20 token kac taramaya yeter?" sorusunun cevabi hicbir yerde
           yazmiyordu; kullanici ancak harcadiktan SONRA islem gecmisinden
-          goruyordu (UI/UX denetimi 2026-07-30). Degerler backend'de sabit:
-          web taramasi 5 (db.py save_audit), kisi/marka/sosyal 10 (db.py:239). */}
-      <div className="dash-buy-credits__rates">{t('dash_credits_rates')}</div>
+          goruyordu (UI/UX denetimi 2026-07-30). Sayilar SUNUCUDAN geliyor
+          (/api/scan-costs): metne yazilmis hali hem surukleniyordu hem de
+          YANLISTI — "sosyal tarama 10 token" diyordu, oysa sosyal tarama hic
+          ucretlendirilmiyor (uretim: 55 sosyal taramanin 0'i ucretli). */}
+      {costs && (
+        <div className="dash-buy-credits__rates">
+          {t('dash_credits_rates', { web: costs.web, brand: costs.brand })}
+        </div>
+      )}
       <div className="dash-buy-credits__grid">
         {packages.map((pkg) => (
           <div key={pkg.id} className="dash-buy-credits__card">
             <div className="dash-buy-credits__credits">{pkg.credits}</div>
             <div className="dash-buy-credits__name">{pkg.name}</div>
+            {costs && costs.web > 0 && costs.brand > 0 && (
+              <div className="dash-buy-credits__scans">
+                {t('dash_credits_scans', {
+                  site: Math.floor(pkg.credits / costs.web),
+                  kisi: Math.floor(pkg.credits / costs.brand),
+                })}
+              </div>
+            )}
             {pkg.display_price != null && (
               <div className="dash-buy-credits__price">{pkg.display_price} {pkg.currency}</div>
             )}
@@ -239,6 +272,7 @@ function txLabel(tx, t) {
 }
 
 function WalletSection({ t, profile, language, refreshProfile }) {
+  const costs = useScanCosts()
   const [txs, setTxs] = useState(null)
   const [pendingCheckout, setPendingCheckout] = useState(false)
 
@@ -291,6 +325,16 @@ function WalletSection({ t, profile, language, refreshProfile }) {
           {profile?.credit_balance ?? '—'}
           <span className="dash-wallet__unit">{t('dash_credit_unit')}</span>
         </div>
+        {/* Bakiyenin ne ise yaradigi burada yazar: promosyon kodu/referans
+            oduluyle token alan kullanici satin alma bolumune hic inmeyebilir. */}
+        {costs && costs.web > 0 && costs.brand > 0 && (profile?.credit_balance ?? 0) > 0 && (
+          <div className="dash-wallet__scans">
+            {t('dash_credits_scans', {
+              site: Math.floor((profile?.credit_balance ?? 0) / costs.web),
+              kisi: Math.floor((profile?.credit_balance ?? 0) / costs.brand),
+            })}
+          </div>
+        )}
         <div className="dash-wallet__stats">
           <span className="dash-wallet__stat dash-wallet__stat--in">
             <ArrowDownLeft size={14} strokeWidth={1.5} />

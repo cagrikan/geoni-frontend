@@ -136,8 +136,8 @@ export const translations = {
     results_more_topics: 'güçlü konu daha — tümünü gör',
     results_more_opportunities: 'fırsat konusu ve rakip verisi — tümünü gör',
     results_next_step: 'Sonraki Adım',
-    results_cta_sub_site: "ChatGPT, Perplexity ve Claude'un sizi kaynak olarak göstermesi için sistematik GEO çalışması gerekiyor. Rakipleriniz bu yarışa çoktan girdi.",
-    results_cta_sub_brand: "ChatGPT, Gemini ve Claude'un sizi alanınızda kaynak olarak göstermesi için sistematik GEO çalışması gerekiyor. Rakipleriniz bu yarışa çoktan girdi.",
+    results_cta_sub_site: "ChatGPT, Perplexity ve Claude'un sizi kaynak olarak göstermesi kendiliğinden olmuyor — botlara erişim, doğru site yapısı ve güvenilir kaynaklarda görünürlük gibi somut adımlar gerekiyor. Rakipleriniz bu adımları çoktan attı.",
+    results_cta_sub_brand: "ChatGPT, Gemini ve Claude'un sizi alanınızda kaynak olarak göstermesi kendiliğinden olmuyor — güvenilir kaynaklarda anılmak, doğru tanımlanmak ve alanınızla birlikte bilinmek gerekiyor. Rakipleriniz bu adımları çoktan attı.",
     results_sticky_upgrade: 'Skorunuzu yükseltmek ister misiniz?',
     results_created_at_suffix: 'tarihinde oluşturuldu',
     results_yes: 'Evet',
@@ -151,6 +151,13 @@ export const translations = {
     results_site_chatgpt_access: 'ChatGPT Bot İzni',
     results_site_claude_access: 'Claude Bot İzni',
     results_site_gemini_access: 'Gemini Bot İzni',
+    results_site_llms_access: 'AI Botlarına Erişim İzni (llms.txt)',
+    // Skor cipasi: esikler bugune kadar YALNIZ RENK olarak kodluydu ve tek
+    // metinsel esik (badge_hint) sadece 70+ skorda gorunuyordu — yani esige en
+    // cok ihtiyaci olan dusuk skorlu kullanici onu HIC gormuyordu.
+    // Sayilar scoreColor() ile BIREBIR ayni olmali (65/40); ayrica muhur esigi
+    // 70 oldugu icin o da yaziliyor, yoksa "yesilim ama muhrum yok" sorusu cikar.
+    results_score_legend: '65+ iyi · 40-64 geliştirilmeli · 40 altı zayıf — mühür için 70 gerekir',
     results_site_llmtxt_label: 'llm.txt durumunu gör',
     results_brand_score_label: 'AI Bilinirlik Skoru',
     breakdown_yanit_kalitesi: 'Yanıt Kalitesi',
@@ -226,7 +233,7 @@ export const translations = {
     results_brand_gemini_recognizes: 'Gemini Tanıyor',
     results_brand_perplexity_recognizes: 'Perplexity Tanıyor',
     results_brand_sticky_recognized: 'AI motoru sizi tanıyor',
-    results_brand_sticky_none: 'Hiçbir AI motoru sizi tanımıyor — GEO ile değiştirin',
+    results_brand_sticky_none: 'Hiçbir AI motoru sizi tanımıyor — bunu birlikte değiştirelim',
 
     // ── Identity mismatch ──
     identity_title: 'Kimlik Doğrulanamadı',
@@ -496,8 +503,8 @@ export const translations = {
     error_audit_timeout: 'Tarama beklenenden uzun sürüyor (büyük siteler dakikalar alabilir). Arka planda devam ediyor — sonuç hazır olunca e-postana göndereceğiz.',
     error_query_failed: 'Sorgu başarısız',
     error_query_timeout: 'Sorgu beklenenden uzun sürüyor. Arka planda devam ediyor — sonuç hazır olunca e-postana göndereceğiz.',
-    error_request_failed: 'İstek başarısız',
-    error_connection: 'Bağlantı hatası',
+    error_request_failed: 'İşlem tamamlanamadı. İnternet bağlantınızı kontrol edip tekrar deneyin; sorun sürerse mail@geoni.ai adresine yazın.',
+    error_connection: 'Bağlantı kurulamadı. İnternetinizi kontrol edip tekrar deneyin.',
 
     // ── Admin paneli ──
     admin_denied_text: 'Bu sayfaya erişim yetkiniz yok.',
@@ -897,8 +904,8 @@ export const translations = {
     results_more_topics: 'more strong topics — see all',
     results_more_opportunities: 'more opportunities with competitor data — see all',
     results_next_step: 'Next Step',
-    results_cta_sub_site: 'Getting ChatGPT, Perplexity and Claude to cite you as a source takes systematic GEO work. Your competitors are already in the race.',
-    results_cta_sub_brand: 'Getting ChatGPT, Gemini and Claude to cite you as a source in your field takes systematic GEO work. Your competitors are already in the race.',
+    results_cta_sub_site: 'Getting ChatGPT, Perplexity and Claude to cite you as a source doesn\'t happen on its own — it takes concrete steps: bot access, correct site structure, and visibility on trusted sources. Your competitors already took them.',
+    results_cta_sub_brand: 'Getting ChatGPT, Gemini and Claude to cite you as a source in your field doesn\'t happen on its own — it takes being mentioned by trusted sources, described correctly, and known for your field. Your competitors already took those steps.',
     results_sticky_upgrade: 'Want to raise your score?',
     results_created_at_suffix: 'created on',
     results_yes: 'Yes',
@@ -912,6 +919,8 @@ export const translations = {
     results_site_chatgpt_access: 'ChatGPT Bot Access',
     results_site_claude_access: 'Claude Bot Access',
     results_site_gemini_access: 'Gemini Bot Access',
+    results_site_llms_access: 'AI Bot Permission (llms.txt)',
+    results_score_legend: '65+ good · 40-64 needs work · below 40 weak — the seal needs 70',
     results_site_llmtxt_label: 'See llm.txt status',
     results_brand_score_label: 'AI Recognition Score',
     breakdown_yanit_kalitesi: 'Response Quality',
@@ -982,7 +991,7 @@ export const translations = {
     results_brand_gemini_recognizes: 'Gemini Recognizes',
     results_brand_perplexity_recognizes: 'Perplexity Recognizes',
     results_brand_sticky_recognized: 'AI engines recognize you',
-    results_brand_sticky_none: 'No AI engine recognizes you yet — change that with GEO',
+    results_brand_sticky_none: "No AI engine recognizes you yet — let's fix that together",
 
     // ── Identity mismatch ──
     identity_title: 'Identity Could Not Be Verified',
@@ -1250,8 +1259,8 @@ export const translations = {
     error_audit_timeout: 'The scan is taking longer than expected (large sites can take minutes). It continues in the background — we\'ll email you the result when it\'s ready.',
     error_query_failed: 'Query failed',
     error_query_timeout: 'The query is taking longer than expected. It continues in the background — we\'ll email you the result when it\'s ready.',
-    error_request_failed: 'Request failed',
-    error_connection: 'Connection error',
+    error_request_failed: "We couldn't complete this. Check your connection and try again — email mail@geoni.ai if it keeps happening.",
+    error_connection: "Couldn't connect. Check your internet and try again.",
 
     // ── Admin panel ──
     admin_denied_text: "You don't have access to this page.",

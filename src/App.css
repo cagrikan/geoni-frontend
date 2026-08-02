@@ -556,6 +556,17 @@ body {
   animation: results-sov-spin .8s linear infinite;
 }
 @keyframes results-sov-spin { to { transform: rotate(360deg); } }
+/* Hareket duyarliligi: bu spinner uc `prefers-reduced-motion` blogunun
+   hicbirinde degildi ve SOV beklenirken ~60-70 sn KESINTISIZ doner — sayfadaki
+   en uzun sureli hareket oydu. Donme durur, bekleme gostergesi kaybolmasin
+   diye yerine nabiz gibi bir opaklik gecisi konur. */
+@media (prefers-reduced-motion: reduce) {
+  .results__sov-pending-spinner {
+    animation: results-sov-fade 1.6s ease-in-out infinite;
+    border-top-color: var(--accent);
+  }
+}
+@keyframes results-sov-fade { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
 
 /* Score gauge */
 .score-gauge {
@@ -583,6 +594,16 @@ body {
   text-transform: uppercase;
   color: var(--text-muted);
   margin-top: 6px;
+}
+/* Skor esik cipasi: sayidan sonra gelir, dikkati calmadan okunur kalmali —
+   skorun kendisi hala kahraman, bu yalnizca olcegi veriyor. */
+.score-gauge__legend {
+  font-size: .75rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+  margin-top: 10px;
+  max-width: 260px;
+  text-align: center;
 }
 
 /* Breakdown */
@@ -3025,7 +3046,10 @@ body {
 .sov__sub { font-size: .8125rem; color: var(--text-muted); margin: 6px 0 14px; line-height: 1.5; }
 .sov__queries { display: flex; flex-direction: column; gap: 8px; }
 .sov__query {
-  display: flex; align-items: center; gap: 10px;
+  /* flex-wrap SART: rozet `white-space: nowrap` ve dar ekranda (375px) sorgu
+     metni + "Öneriliyor/Önerilmiyor" rozeti satira sigmiyor -> tasma. Sarma
+     acikken rozet alt satira duser, yatay kaydirma olusmaz. */
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
   padding: 10px 12px;
   background: var(--bg);
   border: 1px solid var(--border);

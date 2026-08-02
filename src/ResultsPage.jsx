@@ -15,7 +15,7 @@ function scoreColor(score) {
   return 'var(--bad)'
 }
 
-function ScoreGauge({ score, label }) {
+function ScoreGauge({ score, label, legend }) {
   const radius = 64
   const circumference = 2 * Math.PI * radius
   const offset = circumference - (score / 100) * circumference
@@ -31,26 +31,38 @@ function ScoreGauge({ score, label }) {
       </svg>
       <div className="score-gauge__num" style={{ color }}>{score}</div>
       <div className="score-gauge__label">{label}</div>
+      {/* Skorun CIPASI: "61" tek basina iyi mi kotu mu soylemiyordu. Esikler
+          yalnizca RENK olarak kodluydu (scoreColor); tek metinsel esik ise
+          70+ skorda gorunen rozet ipucuydu — yani esige en cok ihtiyaci olan
+          dusuk skorlu kullanici onu HIC gormuyordu. Sayilar scoreColor ile
+          birebir ayni tutulmali. */}
+      {legend && <div className="score-gauge__legend">{legend}</div>}
     </div>
   )
 }
 
+/* Etiketler INSAN dilinde: "Şema Bütünlüğü"/"Otorite"/"Dizin Kapsamı" ne
+   olculdugunu teknik olmayan kullaniciya anlatmiyordu. Urun bu jargondan
+   FIX ONERILERINDE zaten kacinmisti (fix_schema_title: "Sitenizin AI
+   Tarafından Doğru Anlaşılması") — ayni kelimeyi iki satir yukarida jargon
+   olarak birakmak tutarsizdi (2026-08-02 kullanici-dostlugu denetimi).
+   Bu etiketler mailer.py ve mobil lib/i18n ile AYNI kalmali. */
 const BREAKDOWN_LABELS_TR = {
-  index_coverage: 'Dizin Kapsamı',
-  authority: 'Otorite',
-  freshness: 'Tazelik',
-  schema: 'Şema Bütünlüğü',
-  ai_access: 'AI Erişimi',
+  index_coverage: "AI'ın Görebildiği Sayfalar",
+  authority: 'Güvenilirlik Sinyali',
+  freshness: 'İçerik Güncelliği',
+  schema: "Sitenin AI'a Doğru Anlatılması",
+  ai_access: 'AI Botlarının Erişimi',
   engagement: 'Etkileşim',
   brand_recall: 'Marka Bilinirliği',
 }
 
 const BREAKDOWN_LABELS_EN = {
-  index_coverage: 'Index Coverage',
-  authority: 'Authority',
-  freshness: 'Freshness',
-  schema: 'Schema Integrity',
-  ai_access: 'AI Access',
+  index_coverage: 'Pages AI Can Actually See',
+  authority: 'Trust Signal',
+  freshness: 'Content Freshness',
+  schema: 'Correct Site Understanding by AI',
+  ai_access: 'AI Bot Access',
   engagement: 'Engagement',
   brand_recall: 'Brand Recall',
 }
@@ -123,7 +135,10 @@ function FixSuggestions({ result, t, onUpgrade }) {
     fixes.push({
       key: 'ssr',
       title: t('ssr_title'),
-      why: `${t('ssr_hidden_prefix')} %${result.ssr.hidden_pct} ${t('ssr_hidden_suffix')}`,
+      // ?? 0: backend bugun bu alani HER ZAMAN dolduruyor (ssr_check.py:117),
+      // ama komsu dallar da (schema/entity) ayni sigortayi tasiyor — alan
+      // ileride opsiyonel olursa kullaniciya "%undefined" gostermeyelim.
+      why: `${t('ssr_hidden_prefix')} %${result.ssr.hidden_pct ?? 0} ${t('ssr_hidden_suffix')}`,
     })
   }
   /* Eksik SAYFA TIPI (golge mod olcumu): "sema ekle" gibi genel oneri yerine
@@ -133,7 +148,7 @@ function FixSuggestions({ result, t, onUpgrade }) {
     fixes.push({
       key: 'pagetype',
       title: t('pagetype_title'),
-      why: `${t('pagetype_why_prefix')} %${Math.round((tipEksik.ai_orani || 0) * 100)} ${t('pagetype_why_mid')} ${tipEksik.bizdeki_sayfa} ${t('pagetype_why_suffix')}`,
+      why: `${t('pagetype_why_prefix')} %${Math.round((tipEksik.ai_orani || 0) * 100)} ${t('pagetype_why_mid')} ${tipEksik.bizdeki_sayfa ?? 0} ${t('pagetype_why_suffix')}`,
     })
   }
   if (result.sov?.checked && (result.sov.score ?? 100) < 50) {
@@ -236,7 +251,7 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
         {/* Skor + Breakdown (breakdown blur) */}
         <div className="results__top">
           <div className="results__gauge-col">
-            <ScoreGauge score={score} label={t('results_score_label')} />
+            <ScoreGauge score={score} label={t('results_score_label')} legend={t('results_score_legend')} />
             <StabilityNote
               stability={result.stability}
               driverLabel={(language === 'en' ? BREAKDOWN_LABELS_EN : BREAKDOWN_LABELS_TR)[result.stability?.driver]}
@@ -282,7 +297,12 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
             <span className="results__stat-n" style={{ color: result.llms_txt == null ? 'var(--text-muted)' : result.llms_txt ? 'var(--good)' : 'var(--bad)' }}>
               {result.llms_txt == null ? '—' : result.llms_txt ? t('results_yes') : t('results_no')}
             </span>
-            <span className="results__stat-l">llms.txt</span>
+            {/* Eskiden ham dosya adi ("llms.txt") yaziyordu: komsu uc kart
+                "... Bot Izni" diye anlasilir bir cerceve kurarken bu kart teknik
+                bir dosya adiydi. Terim urunun HICBIR yerinde tanimli degil
+                (2026-08-02 kullanici-dostlugu denetimi). Ne oldugu yaziliyor,
+                dosya adi parantezde teknik ipucu olarak kaliyor. */}
+            <span className="results__stat-l">{t('results_site_llms_access')}</span>
           </div>
         </div>
 

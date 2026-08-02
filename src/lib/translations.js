@@ -177,6 +177,21 @@ export const translations = {
     sov_own_not_cited: 'Siteniz bu yanıtların hiçbirinde kaynak gösterilmedi — aşağıdaki sitelerde yer almak AI yanıtlarına girmenin en kısa yoludur.',
     sov_gap_title: 'Atıf fırsatı — rakiplerini anlatan ama seni anmayan kaynaklar:',
     sov_gap_sub: 'AI bu sitelerde rakiplerini görüyor, seni değil. Buralarda yer almak görünürlüğe en hızlı yol.',
+    /* Google AI Overview (2026-08-02) — Google aramanin ustundeki yapay zeka
+       kutusu. SOV'dan AYRI bir yuzey: musteri bunu 10 saniyede kendi gozuyle
+       dogrulayabilir, o yuzden satis degeri yuksek. */
+    aio_title: 'Google AI Özeti',
+    aio_summary_suffix: 'sorguda geçtin',
+    aio_subtitle: 'Google aramanın en üstündeki yapay zekâ kutusunda adın geçiyor mu?',
+    aio_present_prefix: 'Kutu',
+    aio_present_suffix: 'sorguda çıktı.',
+    aio_detail_label: 'AI Özeti detayları',
+    aio_no_box: 'kutu yok',
+    aio_sources_title: 'Google’ın AI özetini kurarken okuduğu kaynaklar:',
+    aio_own_cited_prefix: 'Siten',
+    aio_own_cited_suffix: 'özette kaynak gösterildi.',
+    aio_own_not_cited: 'Bu kaynakların hiçbirinde siten geçmiyor — kutuya girmenin yolu buradan geçiyor.',
+    aio_failed_note: 'sorgu ölçülemedi (sağlayıcı hatası). Bu “kutu yok” demek değildir; paydaya katılmadı.',
     brand_cached_note: 'Bu, yakın zamanda yaptığın taramanın sonucu (skorun tutarlı kalması için). Değişiklik yaptıysan yeniden ölçebilirsin.',
     res_shadow_engine: 'deneysel · skora katılmıyor',
 
@@ -909,6 +924,19 @@ export const translations = {
     sov_own_not_cited: 'Your site was not cited in any of these answers — getting listed on the sites below is the shortest path into AI answers.',
     sov_gap_title: 'Citation opportunity — sources that cite your competitors but not you:',
     sov_gap_sub: 'AI sees your competitors on these sites, not you. Getting listed here is the fastest path to visibility.',
+    /* Google AI Overview (2026-08-02) — see TR block for the why. */
+    aio_title: 'Google AI Overview',
+    aio_summary_suffix: 'queries mention you',
+    aio_subtitle: 'Does your name appear in the AI box at the top of Google Search?',
+    aio_present_prefix: 'The box appeared in',
+    aio_present_suffix: 'queries.',
+    aio_detail_label: 'AI Overview details',
+    aio_no_box: 'no box',
+    aio_sources_title: 'Sources Google read to build the AI overview:',
+    aio_own_cited_prefix: 'Your site was cited in',
+    aio_own_cited_suffix: 'overviews.',
+    aio_own_not_cited: 'Your site appears in none of these sources — that is the path into the box.',
+    aio_failed_note: 'queries could not be measured (provider error). That is not “no box”; they were excluded from the denominator.',
     brand_cached_note: 'This is your recent scan result (so your score stays consistent). If you made changes, you can re-measure.',
     res_shadow_engine: 'experimental · not counted',
 

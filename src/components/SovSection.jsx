@@ -1,5 +1,6 @@
 import { Radar, CheckCircle2, XCircle } from 'lucide-react'
 import ProBlur from '../ProBlur'
+import AiOverviewSection from './AiOverviewSection'
 
 /* Motor anahtari -> gosterim adi. claude/chatgpt eksikti: uretimde bu iki motor
    da SOV sorgusu yanitliyor (dogrulandi 2026-07-30, son 10 gun) ve etiketsiz
@@ -36,7 +37,8 @@ export default function SovSection({ sov, t, isPro = false, pending = false }) {
   const color = sov.score >= 65 ? 'var(--good)' : sov.score >= 40 ? 'var(--warn)' : 'var(--bad)'
 
   return (
-    <div className="sov">
+    <>
+      <div className="sov">
       <div className="sov__head">
         <h3 className="sov__title"><Radar size={15} strokeWidth={1.5} /> {t('sov_title')}</h3>
         <span className="sov__summary" style={{ color }}>
@@ -135,6 +137,10 @@ export default function SovSection({ sov, t, isPro = false, pending = false }) {
           </div>
         )}
       </ProBlur>
-    </div>
+      </div>
+      {/* Google AI Overview: ayri kart, ayni kart dili. sov.ai_overview yoksa
+          (DATAFORSEO kimligi tanimsiz) bilesen null doner — bolum cizilmez. */}
+      <AiOverviewSection aio={sov.ai_overview} t={t} isPro={isPro} />
+    </>
   )
 }

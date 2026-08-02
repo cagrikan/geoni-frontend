@@ -3624,3 +3624,20 @@ button.fixes__item { width: 100%; text-align: left; }
 
 .dash-promo__msg--err { color: #f85149; }
 .dash-promo__msg--ok  { color: #3fb950; }
+
+/* Google AI Overview bolumu (2026-08-02). Mevcut .sov__* kart dili yeniden
+   kullaniliyor; yalniz bu iki sinif yeni. */
+.aio__excerpt {
+  display: block;
+  margin-top: 3px;
+  font-size: .82rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  /* Kutu metni uzun olabiliyor: sorgu satirini tasirmasin, yatay kaydirma yaratmasin. */
+  overflow-wrap: anywhere;
+}
+.aio__note {
+  margin: 10px 0 0;
+  font-size: .8rem;
+  color: var(--text-muted);
+}

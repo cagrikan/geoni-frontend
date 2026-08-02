@@ -3641,3 +3641,20 @@ button.fixes__item { width: 100%; text-align: left; }
   font-size: .8rem;
   color: var(--text-muted);
 }
+
+/* Oneri sirasi rozeti (2026-08-02). Backend `_extract_position` zaten
+   olcuyordu; "anildin" ile "1. siradasin" bambaska bilgi. */
+.sov__pos {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 99px;
+  font-size: .72rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.sov__pos--top { background: var(--good-soft); color: var(--good); }
+.sov__pos--mid { background: var(--warn-soft); color: var(--warn); }
+.sov__pos--low { background: var(--bad-soft);  color: var(--bad);  }

@@ -61,6 +61,18 @@ export default function SovSection({ sov, t, isPro = false, pending = false }) {
                     {t('sov_adjacent_tag')}{q.adjacent_topic ? `: ${q.adjacent_topic}` : ''}
                   </span>
                 )}
+                {/* ONERI SIRASI (2026-08-02): backend `_extract_position` ile
+                    ZATEN cikariyordu (sov.py:201) ama arayuz hic gostermiyordu.
+                    "Anildin" ile "1. siradasin" bambaska bilgi: donusumde
+                    1. sira ile 8. sira arasinda ucurum var. Yalniz marka
+                    ANILDIYSA ve pozisyon GERCEKTEN cikarildiysa gosterilir —
+                    backend bulamazsa None birakiyor, uydurmuyoruz. */}
+                {q.mentioned && typeof q.position === 'number' && (
+                  <span className={`sov__pos ${q.position <= 2 ? 'sov__pos--top'
+                                    : q.position <= 5 ? 'sov__pos--mid' : 'sov__pos--low'}`}>
+                    {t('sov_position_prefix')}{q.position}{t('sov_position_suffix')}
+                  </span>
+                )}
               </span>
               {q.engines ? (
                 /* Motor bazinda sonuc: Perplexity + Google AI (Overviews esdegeri) */

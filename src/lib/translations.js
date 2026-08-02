@@ -195,6 +195,10 @@ export const translations = {
     /* SSR korlugu + eksik sayfa tipi (2026-08-02). SSR skora GIRIYOR
        (ai_access kesintisi) — musteri sebebini gorebilsin diye oneri listesinde.
        Sayfa tipi GOLGE MOD olcumunden gelir. */
+    /* Oneri sirasi. TR sira eki alir ("1. sırada"), EN almaz ("#1") —
+       Ingilizce'de tek bir ek dogru olmaz: 1st/2nd/3rd/4th. */
+    sov_position_prefix: '',
+    sov_position_suffix: '. sırada',
     ssr_title: 'AI botları sayfanı göremiyor',
     ssr_hidden_prefix: 'İçeriğin yaklaşık',
     ssr_hidden_suffix: 'kadarı JavaScript sonrası oluşuyor — AI botları JavaScript çalıştırmaz.',
@@ -949,6 +953,8 @@ export const translations = {
     aio_failed_note: 'queries could not be measured (provider error). That is not “no box”; they were excluded from the denominator.',
     /* SSR blindness + missing page type (2026-08-02). SSR affects the score
        (ai_access deduction) — surfaced so the customer can see WHY. */
+    sov_position_prefix: '#',
+    sov_position_suffix: '',
     ssr_title: 'AI crawlers cannot see your pages',
     ssr_hidden_prefix: 'Roughly',
     ssr_hidden_suffix: 'of your content is built after JavaScript runs — AI crawlers do not execute JavaScript.',

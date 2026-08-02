@@ -192,6 +192,16 @@ export const translations = {
     aio_own_cited_suffix: 'özette kaynak gösterildi.',
     aio_own_not_cited: 'Bu kaynakların hiçbirinde siten geçmiyor — kutuya girmenin yolu buradan geçiyor.',
     aio_failed_note: 'sorgu ölçülemedi (sağlayıcı hatası). Bu “kutu yok” demek değildir; paydaya katılmadı.',
+    /* SSR korlugu + eksik sayfa tipi (2026-08-02). SSR skora GIRIYOR
+       (ai_access kesintisi) — musteri sebebini gorebilsin diye oneri listesinde.
+       Sayfa tipi GOLGE MOD olcumunden gelir. */
+    ssr_title: 'AI botları sayfanı göremiyor',
+    ssr_hidden_prefix: 'İçeriğin yaklaşık',
+    ssr_hidden_suffix: 'kadarı JavaScript sonrası oluşuyor — AI botları JavaScript çalıştırmaz.',
+    pagetype_title: 'Yanlış sayfa tipinde içerik üretiyorsun',
+    pagetype_why_prefix: 'AI bu kategoride atıflarının',
+    pagetype_why_mid: 'kadarını karşılaştırma/liste sayfalarından alıyor; sende',
+    pagetype_why_suffix: 'sayfa var.',
     brand_cached_note: 'Bu, yakın zamanda yaptığın taramanın sonucu (skorun tutarlı kalması için). Değişiklik yaptıysan yeniden ölçebilirsin.',
     res_shadow_engine: 'deneysel · skora katılmıyor',
 
@@ -937,6 +947,15 @@ export const translations = {
     aio_own_cited_suffix: 'overviews.',
     aio_own_not_cited: 'Your site appears in none of these sources — that is the path into the box.',
     aio_failed_note: 'queries could not be measured (provider error). That is not “no box”; they were excluded from the denominator.',
+    /* SSR blindness + missing page type (2026-08-02). SSR affects the score
+       (ai_access deduction) — surfaced so the customer can see WHY. */
+    ssr_title: 'AI crawlers cannot see your pages',
+    ssr_hidden_prefix: 'Roughly',
+    ssr_hidden_suffix: 'of your content is built after JavaScript runs — AI crawlers do not execute JavaScript.',
+    pagetype_title: 'Your content is in the wrong page format',
+    pagetype_why_prefix: 'In this category AI takes',
+    pagetype_why_mid: 'of its citations from comparison/list pages; you have',
+    pagetype_why_suffix: 'such pages.',
     brand_cached_note: 'This is your recent scan result (so your score stays consistent). If you made changes, you can re-measure.',
     res_shadow_engine: 'experimental · not counted',
 

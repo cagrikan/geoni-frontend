@@ -116,6 +116,26 @@ function FixSuggestions({ result, t, onUpgrade }) {
   if ((score_breakdown.brand_recall ?? 100) < 40) {
     fixes.push({ key: 'entity', title: t('fix_entity_title'), why: `${t('fix_entity_why')} ${score_breakdown.brand_recall}/100` })
   }
+  /* SSR korlugu: skoru ZATEN dusuruyor (ai_access kesintisi) ama musteri
+     SEBEBINI goremiyordu — "puanim neden dustu" sorusu cevapsiz kaliyordu.
+     Oneri listesinin EN USTUNE degil, teknik sirasina konur. */
+  if (result.ssr?.js_dependent) {
+    fixes.push({
+      key: 'ssr',
+      title: t('ssr_title'),
+      why: `${t('ssr_hidden_prefix')} %${result.ssr.hidden_pct} ${t('ssr_hidden_suffix')}`,
+    })
+  }
+  /* Eksik SAYFA TIPI (golge mod olcumu): "sema ekle" gibi genel oneri yerine
+     "AI %53 karsilastirma listesi aliniyor, sende 1 sayfa var" der. */
+  const tipEksik = (result.page_type_gap?.eksik_tipler || [])[0]
+  if (tipEksik) {
+    fixes.push({
+      key: 'pagetype',
+      title: t('pagetype_title'),
+      why: `${t('pagetype_why_prefix')} %${Math.round((tipEksik.ai_orani || 0) * 100)} ${t('pagetype_why_mid')} ${tipEksik.bizdeki_sayfa} ${t('pagetype_why_suffix')}`,
+    })
+  }
   if (result.sov?.checked && (result.sov.score ?? 100) < 50) {
     fixes.push({ key: 'sov', title: t('fix_sov_title'), why: `${t('fix_sov_why')} ${result.sov.mention_count}/${result.sov.query_count}` })
   }

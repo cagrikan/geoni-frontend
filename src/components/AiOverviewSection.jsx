@@ -1,4 +1,4 @@
-import { Sparkles, CheckCircle2, XCircle, MinusCircle } from 'lucide-react'
+import { CheckCircle2, XCircle, MinusCircle } from 'lucide-react'
 import ProBlur from '../ProBlur'
 
 /* Google AI Overview (2026-08-02).
@@ -13,6 +13,28 @@ import ProBlur from '../ProBlur'
 
    Skora KATILMAZ (WEIGHTS'e dokunulmadi) — bilincli, once veri birikecek.
    Alan yoksa (DATAFORSEO kimligi tanimli degil) bolum hic cizilmez. */
+
+/* Google AI Ozeti'nin kendi gorsel dili: dort uclu "spark". Google'in AI
+   Overview / Gemini isaretini kullanicilar bu SEKILDEN taniyor, o yuzden
+   lucide'in uc-yildizli <Sparkles> ikonu yerine tek dort-uclu spark cizildi.
+
+   NEDEN GOOGLE'IN LOGOSU DEGIL: Google'in gradyanli marka isaretini urunumuze
+   koymak ticari marka riskidir ve "Google ile resmi baglantimiz var" izlenimi
+   verir. Dort-uclu spark ise sektorde AI'in genel isareti — taninirligi verir,
+   marka taklidi yapmaz.
+
+   currentColor kullanir -> acik/koyu temada baslik rengiyle uyumlu kalir. */
+function AiSparkIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"
+         style={{ flex: '0 0 auto' }}>
+      <path d="M12 2.5c.35 3.9 1.7 6.3 3.6 7.6 1.2.8 2.7 1.3 4.4 1.6 .35.06.35.54 0 .6-1.7.3-3.2.8-4.4 1.6-1.9 1.3-3.25 3.7-3.6 7.6-.03.36-.57.36-.6 0-.35-3.9-1.7-6.3-3.6-7.6-1.2-.8-2.7-1.3-4.4-1.6-.35-.06-.35-.54 0-.6 1.7-.3 3.2-.8 4.4-1.6C9.7 8.8 11.05 6.4 11.4 2.5c.03-.36.57-.36.6 0Z"
+            fill="currentColor" opacity="0.9" />
+      <path d="M19.2 3.2c.14 1.5.66 2.42 1.4 2.92.46.31 1.04.5 1.7.62.13.02.13.2 0 .23-.66.12-1.24.31-1.7.62-.73.5-1.26 1.42-1.4 2.92-.01.14-.22.14-.23 0-.14-1.5-.66-2.42-1.4-2.92-.46-.31-1.04-.5-1.7-.62-.13-.03-.13-.21 0-.23.66-.12 1.24-.31 1.7-.62.74-.5 1.26-1.42 1.4-2.92.01-.14.22-.14.23 0Z"
+            fill="currentColor" opacity="0.55" />
+    </svg>
+  )
+}
 
 /* Mevcut sov__* siniflari yeniden kullaniliyor: ayni kart dili, sifir yeni CSS
    riski. Yalniz iki yeni sinif var (aio__excerpt, aio__note) — App.css'te. */
@@ -35,7 +57,7 @@ export default function AiOverviewSection({ aio, t, isPro = false }) {
     <div className="sov">
       <div className="sov__head">
         <h3 className="sov__title">
-          <Sparkles size={15} strokeWidth={1.5} /> {t('aio_title')}
+          <AiSparkIcon /> {t('aio_title')}
         </h3>
         <span className="sov__summary" style={{ color }}>
           {hits}/{shown} {t('aio_summary_suffix')}

@@ -32,7 +32,15 @@ export default function SovSection({ sov, t, isPro = false, pending = false }) {
     )
   }
 
-  if (!sov || !sov.checked || sov.score === null || sov.score === undefined) return null
+  /* SOV olculemediyse SOV karti cizilmez — ama AI OZETI ayri bir olcumdur ve
+     ayri para yakar (DataForSEO). Ikisini ayni kapiya baglamak, SOV motorlari
+     cevap vermediginde musterinin ODEDIGI AI Ozeti olcumunu de sessizce
+     gizliyordu (sov.py: answered_cells==0 -> checked=False ama queries DOLU
+     kalir ve brand_recall o queries'ten AI Ozeti uretebilir). Olculmus veri
+     saklanmaz. */
+  if (!sov || !sov.checked || sov.score === null || sov.score === undefined) {
+    return <AiOverviewSection aio={sov?.ai_overview} t={t} isPro={isPro} />
+  }
 
   const color = sov.score >= 65 ? 'var(--good)' : sov.score >= 40 ? 'var(--warn)' : 'var(--bad)'
 

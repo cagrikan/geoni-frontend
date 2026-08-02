@@ -89,12 +89,20 @@ export default function AiOverviewSection({ aio, t, isPro = false }) {
                 <span className="sov__query-text">
                   {q.query}
                   {q.present && q.text && (
-                    <span className="aio__excerpt">{q.text.slice(0, 190)}…</span>
+                    /* "…" yalnizca GERCEKTEN kesildiginde: kisa alinti da
+                       kirpilmis gibi gorunuyordu, kullanici eksik metin
+                       okudugunu saniyordu. */
+                    <span className="aio__excerpt">
+                      {q.text.length > 190 ? `${q.text.slice(0, 190)}…` : q.text}
+                    </span>
                   )}
                 </span>
                 <span className={`sov__query-tag ${tagCls}`}>
+                  {/* SOV'un etiketleri ODUNC ALINMAZ: ayni sayfada "Öneriliyor"
+                      iki farkli olcumu anlatiyordu (SOV = sohbet motoru seni
+                      onerdi mi, AIO = Google kutusunda adin gecti mi). */}
                   {!q.present ? t('aio_no_box')
-                    : q.brand_mentioned ? t('sov_mentioned') : t('sov_not_mentioned')}
+                    : q.brand_mentioned ? t('aio_in_box') : t('aio_not_in_box')}
                 </span>
               </div>
             )
@@ -106,7 +114,8 @@ export default function AiOverviewSection({ aio, t, isPro = false }) {
             <span className="sov__competitors-label">{t('aio_sources_title')}</span>
             {aio.own_domain_cited_count > 0 ? (
               <p className="sov__own-cited sov__own-cited--yes">
-                ✓ {t('aio_own_cited_prefix')} {aio.own_domain_cited_count} {t('aio_own_cited_suffix')}
+                ✓ {t('aio_own_cited_prefix')} {aio.own_domain_cited_count}{' '}
+                {aio.own_domain_cited_count === 1 ? t('aio_own_cited_suffix_one') : t('aio_own_cited_suffix')}
               </p>
             ) : (
               <p className="sov__own-cited">{t('aio_own_not_cited')}</p>

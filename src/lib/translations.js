@@ -197,6 +197,14 @@ export const translations = {
     aio_sources_title: 'Google’ın AI özetini kurarken okuduğu kaynaklar:',
     aio_own_cited_prefix: 'Siten',
     aio_own_cited_suffix: 'özette kaynak gösterildi.',
+    // Turkce'de sayidan sonra cogul eki gelmez -> tekil/cogul AYNI metin.
+    // Anahtar yine de var: TR/EN simetrisi bozulmasin, istemci tek kod yolu kullansin.
+    aio_own_cited_suffix_one: 'özette kaynak gösterildi.',
+    // AIO KENDI etiketini kullanir: SOV'un "Öneriliyor"unu odunc almak AYNI
+    // SAYFADA ayni kelimeyi iki FARKLI olcume yapistiriyordu. SOV = "sohbet
+    // motoru seni onerdi mi", AIO = "Google'in kutusunda adin gecti mi".
+    aio_in_box: 'Kutuda geçiyor',
+    aio_not_in_box: 'Kutuda yok',
     aio_own_not_cited: 'Bu kaynakların hiçbirinde siten geçmiyor — kutuya girmenin yolu buradan geçiyor.',
     aio_failed_note: 'sorgu ölçülemedi (sağlayıcı hatası). Bu “kutu yok” demek değildir; paydaya katılmadı.',
     /* SSR korlugu + eksik sayfa tipi (2026-08-02). SSR skora GIRIYOR
@@ -957,7 +965,11 @@ export const translations = {
     aio_no_box: 'no box',
     aio_sources_title: 'Sources Google read to build the AI overview:',
     aio_own_cited_prefix: 'Your site was cited in',
+    // Tekil/cogul: sayac 1 iken "1 overviews" yaziyordu.
     aio_own_cited_suffix: 'overviews.',
+    aio_own_cited_suffix_one: 'overview.',
+    aio_in_box: 'In the box',
+    aio_not_in_box: 'Not in the box',
     aio_own_not_cited: 'Your site appears in none of these sources — that is the path into the box.',
     aio_failed_note: 'queries could not be measured (provider error). That is not “no box”; they were excluded from the denominator.',
     /* SSR blindness + missing page type (2026-08-02). SSR affects the score

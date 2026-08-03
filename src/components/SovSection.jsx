@@ -1,6 +1,7 @@
 import { Radar, CheckCircle2, XCircle } from 'lucide-react'
 import ProBlur from '../ProBlur'
 import AiOverviewSection from './AiOverviewSection'
+import GrokShadowNote from './GrokShadowNote'
 
 /* Motor anahtari -> gosterim adi. claude/chatgpt eksikti: uretimde bu iki motor
    da SOV sorgusu yanitliyor (dogrulandi 2026-07-30, son 10 gun) ve etiketsiz
@@ -161,6 +162,9 @@ export default function SovSection({ sov, t, isPro = false, pending = false }) {
       {/* Google AI Overview: ayri kart, ayni kart dili. sov.ai_overview yoksa
           (DATAFORSEO kimligi tanimsiz) bilesen null doner — bolum cizilmez. */}
       <AiOverviewSection aio={sov.ai_overview} t={t} isPro={isPro} />
+      {/* Grok golge notu: skora girmez, etiketle isaretli. Alan cogu
+          taramada yok (gunluk tavan) -> bilesen null doner. */}
+      <GrokShadowNote gw={sov.grok_web_shadow} t={t} />
     </>
   )
 }

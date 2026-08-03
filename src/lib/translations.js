@@ -231,6 +231,11 @@ export const translations = {
     cit_why_mid: 'sayfanda bu uzunlukta bölüm neredeyse hiç yok; ortanca paragraf',
     cit_why_suffix: 'kelime.',
     cit_tag: 'deneysel · skora katılmıyor',
+    // Grok gölge motoru — bilgi notu, skora GİRMEZ.
+    grok_title: 'Grok (X araması dahil)',
+    grok_subtitle: 'xAI\'ın Grok motoru aynı soruları X (Twitter) aramasıyla birlikte yanıtladı. Bu ölçüm deneyseldir ve puanınıza dahil edilmez; diğer motorların göremediği kaynakları göstermek için buradadır.',
+    grok_unique_title: 'YALNIZCA GROK\'UN BULDUĞU KAYNAKLAR',
+    grok_unique_desc: 'Bu siteler diğer dört motorun yanıtlarında geçmedi — çoğu X üzerinden geliyor.',
     // Kirilimin kalan dort boyutu. Metinler boyutun GERCEKTE olctugu seyi
     // anlatir (scoring.py docstring'lerinden), genel tavsiye degil.
     fix_index_title: 'AI, sayfalarının çoğunu göremiyor',
@@ -1009,6 +1014,10 @@ export const translations = {
     cit_why_mid: 'pages we scanned there is almost none of that length; the median paragraph is',
     cit_why_suffix: 'words.',
     cit_tag: 'experimental · not in score',
+    grok_title: 'Grok (includes X search)',
+    grok_subtitle: 'xAI\'s Grok answered the same questions with X (Twitter) search enabled. This measurement is experimental and is not part of your score; it is here to surface sources the other engines did not see.',
+    grok_unique_title: 'SOURCES ONLY GROK FOUND',
+    grok_unique_desc: 'These sites did not appear in the other four engines\' answers — most come via X.',
     fix_index_title: 'AI cannot see most of your pages',
     fix_index_why_prefix: 'Only',
     fix_index_why_suffix: 'of the pages we crawled are in search engine indexes. A page that is not indexed cannot be cited.',

@@ -46,6 +46,7 @@ async function apiErrorFrom(res, fallback) {
   } catch { /* gövde JSON değil */ }
   const e = new Error(message)
   e.code = code
+  e.status = res.status   // 401 (login duvari) ayirt edilebilsin
   return e
 }
 
@@ -102,6 +103,20 @@ function captureScanDomain() {
     const d = params.get('scan_domain')
     if (d) localStorage.setItem('geoni_pending_scan', JSON.stringify({ type: 'site', domain: d }))
   } catch { /* ignore */ }
+}
+
+/* 2026-08-03: anonim tarama kapatildi (kurucu karari) — API 401 doner.
+   Kullaniciyi bos bir hata mesajiyla birakmak yerine FORMU SAKLAYIP login'e
+   gonderiyoruz; giris tamamlaninca yukaridaki useEffect taramayi otomatik
+   baslatiyor. Bu kalip zaten kisi/marka tarafinda vardi (geoni_pending_scan),
+   simdi site ve sosyal de ayni yoldan geciyor — kullanici formu bastan
+   doldurmuyor (bkz. form-kaybi geri bildirimi). */
+function loginDuvari(err, payload, setView) {
+  if (err?.status !== 401) return false
+  try { localStorage.setItem('geoni_pending_scan', JSON.stringify(payload)) } catch { /* kota dolu */ }
+  window.history.pushState({}, '', '/login')
+  setView('login')
+  return true
 }
 
 const SAMPLE_RESULT_BY_LANG = {
@@ -195,6 +210,12 @@ function AppInner() {
       if (payload?.type === 'site' && payload.domain) {
         // Site taramasi: geoni.ai widget'i ya da login duvarindan gelen form
         handleAudit(payload.domain, payload.email, !!payload.private)
+      } else if (payload?.type === 'social' && payload.handle) {
+        // Sosyal: login duvarindan donen form. handleSocialCheck NESNE alir
+        // ({handle, niche, email}) — pozisyonel cagrilirsa niche/email sessizce
+        // kaybolur ve kullanici formu bastan doldurur (tam da onlemeye
+        // calistigimiz kusur).
+        handleSocialCheck({ handle: payload.handle, niche: payload.niche, email: payload.email })
       } else if (payload && payload.name) {
         handleBrandCheck(payload)
       }
@@ -345,7 +366,11 @@ function AppInner() {
         headers: { 'Content-Type': 'application/json', ...langHeaders(), ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
         body: JSON.stringify({ domain, email: email || user?.email || 'anonymous@geoni.ai', competitors: [], lang: language, private: isPrivate, custom_queries: customQueries, turnstile_token: turnstileToken }),
       })
-      if (!res.ok) throw await apiErrorFrom(res, t('error_request_failed'))
+      if (!res.ok) {
+        const hata = await apiErrorFrom(res, t('error_request_failed'))
+        if (loginDuvari(hata, { type: 'site', domain, email, private: isPrivate }, setView)) return
+        throw hata
+      }
       const jobId = (await res.json()).job_id
       let es
       try {
@@ -433,7 +458,11 @@ function AppInner() {
         headers: { 'Content-Type': 'application/json', ...langHeaders() },
         body: JSON.stringify({ handle, niche, email, lang: language, turnstile_token }),
       })
-      if (!res.ok) throw await apiErrorFrom(res, t('error_request_failed'))
+      if (!res.ok) {
+        const hata = await apiErrorFrom(res, t('error_request_failed'))
+        if (loginDuvari(hata, { type: 'social', handle, niche, email }, setView)) return
+        throw hata
+      }
       const data = await res.json()
       let es
       try {

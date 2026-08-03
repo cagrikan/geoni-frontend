@@ -206,11 +206,14 @@ function BuyCreditsSection({ t }) {
           yazmiyordu; kullanici ancak harcadiktan SONRA islem gecmisinden
           goruyordu (UI/UX denetimi 2026-07-30). Sayilar SUNUCUDAN geliyor
           (/api/scan-costs): metne yazilmis hali hem surukleniyordu hem de
-          YANLISTI — "sosyal tarama 10 token" diyordu, oysa sosyal tarama hic
-          ucretlendirilmiyor (uretim: 55 sosyal taramanin 0'i ucretli). */}
+          YANLISTI — "sosyal tarama 10 token" diyordu, oysa o gun sosyal tarama
+          hic ucretlendirilmiyordu. 2026-08-03: sosyal artik 10 token (yari
+          fiyat) ve metin "ucretsiz" diye SABIT yaziyordu — ayni hata bicimi
+          ikinci kez. Artik uc deger de sunucudan geliyor, hicbiri metne
+          gomulu degil. */}
       {costs && (
         <div className="dash-buy-credits__rates">
-          {t('dash_credits_rates', { web: costs.web, brand: costs.brand })}
+          {t('dash_credits_rates', { web: costs.web, brand: costs.brand, social: costs.social })}
         </div>
       )}
       <div className="dash-buy-credits__grid">

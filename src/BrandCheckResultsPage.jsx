@@ -253,8 +253,11 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
             <span className="results__stat-l">{t('results_brand_recognizing_models')}</span>
           </div>
           <div className="results__stat">
-            <span className="results__stat-n">{google_result_count}</span>
-            <span className="results__stat-l">{t('results_brand_web_results')}</span>
+            <span className="results__stat-n" style={{ color: model_results?.openai?.recognized ? 'var(--good)' : 'var(--bad)' }}>
+              {model_results?.openai?.recognized ? t('results_yes') : t('results_no')}
+            </span>
+            <span className="results__stat-l">{t('results_brand_chatgpt_recognizes')}</span>
+            <SentimentTag sentiment={model_results?.openai?.sentiment} hallucination={model_results?.openai?.hallucination} t={t} />
           </div>
           <div className="results__stat">
             <span className="results__stat-n" style={{ color: model_results?.claude?.recognized ? 'var(--good)' : 'var(--bad)' }}>
@@ -264,11 +267,8 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
             <SentimentTag sentiment={model_results?.claude?.sentiment} hallucination={model_results?.claude?.hallucination} t={t} />
           </div>
           <div className="results__stat">
-            <span className="results__stat-n" style={{ color: model_results?.openai?.recognized ? 'var(--good)' : 'var(--bad)' }}>
-              {model_results?.openai?.recognized ? t('results_yes') : t('results_no')}
-            </span>
-            <span className="results__stat-l">{t('results_brand_chatgpt_recognizes')}</span>
-            <SentimentTag sentiment={model_results?.openai?.sentiment} hallucination={model_results?.openai?.hallucination} t={t} />
+            <span className="results__stat-n">{google_result_count}</span>
+            <span className="results__stat-l">{t('results_brand_web_results')}</span>
           </div>
           <div className="results__stat">
             <span className="results__stat-n" style={{ color: model_results?.gemini?.recognized ? 'var(--good)' : 'var(--bad)' }}>

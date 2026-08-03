@@ -45,6 +45,21 @@ export default function SovSection({ sov, t, isPro = false, pending = false }) {
 
   const color = sov.score >= 65 ? 'var(--good)' : sov.score >= 40 ? 'var(--warn)' : 'var(--bad)'
 
+  /* YAPILAN IS SERIDI (2026-08-03): soru basina motor tablosuna gecince
+     (5 sorgu x 4 motor = 20 canli arama -> 12) musteri bazi sorularda daha az
+     rozet goruyor ve "eksik mi kaldi" diye dusunuyor. Serit, o taramada fiilen
+     yapilan isi sayiyla gosterir. HICBIRI yeni olcum degil — hepsi zaten
+     payload'da duran veriden sayilir, ek maliyet YOK.
+     Sifir olan kalem gosterilmez: "0 rakip cikarildi" is degil, eksiklik. */
+  const isKalemleri = [
+    [(sov.queries || []).length, t('sov_work_queries')],
+    [(sov.queries || []).reduce((n, q) => n + Object.keys(q.engines || {}).length, 0),
+     t('sov_work_searches')],
+    [((sov.ai_overview || {}).queries || []).length, t('sov_work_google')],
+    [(sov.sources || []).length + (sov.citation_gap || []).length, t('sov_work_sources')],
+    [(sov.competitors || []).length, t('sov_work_competitors')],
+  ].filter(([n]) => n > 0)
+
   return (
     <>
       <div className="sov">
@@ -55,6 +70,13 @@ export default function SovSection({ sov, t, isPro = false, pending = false }) {
         </span>
       </div>
       <p className="sov__sub">{t('sov_subtitle')}</p>
+      {isKalemleri.length > 0 && (
+        <div className="sov__work">
+          {isKalemleri.map(([n, etiket]) => (
+            <span className="sov__work-item" key={etiket}><b>{n}</b> {etiket}</span>
+          ))}
+        </div>
+      )}
 
       <ProBlur isPro={isPro} cta={false} label={t('sov_detail_label')}>
         <div className="sov__queries">
@@ -103,6 +125,10 @@ export default function SovSection({ sov, t, isPro = false, pending = false }) {
           ))}
         </div>
         {sov.custom_queries_used && <p className="sov__custom-note">{t('sov_custom_note')}</p>}
+        {/* Motor sayisi sorudan soruya degisiyor (soru basina motor tablosu,
+            sov.py). Aciklama olmadan musteri "ChatGPT'yi neden bu soruya
+            sormadiniz, eksik mi kaldi?" diye dusunuyor. */}
+        <p className="sov__custom-note">{t('sov_engine_note')}</p>
 
         {(sov.competitors || []).length > 0 && (
           <div className="sov__competitors">

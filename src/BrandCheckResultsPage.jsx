@@ -288,6 +288,17 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
           )}
         </div>
 
+        {/* Hakem notu: yukaridaki tanima cevaplarini puanlayan taraf. SOV'dan
+            ONCE durur cunku yargiladigi sey YUKARISI — judge yalniz recall
+            yanitlarina bakar (brand_recall.py:1905 live_texts), kategori
+            sorgularina hic girmez. SOV'un altina koymak yanlis yerlestirme
+            olurdu. Judge cagrilmadiysa (hicbir motor tanimadi) gosterilme. */}
+        {recognition_count > 0 && (
+          <p className="judge-note">
+            <b>{t('judge_note_title')}</b> {t('judge_note_body')}
+          </p>
+        )}
+
         {/* Share of Voice: kategori sorgularinda gorunurluk (v3) */}
         <SovSection sov={result.sov} t={t} isPro={isPro} />
 

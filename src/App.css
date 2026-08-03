@@ -3698,3 +3698,26 @@ button.fixes__item { width: 100%; text-align: left; }
   vertical-align: middle;
   white-space: nowrap;
 }
+
+
+/* Yapilan is seridi + hakem notu (2026-08-03) — soru basina motor tablosuna
+   gecince musteri bazi sorularda daha az rozet goruyor; yapilan isi gorunur
+   kilar ve "eksik mi kaldi" izlenimini karsilar. */
+.sov__work {
+  display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center;
+  padding: 9px 12px; margin: 0 0 14px;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--r-md); font-size: .75rem; color: var(--text-muted);
+}
+.sov__work-item { white-space: nowrap; }
+.sov__work-item b {
+  font-family: var(--mono); color: var(--text); font-weight: 700;
+  font-variant-numeric: tabular-nums; margin-right: 2px;
+}
+.judge-note {
+  font-size: .8125rem; color: var(--text-muted); line-height: 1.55;
+  margin: 0 0 16px; padding: 10px 12px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-left: 3px solid var(--accent); border-radius: var(--r-md);
+}
+.judge-note b { color: var(--accent); font-weight: 600; }

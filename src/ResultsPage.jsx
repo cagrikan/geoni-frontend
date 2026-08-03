@@ -9,6 +9,13 @@ import EmbedBadge from './components/EmbedBadge'
 import WatchlistButton from './components/WatchlistButton'
 import { useLanguage } from './lib/LanguageContext'
 
+/* Alintilanabilirlik bulgusunun esikleri. MIN_SAYFA: tek/iki sayfalik siteden
+   aksiyon uretmeyelim (orani bir paragraf belirler). ESIK: kabul araligindaki
+   (100-220 kelime) pasajlarin orani bunun altindaysa "alintilanabilir blok
+   neredeyse yok" demektir. */
+const CIT_MIN_SAYFA = 5
+const CIT_ESIK = 0.10
+
 function scoreColor(score) {
   if (score >= 65) return 'var(--good)'
   if (score >= 40) return 'var(--warn)'
@@ -151,6 +158,21 @@ function FixSuggestions({ result, t, onUpgrade }) {
       why: `${t('pagetype_why_prefix')} %${Math.round((tipEksik.ai_orani || 0) * 100)} ${t('pagetype_why_mid')} ${tipEksik.bizdeki_sayfa ?? 0} ${t('pagetype_why_suffix')}`,
     })
   }
+  /* Alintilanabilirlik (GOLGE MOD — skora GIRMEZ, `shadow: true`).
+     NEDEN GOSTERILIYOR: urunun vaadi "AI seni ALINTILASIN"; bu, o vaadin tam
+     kalbindeki tek olcum. NEDEN SKORA GIRMIYOR: dayandigi arastirma degerleri
+     (ideal pasaj 134-167 kelime) claude-seo'nun kaynak gosterdigi rakamlar,
+     BIZ bagimsiz dogrulamadik. Bulgu olarak gostermek risksiz: yanlissa
+     kullaniciyi yaniltmaz, sadece bir oneri fazla cikar. Etiket bunu soyler. */
+  const cit = result.citability
+  if (cit && cit.sayfa >= CIT_MIN_SAYFA && (cit.alintilanabilir_oran ?? 1) < CIT_ESIK) {
+    fixes.push({
+      key: 'citability',
+      title: t('cit_title'),
+      why: `${t('cit_why_prefix')} ${cit.sayfa} ${t('cit_why_mid')} ${cit.ortanca_pasaj_kelime ?? 0} ${t('cit_why_suffix')}`,
+      tag: cit.shadow ? t('cit_tag') : null,
+    })
+  }
   if (result.sov?.checked && (result.sov.score ?? 100) < 50) {
     fixes.push({ key: 'sov', title: t('fix_sov_title'), why: `${t('fix_sov_why')} ${result.sov.mention_count}/${result.sov.query_count}` })
   }
@@ -162,7 +184,10 @@ function FixSuggestions({ result, t, onUpgrade }) {
         {fixes.map((f) => (
           <button key={f.key} type="button" className="fixes__item" onClick={() => onUpgrade?.(domain || '')}>
             <div className="fixes__item-body">
-              <div className="fixes__item-title">{f.title}</div>
+              <div className="fixes__item-title">
+                {f.title}
+                {f.tag && <span className="fixes__item-tag">{f.tag}</span>}
+              </div>
               <div className="fixes__item-why">{f.why}</div>
             </div>
             <span className="fixes__item-cta">{t('fix_cta')} <ArrowRight size={13} strokeWidth={1.75} /></span>

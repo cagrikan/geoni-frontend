@@ -3682,3 +3682,19 @@ button.fixes__item { width: 100%; text-align: left; }
 .sov__pos--top { background: var(--good-soft); color: var(--good); }
 .sov__pos--mid { background: var(--warn-soft); color: var(--warn); }
 .sov__pos--low { background: var(--bad-soft);  color: var(--bad);  }
+
+/* "deneysel · skora katilmiyor" cipi: golge-mod bulgular skoru DEGISTIRMEZ.
+   Etiket olmadan kullanici bunu da puanini dusuren bir kusur sanardi. */
+.fixes__item-tag {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: .6875rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+  padding: 1px 7px;
+  border-radius: var(--r-full);
+  background: var(--tint);
+  color: var(--text-muted);
+  vertical-align: middle;
+  white-space: nowrap;
+}

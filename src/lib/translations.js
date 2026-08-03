@@ -221,6 +221,12 @@ export const translations = {
     pagetype_why_prefix: 'AI bu kategoride atıflarının',
     pagetype_why_mid: 'kadarını karşılaştırma/liste sayfalarından alıyor; sende',
     pagetype_why_suffix: 'sayfa var.',
+    // Alintilanabilirlik (golge mod — skora girmez, etiket bunu soyler).
+    cit_title: 'Sayfalarında alıntılanabilir bölüm yok',
+    cit_why_prefix: 'AI, kendi başına ayakta duran 100-220 kelimelik blokları alıntılıyor. Taranan',
+    cit_why_mid: 'sayfanda bu uzunlukta bölüm neredeyse hiç yok; ortanca paragraf',
+    cit_why_suffix: 'kelime.',
+    cit_tag: 'deneysel · skora katılmıyor',
     brand_cached_note: 'Bu, yakın zamanda yaptığın taramanın sonucu (skorun tutarlı kalması için). Değişiklik yaptıysan yeniden ölçebilirsin.',
     res_shadow_engine: 'deneysel · skora katılmıyor',
 
@@ -983,6 +989,11 @@ export const translations = {
     pagetype_why_prefix: 'In this category AI takes',
     pagetype_why_mid: 'of its citations from comparison/list pages; you have',
     pagetype_why_suffix: 'such pages.',
+    cit_title: 'Your pages have no citable blocks',
+    cit_why_prefix: 'AI cites self-contained blocks of 100-220 words. Across the',
+    cit_why_mid: 'pages we scanned there is almost none of that length; the median paragraph is',
+    cit_why_suffix: 'words.',
+    cit_tag: 'experimental · not in score',
     brand_cached_note: 'This is your recent scan result (so your score stays consistent). If you made changes, you can re-measure.',
     res_shadow_engine: 'experimental · not counted',
 

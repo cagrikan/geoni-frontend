@@ -38,8 +38,12 @@ export const translations = {
     landing_close_text: 'Skorunuz ve eksik listeniz <b>ücretsiz</b> — düzeltmek isterseniz uzmanlarımız hazır.',
     landing_close_btn: 'Ücretsiz Taramaya Başla ↑',
     private_scan_label: 'Özel tarama (geçmişe kaydedilmez)',
-    private_scan_banner: 'Bu özel bir taramaydı — sonuç hiçbir yerde kaydedilmedi.',
-    private_scan_toast: 'Aramanız gizli olacak — sonuç tarama geçmişinize kaydedilmeyecek.',
+    // Bu cumle 2026-08-03'e kadar DOGRU DEGILDI: SQS modunda sonuc, polling
+    // okuyabilsin diye audits satirina yaziliyor ve orada kaliyordu. Artik
+    // teslimde siliniyor -> cumle savunulabilir. Kopyanin NEREDE oldugunu da
+    // soyluyoruz, yoksa kullanici raporunu kaybettigini sanar.
+    private_scan_banner: 'Bu özel bir taramaydı — sonuç size gösterildikten sonra sunucudan silindi. Kalıcı kopyası e-postanızda.',
+    private_scan_toast: 'Aramanız gizli olacak — sonuç size gösterildikten sonra sunucudan silinecek, kopyası e-postanıza gidecek.',
 
     // ── Mod sekmeleri ──
     mode_site: 'Web Sitesi',
@@ -831,8 +835,8 @@ export const translations = {
     landing_close_text: 'Your score and gap list are <b>free</b> — and our experts are ready when you want the gaps fixed.',
     landing_close_btn: 'Start a Free Scan ↑',
     private_scan_label: "Private scan (won't be saved to history)",
-    private_scan_banner: 'This was a private scan — the result was not saved anywhere.',
-    private_scan_toast: 'Your search will be private — the result won\'t be saved to your scan history.',
+    private_scan_banner: 'This was a private scan — the result was deleted from our servers after it was shown to you. Your permanent copy is in your email.',
+    private_scan_toast: 'Your search will be private — the result is deleted from our servers after you see it, and a copy goes to your email.',
 
     // ── Mode tabs ──
     mode_site: 'Website',

@@ -227,6 +227,17 @@ export const translations = {
     cit_why_mid: 'sayfanda bu uzunlukta bölüm neredeyse hiç yok; ortanca paragraf',
     cit_why_suffix: 'kelime.',
     cit_tag: 'deneysel · skora katılmıyor',
+    // Kirilimin kalan dort boyutu. Metinler boyutun GERCEKTE olctugu seyi
+    // anlatir (scoring.py docstring'lerinden), genel tavsiye degil.
+    fix_index_title: 'AI, sayfalarının çoğunu göremiyor',
+    fix_index_why_prefix: 'Taradığımız sayfaların yalnızca',
+    fix_index_why_suffix: 'kadarı arama motorlarının dizininde. Dizinde olmayan sayfa alıntılanamaz.',
+    fix_authority_title: 'Seni doğrulayan bağımsız kaynak az',
+    fix_authority_why: 'AI, başka sitelerin senden bahsedip bahsetmediğine bakıyor. Güvenilirlik Sinyali:',
+    fix_freshness_title: 'İçeriğin güncelliğini yitiriyor',
+    fix_freshness_why: 'Motorlar 90 günden eski içeriği belirgin şekilde daha az alıntılıyor. İçerik Güncelliği:',
+    fix_engagement_title: 'Üçüncü taraf platformlarda görünmüyorsun',
+    fix_engagement_why: 'LinkedIn, sektör dizinleri ve inceleme siteleri AI\'ın kontrol ettiği yerler. Etkileşim:',
     brand_cached_note: 'Bu, yakın zamanda yaptığın taramanın sonucu (skorun tutarlı kalması için). Değişiklik yaptıysan yeniden ölçebilirsin.',
     res_shadow_engine: 'deneysel · skora katılmıyor',
 
@@ -994,6 +1005,15 @@ export const translations = {
     cit_why_mid: 'pages we scanned there is almost none of that length; the median paragraph is',
     cit_why_suffix: 'words.',
     cit_tag: 'experimental · not in score',
+    fix_index_title: 'AI cannot see most of your pages',
+    fix_index_why_prefix: 'Only',
+    fix_index_why_suffix: 'of the pages we crawled are in search engine indexes. A page that is not indexed cannot be cited.',
+    fix_authority_title: 'Few independent sources vouch for you',
+    fix_authority_why: 'AI looks at whether other sites mention you. Trust Signal:',
+    fix_freshness_title: 'Your content is going stale',
+    fix_freshness_why: 'Engines cite content older than 90 days markedly less often. Content Freshness:',
+    fix_engagement_title: 'You are absent from third-party platforms',
+    fix_engagement_why: 'LinkedIn, industry directories and review sites are places AI checks. Engagement:',
     brand_cached_note: 'This is your recent scan result (so your score stays consistent). If you made changes, you can re-measure.',
     res_shadow_engine: 'experimental · not counted',
 

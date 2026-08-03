@@ -15,6 +15,7 @@ import { useLanguage } from './lib/LanguageContext'
    neredeyse yok" demektir. */
 const CIT_MIN_SAYFA = 5
 const CIT_ESIK = 0.10
+const MAX_FIX = 6
 
 function scoreColor(score) {
   if (score >= 65) return 'var(--good)'
@@ -176,12 +177,43 @@ function FixSuggestions({ result, t, onUpgrade }) {
   if (result.sov?.checked && (result.sov.score ?? 100) < 50) {
     fixes.push({ key: 'sov', title: t('fix_sov_title'), why: `${t('fix_sov_why')} ${result.sov.mention_count}/${result.sov.query_count}` })
   }
+
+  /* Kirilimin kalan DORT boyutu (2026-08-03). Bunlar cikPlak sayi olarak
+     duruyordu: kullanici "Güvenilirlik Sinyali 22/100" goruyor, kirmizi bar
+     var, ama NE YAPACAGI raporda yazmiyordu — teshis var, tedavi yok. Urunun
+     hunisi "tara -> eksigi gor -> duzelttir"; aksiyonu olmayan boyut bu huniden
+     dusuyor. Her metin boyutun GERCEKTE olctugu seyi anlatir (scoring.py
+     docstring'leri okunarak yazildi), genel tavsiye degil. */
+  if ((score_breakdown.index_coverage ?? 100) < 50) {
+    fixes.push({
+      key: 'index',
+      title: t('fix_index_title'),
+      why: `${t('fix_index_why_prefix')} ${result.indexed_pages ?? 0}/${result.total_pages ?? 0} ${t('fix_index_why_suffix')}`,
+    })
+  }
+  if ((score_breakdown.authority ?? 100) < 40) {
+    fixes.push({ key: 'authority', title: t('fix_authority_title'),
+                 why: `${t('fix_authority_why')} ${score_breakdown.authority}/100` })
+  }
+  if ((score_breakdown.freshness ?? 100) < 50) {
+    fixes.push({ key: 'freshness', title: t('fix_freshness_title'),
+                 why: `${t('fix_freshness_why')} ${score_breakdown.freshness}/100` })
+  }
+  if ((score_breakdown.engagement ?? 100) < 40) {
+    fixes.push({ key: 'engagement', title: t('fix_engagement_title'),
+                 why: `${t('fix_engagement_why')} ${score_breakdown.engagement}/100` })
+  }
+
   if (fixes.length === 0) return null
   return (
     <div className="fixes">
       <h3 className="fixes__title"><Wrench size={15} strokeWidth={1.5} /> {t('fix_section_title')}</h3>
+      {/* Tavan: dort yeni boyutla birlikte liste 9 maddeye cikabiliyor. Dokuz
+          maddelik duvar karar felci yapar ve satis gibi durur — ilk MAX_FIX
+          gosterilir, sira zaten teknik onceliktedir (bot erisimi -> sema ->
+          kimlik -> SSR -> sayfa tipi -> alintilanabilirlik -> SOV -> kirilim). */}
       <div className="fixes__list">
-        {fixes.map((f) => (
+        {fixes.slice(0, MAX_FIX).map((f) => (
           <button key={f.key} type="button" className="fixes__item" onClick={() => onUpgrade?.(domain || '')}>
             <div className="fixes__item-body">
               <div className="fixes__item-title">

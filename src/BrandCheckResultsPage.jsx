@@ -10,10 +10,11 @@ import EngineNotice from './components/EngineNotice'
 import EmbedBadge from './components/EmbedBadge'
 import WatchlistButton from './components/WatchlistButton'
 import { useLanguage } from './lib/LanguageContext'
+import { SKOR_IYI, SKOR_ORTA } from './lib/skor'
 
 function scoreColor(score) {
-  if (score >= 65) return 'var(--good)'
-  if (score >= 40) return 'var(--warn)'
+  if (score >= SKOR_IYI) return 'var(--good)'
+  if (score >= SKOR_ORTA) return 'var(--warn)'
   return 'var(--bad)'
 }
 
@@ -42,7 +43,7 @@ function ScoreGauge({ score, label }) {
   )
 }
 
-function Breakdown({ breakdown, t, shadowEngines = [] }) {
+function Breakdown({ breakdown, t, shadowEngines = [], zeroWeight = [] }) {
   const labels = {
     claude: 'Claude',
     chatgpt: 'ChatGPT',
@@ -59,7 +60,13 @@ function Breakdown({ breakdown, t, shadowEngines = [] }) {
           <div className="breakdown__row-top">
             <span className="breakdown__row-label">
               {labels[key] || key}
-              {shadowEngines.includes(key) && <span className="breakdown__shadow"> · {t('res_shadow_engine')}</span>}
+              {/* Golge motor (recognition'a hic girmez) VE sifir-agirlikli motor
+                  (sayima girer ama skora katkisi 0) ayni etiketi alir: kullanici
+                  icin ikisi de "bu satir skorumu etkilemiyor" demektir. Eskiden
+                  yalniz golge isaretleniyordu, Claude ciplak duruyordu.
+                  (Kor denetim 2026-08-04.) */}
+              {(shadowEngines.includes(key) || zeroWeight.includes(key)) &&
+                <span className="breakdown__shadow"> · {t('res_shadow_engine')}</span>}
             </span>
             <span className="breakdown__row-value">{value}</span>
           </div>
@@ -127,6 +134,7 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
     score = 0,
     score_breakdown = {},
     recognition_count = 0,
+    zero_weight_engines = [],
     model_results = {},
     google_result_count = 0,
     performing_topics = [],
@@ -241,7 +249,7 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
             <ShareResult jobId={jobId} score={score} text={t('share_brand_text', { name: capitalizedName, score })} />
           </div>
           <ProBlur isPro={isPro} onUpgrade={onUpgrade} label={t('results_brand_breakdown_label')}>
-            <Breakdown breakdown={score_breakdown} t={t} shadowEngines={shadow_engines} />
+            <Breakdown breakdown={score_breakdown} t={t} shadowEngines={shadow_engines} zeroWeight={zero_weight_engines} />
           </ProBlur>
         </div>
 

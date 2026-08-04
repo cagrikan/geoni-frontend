@@ -125,7 +125,7 @@ export const translations = {
     scan_sub: 'gerçek zamanlı çalışıyor',
     scan_sub_site: 'botlarının sitenize erişimi kontrol ediliyor',
     scan_starting: 'Başlatılıyor…',
-    scan_eta: 'Genelde ~5 dakika sürer; büyük sitelerde 30 dakikayı bulabilir — sonuç hazır olunca e-postanıza da gönderilir',
+    scan_eta: 'Genelde ~5 dakika sürer; büyük sitelerde 45 dakikayı bulabilir — sonuç hazır olunca e-postanıza da gönderilir',
     scan_cancel: 'Vazgeç',
 
     // ── Results (paylaşılan) ──
@@ -154,6 +154,7 @@ export const translations = {
     results_site_pages_scanned: 'Taranan Sayfa',
     results_site_chatgpt_access: 'ChatGPT Bot İzni',
     results_site_claude_access: 'Claude Bot İzni',
+    results_site_perplexity_access: 'Perplexity Bot İzni',
     results_site_gemini_access: 'Gemini Bot İzni',
     results_site_llms_access: 'AI Botlarına Erişim İzni (llms.txt)',
     // Skor cipasi: esikler bugune kadar YALNIZ RENK olarak kodluydu ve tek
@@ -935,7 +936,7 @@ export const translations = {
     scan_sub: 'running in real time',
     scan_sub_site: 'bot access to your site is being checked',
     scan_starting: 'Starting…',
-    scan_eta: 'Usually ~5 minutes; up to 30 for large sites — we also email you the result when it\'s ready',
+    scan_eta: 'Usually ~5 minutes; up to 45 for large sites — we also email you the result when it\'s ready',
     scan_cancel: 'Cancel',
 
     // ── Results (shared) ──
@@ -964,6 +965,7 @@ export const translations = {
     results_site_pages_scanned: 'Pages Scanned',
     results_site_chatgpt_access: 'ChatGPT Bot Access',
     results_site_claude_access: 'Claude Bot Access',
+    results_site_perplexity_access: 'Perplexity Bot Access',
     results_site_gemini_access: 'Gemini Bot Access',
     results_site_llms_access: 'AI Bot Permission (llms.txt)',
     results_score_legend: '65+ good · 40-64 needs work · below 40 weak — the seal needs 70',

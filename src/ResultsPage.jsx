@@ -8,6 +8,7 @@ import ShareResult from './components/ShareResult'
 import EmbedBadge from './components/EmbedBadge'
 import WatchlistButton from './components/WatchlistButton'
 import { useLanguage } from './lib/LanguageContext'
+import { SKOR_IYI, SKOR_ORTA } from './lib/skor'
 
 /* Alintilanabilirlik bulgusunun esikleri. MIN_SAYFA: tek/iki sayfalik siteden
    aksiyon uretmeyelim (orani bir paragraf belirler). ESIK: kabul araligindaki
@@ -18,8 +19,8 @@ const CIT_ESIK = 0.10
 const MAX_FIX = 6
 
 function scoreColor(score) {
-  if (score >= 65) return 'var(--good)'
-  if (score >= 40) return 'var(--warn)'
+  if (score >= SKOR_IYI) return 'var(--good)'
+  if (score >= SKOR_ORTA) return 'var(--warn)'
   return 'var(--bad)'
 }
 
@@ -119,6 +120,7 @@ function FixSuggestions({ result, t, onUpgrade }) {
   const blockedEngines = [
     !platforms.chatgpt && 'ChatGPT',
     !platforms.anthropic && 'Claude',
+    !platforms.perplexity && 'Perplexity',
     !platforms.google && 'Gemini',
   ].filter(Boolean)
   if (blockedEngines.length > 0 || llms_txt === false) {
@@ -327,7 +329,7 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
         <EmbedBadge jobId={jobId} score={score} />
 
         {/* Stats */}
-        <div className="results__stats results__stats--five">
+        <div className="results__stats results__stats--six">
           <div className="results__stat">
             <span className="results__stat-n">{total_pages}</span>
             <span className="results__stat-l">{t('results_site_pages_scanned')}</span>
@@ -349,6 +351,17 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
               {platforms?.google ? t('results_yes') : t('results_no')}
             </span>
             <span className="results__stat-l">{t('results_site_gemini_access')}</span>
+          </div>
+          {/* Perplexity: backend bunu ZATEN olcuyor (audit_payload.py:80) ve
+              tarama ekrani kullaniciya "Perplexity erisimi kontrol ediliyor"
+              DIYOR — ama sonuc ekraninda hic gosterilmiyordu. Mobil gosteriyor:
+              ayni parayi odeyen web kullanicisi eksik urun aliyordu.
+              (Kor denetim 2026-08-04.) */}
+          <div className="results__stat">
+            <span className="results__stat-n" style={{ color: platforms?.perplexity ? 'var(--good)' : 'var(--bad)' }}>
+              {platforms?.perplexity ? t('results_yes') : t('results_no')}
+            </span>
+            <span className="results__stat-l">{t('results_site_perplexity_access')}</span>
           </div>
           <div className="results__stat">
             <span className="results__stat-n" style={{ color: result.llms_txt == null ? 'var(--text-muted)' : result.llms_txt ? 'var(--good)' : 'var(--bad)' }}>

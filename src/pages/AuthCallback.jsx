@@ -11,9 +11,18 @@ export default function AuthCallback({ onDone }) {
         // Kaydin ulkesini SUNUCU tarafinda isaretle (x-vercel-ip-country).
         // Istemci ulkeyi yazamaz; burada yalnizca ucu tetikliyoruz, hata olsa da
         // giris akisi ASLA bloke olmaz.
+        // Ulke sunucudan (x-vercel-ip-country), saat dilimi/dil tarayicidan:
+        // VPN IP'yi degistirir ama saat dilimini genelde degistirmez.
         fetch('/api/signup-country', {
           method: 'POST',
-          headers: { Authorization: `Bearer ${session.access_token}` }
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            lang: navigator.language
+          })
         }).catch(() => {})
         onDone('dashboard')
       } else onDone('landing')

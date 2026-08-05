@@ -7,8 +7,16 @@ export default function AuthCallback({ onDone }) {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) onDone('dashboard')
-      else onDone('landing')
+      if (session) {
+        // Kaydin ulkesini SUNUCU tarafinda isaretle (x-vercel-ip-country).
+        // Istemci ulkeyi yazamaz; burada yalnizca ucu tetikliyoruz, hata olsa da
+        // giris akisi ASLA bloke olmaz.
+        fetch('/api/signup-country', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${session.access_token}` }
+        }).catch(() => {})
+        onDone('dashboard')
+      } else onDone('landing')
     })
   }, [])
 

@@ -4,6 +4,9 @@ import GeoniMark from './GeoniMark'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import ThemeSwitcher from './components/ThemeSwitcher'
 import { useLanguage } from './lib/LanguageContext'
+// Lig skoru rengi TEK KAYNAKTAN: rapor 65'te yesile geciyordu, lig 70
+// kullaniyordu -> ayni site listede sari, raporunda yesil goruunuyordu.
+import { SKOR_IYI } from './lib/skor'
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.geoni.ai'
 // Cloudflare Turnstile (anti-abuse) — public site key.
@@ -537,7 +540,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, onSubmi
               <li className="league__row" key={it.domain}>
                 <span className="league__rank">{i + 1}</span>
                 <span className="league__domain">{it.domain}</span>
-                <span className="league__score" style={{ color: it.score >= 70 ? '#2fbd84' : '#F5A623' }}>{Math.round(it.score)}</span>
+                <span className="league__score" style={{ color: it.score >= SKOR_IYI ? '#2fbd84' : '#F5A623' }}>{Math.round(it.score)}</span>
               </li>
             ))}
           </ol>

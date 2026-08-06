@@ -3023,6 +3023,21 @@ body {
 }
 .stability__note b { color: var(--text-sub); }
 
+/* ===== Okunamayan site notu =====
+   Sitesi taranamayan kullaniciya durust cekince. Uyari rengi kullanilir ama
+   ALARM degil: bu kullanicinin duzeltebilecegi bir bulgu (bkz.
+   components/OkunamayanSiteNotu.jsx). */
+.okunamayan {
+  max-width: 260px; margin-top: 10px; text-align: left;
+  background: var(--tint); border: 1px solid var(--border);
+  border-left: 3px solid var(--warn, #c98a17);
+  border-radius: var(--r-sm); padding: 10px 12px;
+}
+.okunamayan__baslik { margin: 0 0 5px; font-size: .8125rem; font-weight: 700; color: var(--text); }
+.okunamayan__metin { margin: 0; font-size: .75rem; line-height: 1.55; color: var(--text-muted); }
+.okunamayan__eksik { margin: 6px 0 0; font-size: .75rem; color: var(--text-muted); }
+.okunamayan__eksik b { color: var(--text-sub); }
+
 /* ===== Rapor: Share of Voice (v3) ===== */
 .sov {
   margin: 24px 0;

@@ -3,6 +3,7 @@ import GeoniMark from './GeoniMark'
 import ProBlur from './ProBlur'
 import SovSection from './components/SovSection'
 import StabilityNote from './components/StabilityNote'
+import OkunamayanSiteNotu from './components/OkunamayanSiteNotu'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import ShareResult from './components/ShareResult'
 import EmbedBadge from './components/EmbedBadge'
@@ -311,6 +312,11 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
         <div className="results__top">
           <div className="results__gauge-col">
             <ScoreGauge score={score} label={t('results_score_label')} legend={t('results_score_legend')} />
+            <OkunamayanSiteNotu
+              diagnostics={result.diagnostics}
+              totalPages={result.total_pages}
+              t={t}
+            />
             <StabilityNote
               stability={result.stability}
               driverLabel={(language === 'en' ? BREAKDOWN_LABELS_EN : BREAKDOWN_LABELS_TR)[result.stability?.driver]}

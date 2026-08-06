@@ -14,22 +14,29 @@ export default function WatchlistButton({ user, type, label, target }) {
   const [added, setAdded] = useState(false)
   const [checking, setChecking] = useState(true)
 
+  // Varlik kontrolu HARF DUYARSIZ + bosluk kirpilmis olmali. Eskiden `.eq('label')`
+  // birebir esliyordu: kullanici ayni hedefi bir kez "cagricakir.com.tr", bir kez
+  // "Cagricakir.com.tr" yazinca kontrol iskaliyor ve AYNI SITE ikinci kez izleme
+  // listesine giriyordu. Sonuc: iki ayri otomatik tarama ve kullaniciya celiskili
+  // iki skor (olculdu 2026-08-06: 74 ve 70).
+  const temizLabel = (label ?? '').trim()
+
   useEffect(() => {
-    if (!user || !label) { setChecking(false); return }
+    if (!user || !temizLabel) { setChecking(false); return }
     let cancelled = false
     getSupabase().then((supabase) => supabase
       .from('watchlist')
       .select('id')
       .eq('user_id', user.id)
       .eq('type', type)
-      .eq('label', label)
+      .ilike('label', temizLabel)
       .maybeSingle()
       .then(({ data, error }) => {
         if (error) console.error('Watchlist check failed:', error)
         if (!cancelled) { setAdded(!!data); setChecking(false) }
       }))
     return () => { cancelled = true }
-  }, [user, type, label])
+  }, [user, type, temizLabel])
 
   if (!user || !label) return null
 
@@ -37,7 +44,7 @@ export default function WatchlistButton({ user, type, label, target }) {
     if (added || checking) return
     setAdded(true)
     const supabase = await getSupabase()
-    const { error } = await supabase.from('watchlist').insert({ user_id: user.id, type, label, target })
+    const { error } = await supabase.from('watchlist').insert({ user_id: user.id, type, label: temizLabel, target })
     if (error) {
       if (error.code !== '23505') { setAdded(false); console.error('Watchlist insert failed:', error) }
     }

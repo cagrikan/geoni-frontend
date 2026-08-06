@@ -3,6 +3,7 @@ import GeoniMark from './GeoniMark'
 import ProBlur from './ProBlur'
 import SovSection from './components/SovSection'
 import StabilityNote from './components/StabilityNote'
+import { siteHaritasiBulgusu } from './lib/bulgular'
 import OkunamayanSiteNotu from './components/OkunamayanSiteNotu'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import ShareResult from './components/ShareResult'
@@ -116,7 +117,7 @@ function TopicCard({ topic, isOpportunity }) {
    cikarir ve her birini app'teki ilgili hizmete baglar (hedef on-dolu).
    Urunun ana hunisi bu: "tara, eksigi gor, duzelttir". */
 function FixSuggestions({ result, t, onUpgrade }) {
-  const { domain, platforms = {}, llms_txt, score_breakdown = {} } = result
+  const { domain, platforms = {}, llms_txt, sitemap_found, score_breakdown = {} } = result
   const fixes = []
   const blockedEngines = [
     !platforms.chatgpt && 'ChatGPT',
@@ -187,6 +188,15 @@ function FixSuggestions({ result, t, onUpgrade }) {
      hunisi "tara -> eksigi gor -> duzelttir"; aksiyonu olmayan boyut bu huniden
      dusuyor. Her metin boyutun GERCEKTE olctugu seyi anlatir (scoring.py
      docstring'leri okunarak yazildi), genel tavsiye degil. */
+  /* SITE HARITASI YOK — olculuyordu, HICBIR ISTEMCI SOYLEMIYORDU.
+     Olculdu 2026-08-06: son 30 gunde 106 web taramasinin 30'unda (%28)
+     `sitemap_found` false. Site haritasi, tarayicinin hangi sayfalarin var
+     oldugunu KESFETME yolu; yoksa derindeki sayfalar hic gorulmeyebilir ve bu
+     dogrudan urunun tezine dokunuyor. `false` DEGILSE (undefined = olculemedi)
+     bulgu basilmaz — olculmemis seyi kusur gibi gostermeyiz. */
+  if (siteHaritasiBulgusu(sitemap_found)) {
+    fixes.push({ key: 'sitemap', title: t('fix_sitemap_title'), why: t('fix_sitemap_why') })
+  }
   if ((score_breakdown.index_coverage ?? 100) < 50) {
     fixes.push({
       key: 'index',

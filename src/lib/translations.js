@@ -176,6 +176,8 @@ export const translations = {
     sov_mentioned: 'Öneriliyor',
     sov_not_mentioned: 'Geçmiyor',
     // Sitesi taranamayan kullanıcıya dürüst çekince (bkz. OkunamayanSiteNotu).
+    fix_sitemap_title: 'Site haritası ekleyin',
+    fix_sitemap_why: 'Sitenizde site haritası (sitemap.xml) bulunamadı. Yapay zekâ tarayıcıları hangi sayfaların var olduğunu bu dosyadan öğreniyor; olmadığında derindeki sayfalarınız hiç görülmeyebilir.',
     unread_title_none: 'Sitenizin sayfalarını okuyamadık',
     unread_title_partial: 'Sitenizi kısmen okuyabildik',
     unread_body_blocked: 'Siteniz otomatik ziyaretçileri engelliyor. Aynı duvara yapay zekâ tarayıcıları da çarpıyor — yani bu, düzeltilebilir bir görünürlük sorunu. Aşağıdaki puan yalnızca site dışından ölçülebilen sinyallere dayanıyor.',
@@ -987,6 +989,8 @@ export const translations = {
     sov_detail_label: 'Query details and competitors',
     sov_mentioned: 'Recommended',
     sov_not_mentioned: 'Not mentioned',
+    fix_sitemap_title: 'Add a sitemap',
+    fix_sitemap_why: "No sitemap (sitemap.xml) was found on your site. AI crawlers use it to discover which pages exist; without one, your deeper pages may never be seen.",
     unread_title_none: "We couldn't read your site's pages",
     unread_title_partial: 'We could only read part of your site',
     unread_body_blocked: 'Your site blocks automated visitors. AI crawlers hit the same wall — so this is a fixable visibility problem. The score below relies only on signals measurable from outside your site.',

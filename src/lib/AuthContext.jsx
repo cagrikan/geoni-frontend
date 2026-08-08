@@ -145,6 +145,43 @@ export function AuthProvider({ children }) {
     options: { redirectTo: `${window.location.origin}/auth/callback` }
   })
 
+  // ── E-posta + parola ────────────────────────────────────────────────────
+  // 🔴 SIMETRI (2026-08-08): mobile e-posta girisi eklendi. Web'de YOKTU, yani
+  // uygulamada e-posta ile hesap acan kisi ayni hesapla web'e giremiyordu —
+  // gunun tekrarlayan hata bicimi ("bir uctan duzelt, digerini unut") tam
+  // olarak bu. Iki uc de ayni yollari sunuyor.
+  //
+  // 🪤 Hata YUTULMAZ, cagirana firlatilir: yutulan hata kullanicida "butona
+  // bastim, hicbir sey olmadi" demektir.
+  const signInWithEmail = async (email, password) => {
+    const supabase = await getSupabase()
+    const { error } = await supabase.auth.signInWithPassword({
+      email: String(email).trim().toLowerCase(), password,
+    })
+    if (error) throw error
+  }
+
+  const signUpWithEmail = async (email, password) => {
+    const supabase = await getSupabase()
+    const { data, error } = await supabase.auth.signUp({
+      email: String(email).trim().toLowerCase(), password,
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+    })
+    if (error) throw error
+    // E-posta dogrulamasi acikken oturum NULL doner ama hata da YOKTUR.
+    // Bunu "giris oldu" saymak kullaniciyi bos ekranda birakirdi.
+    return { dogrulamaGerekli: !data.session }
+  }
+
+  const sendPasswordReset = async (email) => {
+    const supabase = await getSupabase()
+    const { error } = await supabase.auth.resetPasswordForEmail(
+      String(email).trim().toLowerCase(),
+      { redirectTo: `${window.location.origin}/parola-yenile` },
+    )
+    if (error) throw error
+  }
+
   // Cikis sonrasi login ekrani degil pazarlama sitesi acilir
   const signOut = async () => {
     try { const supabase = await getSupabase(); await supabase.auth.signOut() } catch { /* oturum zaten dusmus olabilir */ }
@@ -157,6 +194,7 @@ export function AuthProvider({ children }) {
     <AuthContext.Provider value={{
       user, profile, loading, profileError,
       signInWithGoogle, signInWithApple, signInWithLinkedIn,
+      signInWithEmail, signUpWithEmail, sendPasswordReset,
       signOut, refreshProfile
     }}>
       {children}

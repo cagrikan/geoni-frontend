@@ -113,3 +113,18 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+/* Parola yenileme sayfası — sıfırlama e-postasının indiği yer.
+   Tek işi olan bir sayfa: dar kolon, büyük dokunma alanları, dikkat dağıtan yok. */
+.pw-sayfa { max-width: 420px; margin: 0 auto; padding: 64px 24px; }
+.pw-sayfa h1 { font-size: 1.5rem; margin: 0 0 8px; }
+.pw-sayfa p { color: var(--text-muted, #6b7280); margin: 0 0 24px; line-height: 1.6; }
+.pw-form { display: flex; flex-direction: column; gap: 12px; }
+.pw-form input { padding: 14px 16px; font-size: 16px; border-radius: 10px;
+  border: 1px solid var(--border, #d1d5db); background: var(--surface, #fff);
+  color: inherit; }
+.pw-form input:disabled { opacity: .6; }
+.pw-btn { padding: 14px 18px; font-size: 16px; font-weight: 600; border: 0;
+  border-radius: 10px; background: var(--accent, #3b4fd8); color: #fff; cursor: pointer; }
+.pw-btn:disabled { opacity: .55; cursor: default; }
+.pw-hata { color: #b3261e; margin: 0; font-size: .95rem; }

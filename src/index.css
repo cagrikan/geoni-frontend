@@ -128,19 +128,3 @@ code {
   border-radius: 10px; background: var(--accent, #3b4fd8); color: #fff; cursor: pointer; }
 .pw-btn:disabled { opacity: .55; cursor: default; }
 .pw-hata { color: #b3261e; margin: 0; font-size: .95rem; }
-
-/* Giriş ekranı — e-posta ile giriş/kayıt (sosyal düğmelerin altında) */
-.login-eposta-ac { width: 100%; background: none; border: 0; color: var(--text-muted, #6b7280);
-  font-size: .95rem; padding: 14px 0 4px; cursor: pointer; text-decoration: underline; }
-.login-eposta { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
-.login-eposta input { padding: 13px 15px; font-size: 16px; border-radius: 10px;
-  border: 1px solid var(--border, #d1d5db); background: var(--surface, #fff); color: inherit; }
-.login-eposta__btn { padding: 13px 16px; font-size: 15px; font-weight: 600; border: 0;
-  border-radius: 10px; background: var(--accent, #3b4fd8); color: #fff; cursor: pointer; }
-.login-eposta__btn:disabled { opacity: .5; cursor: default; }
-.login-eposta__gecis, .login-eposta__unuttum { background: none; border: 0; cursor: pointer;
-  font-size: .9rem; padding: 4px 0; }
-.login-eposta__gecis { color: var(--accent, #3b4fd8); }
-.login-eposta__unuttum { color: var(--text-muted, #6b7280); }
-.login-eposta__hata { color: #b3261e; font-size: .9rem; margin: 0; }
-.login-eposta__bilgi { color: #0e7a5f; font-size: .9rem; margin: 0; }

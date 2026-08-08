@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useAuth } from '../lib/AuthContext'
 import GeoniMark from '../GeoniMark'
 import LanguageSwitcher from '../components/LanguageSwitcher'
@@ -6,53 +6,12 @@ import ThemeSwitcher from '../components/ThemeSwitcher'
 import { useLanguage } from '../lib/LanguageContext'
 
 export default function LoginPage({ onSuccess, onHome }) {
-  const { user, signInWithGoogle, signInWithApple, signInWithLinkedIn,
-    signInWithEmail, signUpWithEmail, sendPasswordReset } = useAuth()
+  const { user, signInWithGoogle, signInWithApple, signInWithLinkedIn } = useAuth()
   const { t } = useLanguage()
 
   useEffect(() => {
     if (user) onSuccess()
   }, [user])
-
-  // E-posta + parola. Varsayilan KAPALI: sosyal giris tek tik, e-posta iki alan.
-  const [formAcik, setFormAcik] = useState(false)
-  const [kayitModu, setKayitModu] = useState(false)
-  const [eposta, setEposta] = useState('')
-  const [parola, setParola] = useState('')
-  const [mesaj, setMesaj] = useState(null)   // { tur: 'hata'|'bilgi', metin }
-  const [bekliyor, setBekliyor] = useState(false)
-
-  const epostaGecerli = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(eposta.trim())
-  const parolaGecerli = parola.length >= 6
-
-  const gonder = async (e) => {
-    e.preventDefault()
-    setMesaj(null); setBekliyor(true)
-    try {
-      if (kayitModu) {
-        const { dogrulamaGerekli } = await signUpWithEmail(eposta, parola)
-        // 🪤 Oturum acilmadi ama hata da yok: "giris oldu" saymak kullaniciyi
-        // bos ekranda birakirdi.
-        if (dogrulamaGerekli) setMesaj({ tur: 'bilgi', metin: t('login_verify_body') })
-      } else {
-        await signInWithEmail(eposta, parola)
-      }
-    } catch (err) {
-      setMesaj({ tur: 'hata', metin: err?.message || t('error_generic') })
-    } finally { setBekliyor(false) }
-  }
-
-  const parolaUnuttum = async () => {
-    if (!epostaGecerli) { setMesaj({ tur: 'hata', metin: t('login_reset_need_email') }); return }
-    setMesaj(null); setBekliyor(true)
-    try {
-      await sendPasswordReset(eposta)
-      // Hesabin var olup olmadigi SOYLENMEZ (hesap sayimini engeller).
-      setMesaj({ tur: 'bilgi', metin: t('login_reset_sent_body') })
-    } catch (err) {
-      setMesaj({ tur: 'hata', metin: err?.message || t('error_generic') })
-    } finally { setBekliyor(false) }
-  }
 
   return (
     <div className="login-page">
@@ -93,46 +52,6 @@ export default function LoginPage({ onSuccess, onHome }) {
             {t('login_linkedin')}
           </button>
         </div>
-
-        {!formAcik ? (
-          <button type="button" className="login-eposta-ac" onClick={() => setFormAcik(true)}>
-            {t('login_email_open')}
-          </button>
-        ) : (
-          <form className="login-eposta" onSubmit={gonder}>
-            <input
-              type="email" value={eposta} onChange={(e) => setEposta(e.target.value)}
-              placeholder={t('login_email_ph')} autoComplete="email"
-              disabled={bekliyor} required
-            />
-            <input
-              type="password" value={parola} onChange={(e) => setParola(e.target.value)}
-              placeholder={t('login_password_ph')}
-              autoComplete={kayitModu ? 'new-password' : 'current-password'}
-              disabled={bekliyor} required
-            />
-            {mesaj && (
-              <p className={mesaj.tur === 'hata' ? 'login-eposta__hata' : 'login-eposta__bilgi'}>
-                {mesaj.metin}
-              </p>
-            )}
-            <button type="submit" className="login-eposta__btn"
-              disabled={bekliyor || !epostaGecerli || !parolaGecerli}>
-              {bekliyor ? '…' : kayitModu ? t('login_email_signup') : t('login_email_signin')}
-            </button>
-            <button type="button" className="login-eposta__gecis"
-              onClick={() => { setKayitModu((v) => !v); setMesaj(null) }} disabled={bekliyor}>
-              {kayitModu ? t('login_email_have') : t('login_email_none')}
-            </button>
-            {/* Kayit olurken parola sifirlamak anlamsiz. */}
-            {!kayitModu && (
-              <button type="button" className="login-eposta__unuttum"
-                onClick={parolaUnuttum} disabled={bekliyor}>
-                {t('login_reset_link')}
-              </button>
-            )}
-          </form>
-        )}
 
         <p className="login-terms">
           {t('login_terms_prefix')} <a href="https://geoni.ai/privacy" target="_blank">{t('login_terms_privacy')}</a>{t('login_terms_privacy_suffix')} {t('login_terms_and')} <a href="https://geoni.ai/terms" target="_blank">{t('login_terms_of_use')}</a>{t('login_terms_of_use_suffix')}

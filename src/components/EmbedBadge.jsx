@@ -1,16 +1,20 @@
 import { useState } from 'react'
 import { Copy, Check } from 'lucide-react'
 import { useLanguage } from '../lib/LanguageContext'
+import { rozetHakkiVar } from '../lib/rozet'
 
 /* "Rozeti sitene ekle": kullanici sitesine skor rozeti gomer — ona statu
    gostergesi, bize her gomulumden kalici backlink + marka izi. jobId yoksa
    (ornek/ozel tarama) gorunmez. */
-export default function EmbedBadge({ jobId, score }) {
+export default function EmbedBadge({ jobId, score, pages }) {
   const { t } = useLanguage()
   const [copied, setCopied] = useState(false)
   // Rozet yalnizca "yesil" (70+) skorlarda sunulur — dusuk skoru kimse
-  // sitesine asmaz; teklif etmek bile garip kacar.
-  if (!jobId || !(score >= 70)) return null
+  // sitesine asmaz; teklif etmek bile garip kacar. Ayrica sitenin en az 3
+  // sayfasi gezilebilmis olmali: rozet UCU (geoni/api/badge/[id].js) bunu
+  // 2026-08-08'den beri zorunlu tutuyor, burada gostermeye devam etseydik
+  // kullanici kodu kopyalayip KIRIK RESIM alacakti. Kural: lib/rozet.js
+  if (!jobId || !rozetHakkiVar(score, pages)) return null
 
   const code = `<a href="https://geoni.ai/s/${jobId}" target="_blank" rel="noopener"><img src="https://geoni.ai/badge/${jobId}" alt="AI Visibility Score — geoni.ai" width="232" height="44"></a>`
 

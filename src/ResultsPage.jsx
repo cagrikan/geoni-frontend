@@ -342,7 +342,7 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
           </ProBlur>
         </div>
 
-        <EmbedBadge jobId={jobId} score={score} />
+        <EmbedBadge jobId={jobId} score={score} pages={total_pages} />
 
         {/* Stats */}
         <div className="results__stats results__stats--six">

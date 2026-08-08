@@ -303,7 +303,12 @@ function AppInner() {
       if (scanGenRef.current !== gen) return  // iptal edildi / yeni tarama basladi
       try {
         const res = await fetch(`${API_URL}/api/audit/${jobId}`, { headers: langHeaders() })
-        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || t('error_audit_failed'))
+        if (!res.ok) {
+          // Kodu hataya iliştir: 404 "iş şu an bulunamadı" demek, "iş yok" değil.
+          const e = new Error((await res.json().catch(() => ({}))).detail || t('error_audit_failed'))
+          e.status = res.status
+          throw e
+        }
         const data = await res.json()
         errStreak = 0
         if (scanGenRef.current !== gen) return
@@ -326,7 +331,17 @@ function AppInner() {
       } catch (err) {
         // Gecici ag hatasi (Wi-Fi->4G, tek 502) taramayi OLDURMESIN: is arka
         // planda suruyor, kredi dusuldu. 4 ardisik hataya kadar tolere et.
-        if (++errStreak >= 4) { if (scanGenRef.current === gen) { setError(err.message); pushView('landing') } return }
+        //
+        // 🔴 404 AYRI (2026-08-08, canlida olculdu): dagitim ya da sunucunun
+        // uykudan uyanmasi sirasinda is kisa sure gorunmez oluyor. Eski davranis
+        // ilk 40 tick'te 3sn'de bir doner -> 4 hata = **12 SANIYE**; dagitim ise
+        // 2-3 DAKIKA suruyor. Sonuc: kullanici kontoru odedi, rapor sunucuda
+        // uretildi, ama ekran hata verip kullaniciyi ANA SAYFAYA atti ve bir daha
+        // hic denemedi. Mobilde ayni kusur olculdu ve duzeltildi (b927c62);
+        // web atlanmisti — bugunun tekrarlayan hata bicimi tam olarak bu.
+        const bulunamadi = err?.status === 404
+        errStreak += 1
+        if (errStreak >= (bulunamadi ? 30 : 4)) { if (scanGenRef.current === gen) { setError(err.message); pushView('landing') } return }
       }
     }
     if (scanGenRef.current === gen) { setError(t('error_audit_timeout')); pushView('landing') }
@@ -341,14 +356,21 @@ function AppInner() {
       if (scanGenRef.current !== gen) return
       try {
         const res = await fetch(`${API_URL}/api/brand-check/${jobId}`, { headers: langHeaders() })
-        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || t('error_query_failed'))
+        if (!res.ok) {
+          const e = new Error((await res.json().catch(() => ({}))).detail || t('error_query_failed'))
+          e.status = res.status
+          throw e
+        }
         const data = await res.json()
         errStreak = 0
         if (scanGenRef.current !== gen) return
         if (data.status === 'complete') { setBrandResult({ ...data.result, type: entityType }); setLastJobId(jobId); pushView('brand_results'); if (refreshProfile) refreshProfile(); return }
         if (data.status === 'failed') { setError(t('error_query_failed')); pushView('landing'); return }
       } catch (err) {
-        if (++errStreak >= 4) { if (scanGenRef.current === gen) { setError(err.message); pushView('landing') } return }
+        // Yukaridaki tarama dongusuyle AYNI kural — 404 "su an bulunamadi".
+        const bulunamadi = err?.status === 404
+        errStreak += 1
+        if (errStreak >= (bulunamadi ? 30 : 4)) { if (scanGenRef.current === gen) { setError(err.message); pushView('landing') } return }
       }
     }
     if (scanGenRef.current === gen) { setError(t('error_query_timeout')); pushView('landing') }

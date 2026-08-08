@@ -125,7 +125,7 @@ export const translations = {
     scan_sub: 'gerçek zamanlı çalışıyor',
     scan_sub_site: 'botlarının sitenize erişimi kontrol ediliyor',
     scan_starting: 'Başlatılıyor…',
-    scan_eta: 'Genelde ~5 dakika sürer; büyük sitelerde 45 dakikayı bulabilir — sonuç hazır olunca e-postanıza da gönderilir',
+    scan_eta: 'Genelde birkaç dakika sürer. Bu ekranı kapatabilirsiniz — rapor hazır olunca e-postanıza gönderilir.',
     scan_cancel: 'Vazgeç',
 
     // ── Results (paylaşılan) ──
@@ -945,7 +945,7 @@ export const translations = {
     scan_sub: 'running in real time',
     scan_sub_site: 'bot access to your site is being checked',
     scan_starting: 'Starting…',
-    scan_eta: 'Usually ~5 minutes; up to 45 for large sites — we also email you the result when it\'s ready',
+    scan_eta: 'Usually a few minutes. You can close this screen — we email the report when it\'s ready.',
     scan_cancel: 'Cancel',
 
     // ── Results (shared) ──

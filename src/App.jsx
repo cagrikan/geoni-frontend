@@ -17,7 +17,6 @@ import './App.css'
 // bundle kuculuyor, bu sayfalar sadece gerektiginde ayri parca olarak cekiliyor.
 const LoginPage = lazy(() => import('./pages/LoginPage'))
 const AuthCallback = lazy(() => import('./pages/AuthCallback'))
-const ParolaYenile = lazy(() => import('./pages/ParolaYenile'))
 const DashboardPage = lazy(() => import('./pages/DashboardPage'))
 const AdminPage = lazy(() => import('./pages/AdminPage'))
 
@@ -229,8 +228,6 @@ function AppInner() {
     if (window.location.pathname === '/dashboard') return 'dashboard'
     if (window.location.pathname === '/admin') return 'admin'
     if (window.location.pathname === '/login') return 'login'
-    // Parola sıfırlama e-postasındaki bağlantı buraya gelir.
-    if (window.location.pathname === '/parola-yenile') return 'parola_yenile'
     return 'landing'
   })
   const [result, setResult] = useState(null)
@@ -250,10 +247,6 @@ function AppInner() {
     else if (path === '/dashboard') setView(user ? 'dashboard' : 'login')
     else if (path === '/admin') setView(user ? 'admin' : 'login')
     else if (path === '/login') setView('login')
-    // 🪤 `user` KOŞULU YOK: supabase-js kurtarma token'ıyla geçici bir oturum
-    // açar, yani kullanıcı "girişli" görünür. Buraya `user ? … : 'login'`
-    // yazmak, parolasını yenilemeye gelen kişiyi giriş ekranına atardı.
-    else if (path === '/parola-yenile') setView('parola_yenile')
   }, [user])
 
   // Tarayici geri/ileri tuslari: sonuc/ornek/yukleme ekranlarindan her zaman
@@ -578,7 +571,6 @@ function AppInner() {
     <div className="app-shell">
       <Suspense fallback={<PageFallback />}>
         {view === 'auth_callback' && <AuthCallback onDone={navigateTo} />}
-        {view === 'parola_yenile' && <ParolaYenile onDone={navigateTo} />}
         {view === 'login' && <LoginPage onSuccess={() => navigateTo('dashboard')} onHome={() => navigateTo('landing')} />}
         {view === 'dashboard' && <DashboardPage onReset={handleReset} onNewScan={() => navigateTo('landing')} onViewAudit={handleViewAudit} onRescanWeb={handleAudit} onRescanBrand={handleBrandCheck} onAdmin={profile?.is_admin ? () => navigateTo('admin') : null} />}
         {view === 'admin' && <AdminPage onBack={() => navigateTo('dashboard')} />}

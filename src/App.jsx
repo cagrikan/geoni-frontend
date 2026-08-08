@@ -453,9 +453,18 @@ function AppInner() {
     const gen = ++scanGenRef.current
     pushView('loading')
     try {
+      // 🪤 JETON GONDERILMIYORDU (2026-08-08 fonksiyonel testinde bulundu).
+      // Site (satir ~366) ve marka (satir ~415) uclari Authorization yolluyor,
+      // SOSYAL yollamiyordu -> giris yapmis kullanicinin sosyal taramasi
+      // sunucuda ANONIM sayiliyordu. Sonuc: Turnstile 403 / IP rate-limit 429
+      // ve kullanici hicbir sey olmamis gibi geri atiliyordu; ustelik
+      // `loginDuvari` yalniz 401'de calistigi icin form da saklanmiyordu.
+      // Ucretsiz hak ve askiya alma kontrolleri de kullaniciya baglanamiyordu.
+      const session3 = await (await import('./lib/supabase')).supabase.auth.getSession()
+      const token3 = session3?.data?.session?.access_token || ''
       const res = await fetch(`${API_URL}/api/social-check`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...langHeaders() },
+        headers: { 'Content-Type': 'application/json', ...langHeaders(), ...(token3 ? { 'Authorization': `Bearer ${token3}` } : {}) },
         body: JSON.stringify({ handle, niche, email, lang: language, turnstile_token }),
       })
       if (!res.ok) {

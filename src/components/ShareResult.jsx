@@ -17,6 +17,8 @@ export default function ShareResult({ jobId, text, score = null }) {
   const { t } = useLanguage()
   const [copied, setCopied] = useState(false)
   const [refCode, setRefCode] = useState('')
+  // Pano da paylasim da calismazsa link GORUNUR olur — sessiz kalmaz.
+  const [manuel, setManuel] = useState(false)
 
   useEffect(() => {
     if (!jobId) return
@@ -47,22 +49,51 @@ export default function ShareResult({ jobId, text, score = null }) {
   const url = `https://geoni.ai/s/${jobId}${refCode ? `?ref=${refCode}` : ''}`
   const full = `${text}\n${url}`
 
+  /* 🪤 DUGME SESSIZ KALIYORDU (2026-08-08 fonksiyonel testinde olculdu: uc
+     tiklamada SIFIR etki). Eski kod iki yolu da `catch {}` ile yutuyordu:
+       * `navigator.share` masaustu tarayicilarda VAR ama izin/gesture yoksa
+         NotAllowedError atiyor -> yutuluyor, `return` ile cikiliyordu;
+       * `clipboard.writeText` guvensiz baglamda/izinsiz reddediliyor -> yine
+         yutuluyordu.
+     Ikisinde de kullaniciya HICBIR geri bildirim gitmiyordu; dugme bozuk
+     saniliyordu. Artik: paylasim penceresi acilmazsa panoya, pano da olmazsa
+     GORUNUR bir link kutusuna dusulur. Her dalda kullanici bir sey gorur. */
   const share = async () => {
     if (navigator.share) {
-      try { await navigator.share({ text: full }) } catch { /* kullanici vazgecti */ }
-      return
+      try {
+        await navigator.share({ text: full })
+        return
+      } catch (e) {
+        // Kullanici penceredEN vazgectiyse is bitmistir; baska her hata
+        // (izin/destek) panoya DUSMEYI gerektirir.
+        if (e?.name === 'AbortError') return
+      }
     }
     try {
       await navigator.clipboard.writeText(full)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    } catch { /* pano erisimi yok */ }
+      return
+    } catch { /* asagidaki gorunur cozume dus */ }
+    setManuel(true)
   }
 
   return (
-    <button type="button" className="share-result-btn share-result-btn--card" onClick={share}>
-      {copied ? <Check size={15} strokeWidth={2} /> : <Share2 size={15} strokeWidth={1.75} />}
-      {copied ? t('share_copied') : t('share_cta')}
-    </button>
+    <>
+      <button type="button" className="share-result-btn share-result-btn--card" onClick={share}>
+        {copied ? <Check size={15} strokeWidth={2} /> : <Share2 size={15} strokeWidth={1.75} />}
+        {copied ? t('share_copied') : t('share_cta')}
+      </button>
+      {manuel && (
+        <input
+          className="share-result-manual"
+          type="text"
+          readOnly
+          value={url}
+          aria-label={t('share_cta')}
+          onFocus={(e) => e.target.select()}
+        />
+      )}
+    </>
   )
 }

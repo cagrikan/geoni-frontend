@@ -3736,3 +3736,19 @@ button.fixes__item { width: 100%; text-align: left; }
   border-left: 3px solid var(--accent); border-radius: var(--r-md);
 }
 .judge-note b { color: var(--accent); font-weight: 600; }
+
+/* Paylasim linki son care kutusu: `navigator.share` da pano da calismazsa
+   (izin yok / guvensiz baglam) link GORUNUR olur ve kullanici elle kopyalar.
+   Eskiden iki dal da sessizce yutuluyordu ve dugme bozuk saniliyordu
+   (2026-08-08 fonksiyonel testi). */
+.share-result-manual {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--text, #e7e9f2);
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: 8px;
+}

@@ -850,9 +850,13 @@ function DeltaBadge({ delta }) {
   )
 }
 
-/* İzleme v2: kullanıcı tanımlı SOV soruları editörü. Buraya yazılan
-   sorular haftalık otomatik taramada AI motorlarına aynen sorulur
-   (otomatik üretilen kategori sorularının yerine geçer, en çok 3). */
+/* İzleme v2: kullanıcı tanımlı SOV soruları editörü. Buraya yazılan sorular
+   HER YENİDEN TARAMADA AI motorlarına aynen sorulur (otomatik üretilen
+   kategori sorularının yerine geçer, en çok 3).
+   🪤 Eskiden "haftalık otomatik taramada" yazıyordu — otomatik tarama kurucunun
+   kararıyla 2026-08-08'de KAPATILDI (bkz. lib/otomatikIzleme.js). Kullanıcıya
+   gösterilen metin doğruydu; yanlış olan bu yorumdu ve bir sonraki okuyanı
+   olmayan bir özelliğe inandırırdı. */
 function WatchlistQueryEditor({ item, t, onSaved }) {
   const [queries, setQueries] = useState(item.custom_queries || [])
   const [draft, setDraft] = useState('')

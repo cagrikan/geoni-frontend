@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
+import { OTOMATIK_IZLEME_ACIK } from '../lib/otomatikIzleme'
 import { useLanguage } from '../lib/LanguageContext'
 import { useTheme } from '../lib/ThemeContext'
 import GeoniMark from '../GeoniMark'
@@ -1394,7 +1395,10 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                           <div className="dash-audit-info">
                             <div className="dash-audit-name">{item.label}</div>
                             <div className={`dash-audit-sub ${monitorPaused ? 'dash-audit-sub--warn' : ''}`}>
-                              {item.monitor_enabled === false ? t('watchlist_monitor_off')
+                              {/* Otomatik tarama kapaliyken "duzenli izleme acik" YAZILMAZ:
+                                  yapmadigimiz isi soylemek olur (bkz. lib/otomatikIzleme.js). */}
+                              {!OTOMATIK_IZLEME_ACIK ? t('watchlist_saved_target')
+                                : item.monitor_enabled === false ? t('watchlist_monitor_off')
                                 : monitorPaused ? t('watchlist_monitor_paused')
                                 : !freePeriodOver ? t('watchlist_monitor_badge_free')
                                 : t('watchlist_monitor_badge')}

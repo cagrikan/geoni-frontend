@@ -187,6 +187,10 @@ export const translations = {
     stability_smoothed_hint: 'son 3 tarama ortalaması',
     stability_prev_prefix: 'Önceki taramaya göre',
     stability_prev_suffix: 'puan.',
+    // Sebep tek bir bilesene baglanamadiginda: degisimi saklamiyoruz,
+    // uydurma bir sebep de yazmiyoruz (kurucu karari 2026-08-09).
+    stability_no_driver: 'AI motorlarının yanıtları tarama başına dalgalanabilir; '
+      + 'yumuşatılmış skor daha güvenilir bir gösterge.',
     stability_driver_prefix: 'Bu değişim büyük ölçüde',
     stability_driver_suffix: 'bileşenindeki dalgalanmadan geliyor — yapısal bir değişim olmayabilir.',
     sov_adjacent_tag: 'komşu alan',
@@ -1001,6 +1005,8 @@ export const translations = {
     stability_smoothed_hint: 'average of last 3 scans',
     stability_prev_prefix: 'Compared to the previous scan:',
     stability_prev_suffix: 'points.',
+    stability_no_driver: 'AI engine answers can fluctuate between scans; '
+      + 'the smoothed score is the steadier signal.',
     stability_driver_prefix: 'This change mostly comes from fluctuation in the',
     stability_driver_suffix: 'component — it may not be a structural change.',
     sov_adjacent_tag: 'adjacent field',

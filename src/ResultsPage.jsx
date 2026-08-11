@@ -298,7 +298,12 @@ export default function ResultsPage({ result, jobId = null, onReset, user, onLog
             <h1 className="results__title">{t('results_site_title')}</h1>
             {formattedDate && (
               <div className="results__date">
-                {formattedDate}{formattedTime && <span style={{ marginLeft: 8, opacity: .7 }}>{formattedTime}</span>} {t('results_created_at_suffix')}
+                {/* TR sonek ("... tarihinde oluşturuldu"), EN önek ("Created on ...")
+                    — tek sonekle EN'de "August 12 created on" çıkıyordu (M10).
+                    Kullanılmayan anahtar boş string döner, hiç çizilmez. */}
+                {t('results_created_at_prefix') && `${t('results_created_at_prefix')} `}
+                {formattedDate}{formattedTime && <span style={{ marginLeft: 8, opacity: .7 }}>{formattedTime}</span>}
+                {t('results_created_at_suffix') && ` ${t('results_created_at_suffix')}`}
               </div>
             )}
           </div>

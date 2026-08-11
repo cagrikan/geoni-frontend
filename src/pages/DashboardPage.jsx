@@ -15,6 +15,7 @@ import RateTicket from '../components/RateTicket'
 import InviteCard from '../components/InviteCard'
 import { isPaidUser } from '../lib/access'
 import { langHeaders } from '../lib/apiLang'
+import { translations } from '../lib/translations'
 
 /* Uzmanin, atandigi biletin MUSTERISININ itibarini gormesi - sorunlu
    musteriyi onceden tanimak icin. Musteri tarafinda hic cagrilmaz. */
@@ -68,7 +69,27 @@ async function authedFetch(path, options = {}) {
       ...(options.headers || {}),
     },
   })
-  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || `İstek başarısız (${res.status})`)
+  if (!res.ok) {
+    // `detail` FastAPI'de yapısal nesne olabilir — doğrudan mesaja koymak
+    // ekrana "[object Object]" düşürüyordu; ham "İstek başarısız (404)"
+    // fallback'i ise EN kullanıcıya Türkçe + HTTP kodu sızdırıyordu (Ö5).
+    let mesaj = null
+    try {
+      const d = (await res.json())?.detail
+      if (typeof d === 'string') mesaj = d
+      else if (d && typeof d === 'object' && typeof d.message === 'string') mesaj = d.message
+    } catch { /* gövde JSON değil */ }
+    if (!mesaj) {
+      // React ağacının dışındayız (modül seviyesi) — dil tercihi apiLang ile
+      // aynı tek noktadan (localStorage) okunur, metin i18n sözlüğünden gelir.
+      let lang = 'tr'
+      try { const l = localStorage.getItem('geoni_lang'); if (l === 'en') lang = 'en' } catch { /* ignore */ }
+      mesaj = (translations[lang] || translations.tr).error_request_failed
+    }
+    const e = new Error(mesaj)
+    e.status = res.status
+    throw e
+  }
   return res.json()
 }
 
@@ -566,6 +587,12 @@ function useAutoOpenTicket(list, openFn) {
 
 function MyTicketsSection({ t, userId, language }) {
   const [myTickets, setMyTickets] = useState(null)
+  // Ag hatasi != bos liste: eskiden catch listeyi []'a cevirip parasini odemis
+  // kullaniciya "Henuz biletiniz yok" gosteriyordu, tekrar-dene yolu yoktu.
+  // Tarama gecmisi/izleme listesindeki LoadError deseninin buraya da
+  // uygulanmasi (denetim Ö7). Basarili yuklemeden sonraki bir arka plan
+  // hatasi mevcut listeyi SILMEZ (prev ?? []).
+  const [loadError, setLoadError] = useState(false)
   const [selected, setSelected] = useState(null)
   const [disputeOpen, setDisputeOpen] = useState(false)
   const [disputeReason, setDisputeReason] = useState('')
@@ -574,7 +601,9 @@ function MyTicketsSection({ t, userId, language }) {
   const [confirmBusy, setConfirmBusy] = useState(false)
   const [confirmError, setConfirmError] = useState(null)
 
-  const load = () => authedFetch('/api/tickets').then((l) => { setMyTickets(l); return l }).catch(() => { setMyTickets([]); return [] })
+  const load = () => authedFetch('/api/tickets')
+    .then((l) => { setLoadError(false); setMyTickets(l); return l })
+    .catch(() => { setLoadError(true); setMyTickets((prev) => prev ?? []); return [] })
   useEffect(() => { load() }, [])
 
   const openTicket = (tk) => {
@@ -671,7 +700,10 @@ function MyTicketsSection({ t, userId, language }) {
     <div className="dash-section">
       <h2 className="dash-section__title">{t('dash_tickets_mine')}</h2>
       <p className="dash-hint">{t('dash_tickets_mine_hint')}</p>
-      {myTickets === null ? <div className="dash-loading">{t('dash_loading')}</div> : myTickets.length === 0 ? (
+      {myTickets === null ? <div className="dash-loading">{t('dash_loading')}</div>
+        : loadError && myTickets.length === 0 ? (
+        <LoadError t={t} onRetry={load} />
+      ) : myTickets.length === 0 ? (
         <div className="dash-empty"><p>{t('dash_tickets_empty')}</p></div>
       ) : (
         <TicketBoard tickets={myTickets} columns={columns} authedFetch={authedFetch} onCardClick={openTicket} />
@@ -694,8 +726,12 @@ function ExpertPanelSection({ t, userId, language }) {
   const [selected, setSelected] = useState(null)
   const [search, setSearch] = useState('')
   const [actionError, setActionError] = useState(null)
+  // Bkz. MyTicketsSection'daki not: ag hatasi bos durum gibi gorunmesin (Ö7).
+  const [loadError, setLoadError] = useState(false)
 
-  const load = () => authedFetch('/api/expert/tickets').then(setTickets).catch(() => setTickets([]))
+  const load = () => authedFetch('/api/expert/tickets')
+    .then((l) => { setLoadError(false); setTickets(l) })
+    .catch(() => { setLoadError(true); setTickets((prev) => prev ?? []) })
   useEffect(() => { load() }, [])
 
   const openTicket = (tk) => {
@@ -800,7 +836,10 @@ function ExpertPanelSection({ t, userId, language }) {
         <Search size={15} strokeWidth={1.5} />
         <input placeholder={t('dash_expert_search_ph')} value={search} onChange={(e) => setSearch(e.target.value)} />
       </div>
-      {tickets === null ? <div className="dash-loading">{t('dash_loading')}</div> : visibleTickets.length === 0 ? (
+      {tickets === null ? <div className="dash-loading">{t('dash_loading')}</div>
+        : loadError && tickets.length === 0 ? (
+        <LoadError t={t} onRetry={load} />
+      ) : visibleTickets.length === 0 ? (
         <div className="dash-empty"><p>{t('dash_expert_empty')}</p></div>
       ) : (
         <TicketBoard tickets={visibleTickets} columns={columns} authedFetch={authedFetch} onCardClick={openTicket} subtitleFor={(tk) => tk.target || tk.user_email} />
@@ -928,6 +967,17 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
   const [selectedIds, setSelectedIds] = useState(new Set())
   const [confirmState, setConfirmState] = useState(null)
   const [queryEditor, setQueryEditor] = useState(null) // acik ozel-sorgu editorunun watchlist id'si
+  // Izleme bedeli rozetleri icin (takip listesi satirlari) — sunucudan gelir.
+  const scanCosts = useScanCosts()
+  // Tarama akisindan tasinan tek seferlik bildirim (ör. ucretsiz hak doldu →
+  // Cuzdan'a yonlendirildi). App.jsx yazar, burada bir kez gosterilip silinir.
+  const [pendingNotice, setPendingNotice] = useState(() => {
+    try {
+      const n = localStorage.getItem('geoni_pending_notice')
+      if (n) localStorage.removeItem('geoni_pending_notice')
+      return n
+    } catch { return null }
+  })
   const [tab, setTab] = useState(() => {
     // Polar checkout donusu dogrudan cuzdana insin ki "siparisiniz alindi"
     // seridi ve yuklenen tokenlar gorunsun (parametreyi WalletSection tuketir).
@@ -1191,6 +1241,16 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
         </div>
       )}
 
+      {/* Tarama akisindan gelen "neden buradayim" mesaji (M8): ucretsiz hak
+          dolunca kullanici buraya yonlendiriliyordu ama mesaj landing'de
+          kaliyordu. Backend mesaji zaten X-Lang'e gore lokalize uretir. */}
+      {pendingNotice && (
+        <div className="dash-stale-banner" role="status">
+          <span>{pendingNotice}</span>
+          <button className="dash-stale-banner__retry" onClick={() => setPendingNotice(null)}>{t('confirm_ok')}</button>
+        </div>
+      )}
+
       <div className="dashboard__body">
         {/* Sidebar */}
         <aside className="dashboard__sidebar">
@@ -1220,7 +1280,7 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
             </button>
             {onAdmin && (
               <button className="dash-nav__item" onClick={onAdmin}>
-                <ShieldCheck size={16} strokeWidth={1.5} /> Admin Paneli
+                <ShieldCheck size={16} strokeWidth={1.5} /> {t('dash_nav_admin')}
               </button>
             )}
           </nav>
@@ -1382,11 +1442,20 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                     const delta = series && series.length >= 2 ? series[series.length - 1].score - series[series.length - 2].score : null
                     const matchedAudit = key ? latestAuditByTarget[key] : null
                     const TypeIcon = typeIcon[item.type] || FileText
-                    // Ucretlendirme: ilk 30 gun ucretsiz izleme; sonrasinda
-                    // bakiyesiz kullanicida backend taramayi atlar, burada
-                    // 'duraklatildi' rozeti gosterilir (bkz. monitor.py).
-                    const freePeriodOver = item.created_at && (Date.now() - new Date(item.created_at).getTime()) > 30 * 24 * 3600 * 1000
-                    const monitorPaused = item.monitor_enabled !== false && freePeriodOver && (profile?.credit_balance ?? 0) <= 0
+                    // Ucretlendirme (2026-08-12): izleme UCRETLI, deneme donemi
+                    // YOK. Her otomatik tarama elle taramayla ayni bedeli duser
+                    // (bedel sunucudan, /api/scan-costs — metne gomulmez).
+                    // Bakiye o taramaya yetmiyorsa backend atlar; burada
+                    // 'duraklatildi' rozeti gosterilir, hedef listede kalir ve
+                    // token yuklenince kendiliginden devam eder (monitor.py).
+                    const izlemeBedeli = scanCosts
+                      ? (item.type === 'social' ? scanCosts.social : item.type === 'web' ? scanCosts.web : scanCosts.brand)
+                      : null
+                    const bakiye = profile?.credit_balance ?? 0
+                    // Bedel cekilemediyse muhafazakar davran: yalniz sifir/eksi
+                    // bakiyede "duraklatildi" de — bilmedigimiz esikle korkutma.
+                    const monitorPaused = item.monitor_enabled !== false
+                      && (izlemeBedeli != null ? bakiye < izlemeBedeli : bakiye <= 0)
                     return (
                       <div key={item.id}>
                       <div
@@ -1400,11 +1469,13 @@ export default function DashboardPage({ onReset, onNewScan, onViewAudit, onResca
                             <div className="dash-audit-name">{item.label}</div>
                             <div className={`dash-audit-sub ${monitorPaused ? 'dash-audit-sub--warn' : ''}`}>
                               {/* Otomatik tarama kapaliyken "duzenli izleme acik" YAZILMAZ:
-                                  yapmadigimiz isi soylemek olur (bkz. lib/otomatikIzleme.js). */}
+                                  yapmadigimiz isi soylemek olur (bkz. lib/otomatikIzleme.js).
+                                  Acikken de BEDEL yazilir — kullanici 15 gunde bir kac token
+                                  dustugunu satirda gormeli. */}
                               {!OTOMATIK_IZLEME_ACIK ? t('watchlist_saved_target')
                                 : item.monitor_enabled === false ? t('watchlist_monitor_off')
                                 : monitorPaused ? t('watchlist_monitor_paused')
-                                : !freePeriodOver ? t('watchlist_monitor_badge_free')
+                                : izlemeBedeli != null ? t('watchlist_monitor_badge_cost', { n: izlemeBedeli })
                                 : t('watchlist_monitor_badge')}
                               {(item.custom_queries || []).length > 0 && ` · ${(item.custom_queries || []).length} ${t('watchlist_queries_count')}`}
                             </div>

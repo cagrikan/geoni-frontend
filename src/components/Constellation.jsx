@@ -1,16 +1,24 @@
 import { useRef, useEffect } from 'react'
+import { useLanguage } from '../lib/LanguageContext'
 
 // Tarama ekranı arka plan animasyonu: isimli AI motoru + varlık düğümlerinden
 // oluşan bir takımyıldız, kenarlarda akan sinyaller, kademeli keşif. Merkez
 // GEONI logosu + skor halkası ScanningScreen'de DOM olarak duruyor (bu canvas
 // onun ARKASINDA). Kütüphanesiz; unmount'ta rAF temizlenir, reduced-motion'a saygılı.
+// Düğüm adları dile göre (M1): dekoratif de olsa ("Rakip A", "Haber") EN
+// ekranında Türkçe metin çiziliyordu.
 const ENGINES = ['ChatGPT', 'Claude', 'Gemini', 'Perplexity']
-const ENTITIES = ['Wikipedia', 'Reddit', 'llms.txt', 'Schema', 'Rakip A', 'Haber', 'YouTube', 'Sektör blog', 'Rakip B', 'Dizin']
+const ENTITIES_BY_LANG = {
+  tr: ['Wikipedia', 'Reddit', 'llms.txt', 'Schema', 'Rakip A', 'Haber', 'YouTube', 'Sektör blog', 'Rakip B', 'Dizin'],
+  en: ['Wikipedia', 'Reddit', 'llms.txt', 'Schema', 'Competitor A', 'News', 'YouTube', 'Industry blog', 'Competitor B', 'Directory'],
+}
 
 export default function Constellation() {
   const ref = useRef(null)
+  const { language } = useLanguage()
 
   useEffect(() => {
+    const ENTITIES = ENTITIES_BY_LANG[language] || ENTITIES_BY_LANG.tr
     const cv = ref.current
     if (!cv) return
     const ctx = cv.getContext('2d')
@@ -86,7 +94,7 @@ export default function Constellation() {
     const onResize = () => { started = performance.now(); build() }
     window.addEventListener('resize', onResize)
     return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', onResize) }
-  }, [])
+  }, [language])
 
   return <canvas ref={ref} className="scan-constellation" aria-hidden="true" />
 }

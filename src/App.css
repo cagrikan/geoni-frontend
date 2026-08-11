@@ -497,6 +497,16 @@ body {
 .watchlist-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
 .watchlist-btn:disabled { cursor: default; }
 .watchlist-btn--added { color: var(--good); border-color: var(--good); opacity: .85; }
+/* Izleme ucretli (2026-08-12): bedel/siklik/duraklama ipucu butonun hemen
+   altinda — kullanici izlemeye almadan once kosullari gorsun. */
+.watchlist-btn-wrap { display: inline-flex; flex-direction: column; align-items: flex-start; }
+.watchlist-hint {
+  margin: 5px 0 0;
+  max-width: 280px;
+  font-size: .68rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
 .results__title {
   font-family: var(--display);
   font-size: clamp(1.6rem, 2.6vw, 2.2rem);
@@ -1907,6 +1917,11 @@ body {
   width: 100%;
   align-items: flex-start;
   margin-bottom: 28px;
+  /* Uzun taramada SSE mesajlari "Vazgec" ve ETA satirini ekran disina
+     itmesin (denetim M7): liste kendi icinde kayar, App.jsx ayrica son 60
+     adimla sinirlar. */
+  max-height: 38vh;
+  overflow-y: auto;
 }
 .scan-step {
   display: flex;
@@ -2623,6 +2638,17 @@ body {
 }
 .ticket-thread__messages { display: flex; flex-direction: column; gap: 10px; max-height: 360px; overflow-y: auto; }
 .ticket-thread__empty { font-size: .875rem; color: var(--text-muted); padding: 8px 0; }
+/* Mesaj dizisi yuklenemedigince tekrar-dene (Ö7). */
+.ticket-thread__retry {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--accent);
+  font-size: .875rem;
+  font-family: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
 .ticket-thread__msg {
   background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
   padding: 10px 12px; max-width: 85%; align-self: flex-start;

@@ -159,18 +159,24 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, onSubmi
     } catch { return null }
   }, [user])
 
-  // social (tek adim, anonim - giris gerekmez, funnel)
+  // social (tek adim; giris GEREKIR — anonim tarama 2026-08-03'te kapatildi,
+  // 401'de form saklanip login'e yonlendirilir, bkz. App.jsx loginDuvari)
   const [socialHandle, setSocialHandle] = useState('')
   const [socialNiche, setSocialNiche]   = useState('')
   const [socialEmail, setSocialEmail]   = useState('')
+  // 1 karakterlik handle SESSIZCE yutuluyordu (M3): buton basili kalmis gibi
+  // gorunuyordu, hicbir mesaj yoktu. `required` bos alani yakalar ama kisa
+  // handle'i yakalamaz — gorunur dogrulama mesaji sart.
+  const [socialError, setSocialError] = useState(null)
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    // Sosyal: tek adim, ANONIM (giris gerekmez - funnel). Mevcut akislari
-    // etkilememek icin en basta ele alinir.
+    // Sosyal: tek adim. Mevcut akislari etkilememek icin en basta ele alinir.
     if (mode === 'social') {
       const h = socialHandle.trim().replace(/^@/, '')
-      if (h.length < 2 || !socialEmail.trim()) return
+      if (h.length < 2) { setSocialError(t('social_handle_too_short')); return }
+      if (!socialEmail.trim()) return
+      setSocialError(null)
       onSubmitSocial?.({ handle: h, niche: socialNiche.trim(), email: socialEmail.trim(), turnstile_token: turnstileTokenRef.current })
       resetTurnstile()
       return
@@ -302,6 +308,7 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, onSubmi
                 key={key}
                 type="button"
                 className={`app-tab ${mode === key ? 'app-tab--on' : ''}`}
+                aria-pressed={mode === key}
                 onClick={() => changeMode(key)}
               >
                 <span className="app-tab__ico"><Icon size={17} strokeWidth={1.75} /></span>
@@ -460,12 +467,13 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, onSubmi
               </>
             )}
 
-            {/* ── SOSYAL (tek adim, anonim) ── */}
+            {/* ── SOSYAL (tek adim; giris gerekir) ── */}
             {mode === 'social' && (
               <>
                 <div className="landing__field landing__field--hero">
                   <label htmlFor="social-handle">{t('field_social_handle_label')}</label>
-                  <input id="social-handle" type="text" placeholder={t('field_social_handle_placeholder')} value={socialHandle} onChange={e => setSocialHandle(e.target.value)} disabled={loading} required autoFocus />
+                  <input id="social-handle" type="text" minLength={2} placeholder={t('field_social_handle_placeholder')} value={socialHandle} onChange={e => { setSocialHandle(e.target.value); setSocialError(null) }} disabled={loading} required autoFocus />
+                  {socialError && <p className="landing__error" role="alert">{socialError}</p>}
                 </div>
                 <div className="landing__field">
                   <label htmlFor="social-niche">{t('field_social_niche_label')}</label>
@@ -540,7 +548,9 @@ export default function LandingPage({ onSubmitAudit, onSubmitBrandCheck, onSubmi
               <li className="league__row" key={it.domain}>
                 <span className="league__rank">{i + 1}</span>
                 <span className="league__domain">{it.domain}</span>
-                <span className="league__score" style={{ color: it.score >= SKOR_IYI ? '#2fbd84' : '#F5A623' }}>{Math.round(it.score)}</span>
+                {/* Renk TOKEN'dan (M5): sabit #F5A623 acik temada ~2:1 kontrasttaydi;
+                    App.css --good/--warn temaya gore WCAG-notlu degerler tasir. */}
+                <span className="league__score" style={{ color: it.score >= SKOR_IYI ? 'var(--good)' : 'var(--warn)' }}>{Math.round(it.score)}</span>
               </li>
             ))}
           </ol>

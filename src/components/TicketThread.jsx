@@ -20,7 +20,12 @@ const TicketThread = forwardRef(function TicketThread({ ticketId, currentUserId,
 
   useImperativeHandle(ref, () => ({ setBody }), [])
 
-  const load = () => authedFetch(`/api/tickets/${ticketId}/messages`).then((m) => { setMessages(m); onMessages?.(m) }).catch(() => setMessages([]))
+  // Ag hatasi != "henuz mesaj yok" (denetim Ö7): eskiden catch [] atiyor,
+  // dolu bir yazisma gecici hatada bos gorunuyordu ve tekrar-dene yoktu.
+  const [loadFailed, setLoadFailed] = useState(false)
+  const load = () => authedFetch(`/api/tickets/${ticketId}/messages`)
+    .then((m) => { setLoadFailed(false); setMessages(m); onMessages?.(m) })
+    .catch(() => { setLoadFailed(true); setMessages((prev) => prev ?? []) })
   useEffect(() => { load() }, [ticketId])
 
   const send = async () => {
@@ -59,6 +64,11 @@ const TicketThread = forwardRef(function TicketThread({ ticketId, currentUserId,
       <div className="ticket-thread__messages">
         {messages === null ? (
           <div className="admin-loading admin-loading--widget">{t('admin_loading')}</div>
+        ) : loadFailed && messages.length === 0 ? (
+          <div className="ticket-thread__empty">
+            {t('dash_load_error')}{' '}
+            <button type="button" className="ticket-thread__retry" onClick={load}>{t('dash_load_retry')}</button>
+          </div>
         ) : messages.length === 0 ? (
           <div className="ticket-thread__empty">{t('ticket_thread_empty')}</div>
         ) : messages.map((m) => (
@@ -117,7 +127,7 @@ const TicketThread = forwardRef(function TicketThread({ ticketId, currentUserId,
           tabIndex={-1}
           ref={(el) => el?.focus()}
         >
-          <button type="button" className="ticket-lightbox__close" onClick={() => setLightbox(null)} aria-label="Kapat">
+          <button type="button" className="ticket-lightbox__close" onClick={() => setLightbox(null)} aria-label={t('lightbox_close')}>
             <X size={18} strokeWidth={2} />
           </button>
           <img src={lightbox} alt="" onClick={(e) => e.stopPropagation()} />

@@ -42,7 +42,11 @@ describe('web istemcisi poll dayanıklılığı', () => {
 
   it.each(['const pollAuditJob', 'const pollBrandJob'])('%s: HTTP kodu hataya iliştiriliyor', (ad) => {
     // Yoksa 404 ile geçici ağ hatası ayırt edilemez ve kural ölü kalır.
-    expect(dongu(ad)).toMatch(/e\.status = res\.status/)
+    // 2026-08-12: kod artık apiErrorFrom kullanıyor — o yardımcı hem
+    // `e.status = res.status` yapar hem yapısal detail'i okunur mesaja
+    // çevirir ("[object Object]" düzeltmesi, Ö5). Döngü gövdesinde bu
+    // çağrının durması, statünün iliştirildiğinin kanıtıdır.
+    expect(dongu(ad)).toMatch(/await apiErrorFrom\(res/)
   })
 
   it.each(['const pollAuditJob', 'const pollBrandJob'])('%s: sayaç iki kez artmıyor', (ad) => {

@@ -15,4 +15,16 @@
  * verilecekse buradaki sabit de true yapilmali. Biri unutulursa arayuz yine
  * yalan soyler (bu sefer ters yonde: is yapiliyor ama gorunmuyor).
  */
-export const OTOMATIK_IZLEME_ACIK = false
+/* 2026-08-12 — KURUCU KARARI DEGISTI: izleme geri aciliyor, ama bu sefer
+ * UCRETLI. Her otomatik tarama elle taramayla ayni kontoru duser
+ * (web/marka 20, sosyal 10); 15 gunde bir; ucretsiz deneme donemi yok;
+ * bakiye yetmezse tarama atlanir, hedef listede kalir ve kullaniciya
+ * "izleme duraklatildi" bildirimi gider.
+ *
+ * 2026-08-08'deki kapatma gerekcesi "bedava is, sifir gelir" idi; bedel
+ * eklenince o gerekce ortadan kalkti.
+ *
+ * 🔴 Bu sabit true iken sunucuda MONITOR_AUTO_SCAN=1 OLMAK ZORUNDA.
+ * Ikisi ayrisirsa arayuz yine yalan soyler — bu dosya tam da bunun icin var.
+ */
+export const OTOMATIK_IZLEME_ACIK = true

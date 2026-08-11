@@ -1,8 +1,19 @@
+/* USLUP KURALI (2026-08-12 tutarlilik denetimi, Ö4): rapor ve uygulama
+ * yuzeylerinde "SIZ" kullanilir. Tek istisna: kullanicinin KENDI agzından
+ * arkadaslarina giden viral paylasim metinleri (share_site_text,
+ * share_brand_text) ve og meta'lari — orada "sen" kalabilir. Ayni yuzeyde
+ * iki uslubu karistirmayin.
+ *
+ * SURE VAADI: gercek tarama suresi ~1,3-2 dakika. Tum yuzeylerde "~2 dakika"
+ * yazilir — "60 saniye" ya da "~5 dakika" gibi sapmalar beklenti kirar.
+ *
+ * UCRETSIZ VAADI: yalnizca ILK tarama ucretsiz; sonraki taramalar token
+ * duser. Kosulsuz "ucretsiz tarama" yazmayin. */
 export const translations = {
   tr: {
     // ── Sayfa basligi ──
     page_title: 'GEONI | AI Görünürlük Taraması',
-    page_description: "ChatGPT, Claude, Gemini ve Perplexity'nin sizi nasıl gördüğünü ölçün. Ücretsiz AI görünürlük taraması.",
+    page_description: "ChatGPT, Claude, Gemini ve Perplexity'nin sizi nasıl gördüğünü ölçün. İlk tarama ücretsiz.",
 
     // ── Nav (paylaşılan) ──
     nav_login: 'Giriş Yap',
@@ -14,13 +25,13 @@ export const translations = {
     hero_eyebrow: 'AI Görünürlük Taraması',
     hero_headline_1: 'Rakibiniz her AI yanıtında var.',
     hero_headline_2: 'Siz yoksunuz.',
-    hero_subhead: "ChatGPT, Claude, Gemini ve Perplexity'nin sizi nasıl gördüğünü dakikalar içinde ölçün — eksikleri tek tıkla uzmanlara devredin.",
+    hero_subhead: "ChatGPT, Claude, Gemini ve Perplexity'nin sizi nasıl gördüğünü ~2 dakikada ölçün — eksikleri tek tıkla uzmanlara devredin.",
     hero_eyeline_scans: 'tarama tamamlandı',
-    scan_card_title: 'Ücretsiz AI Görünürlük Taraması',
-    scan_card_eta: '⏱ ~5 dakika',
+    scan_card_title: 'AI Görünürlük Taraması',
+    scan_card_eta: '⏱ ~2 dakika',
     scan_peek_text: '<b>Tarama bitince göreceğiniz:</b> skorunuz, motor motor erişim durumu ve size özel eksik listesi.',
     hero_sample_btn: 'Önce örnek raporu görün →',
-    hero_trust: 'Kredi kartı gerekmez · Sonuç dakikalar içinde',
+    hero_trust: 'Kredi kartı gerekmez · Sonuç ~2 dakikada',
     app_slogan_1: 'AI sizi görmüyorsa, kimse görmüyor.',
     app_slogan_2: "Müşteriniz artık Google'a değil, AI'a soruyor.",
     app_slogan_3: 'Her AI yanıtı bir vitrin — siz orada mısınız?',
@@ -30,13 +41,15 @@ export const translations = {
     tab_desc_site: 'Alan adınızı tarayın',
     tab_desc_person: 'Kişisel marka',
     tab_desc_brand: 'Şirket / ürün',
-    tab_desc_social: 'AI seni öneriyor mu?',
-    trust_free: 'Ücretsiz',
+    tab_desc_social: 'AI sizi öneriyor mu?',
+    // "Ucretsiz" yalniz ILK tarama icin gecerli — kosulsuz yazmak, jeton
+    // dusen ikinci taramada tutulmayan soz olur (UI/UX denetimi Ö2).
+    trust_free: 'İlk tarama ücretsiz',
     scan_trust_line: 'Kredi kartı gerekmez · Skorunuz, her AI motorundaki erişim durumunuz ve size özel eksik listesi',
     underlink_how: 'Nasıl çalışır?',
     hero_trust_scans: '+ tarama tamamlandı ·',
-    landing_close_text: 'Skorunuz ve eksik listeniz <b>ücretsiz</b> — düzeltmek isterseniz uzmanlarımız hazır.',
-    landing_close_btn: 'Ücretsiz Taramaya Başla ↑',
+    landing_close_text: 'İlk taramanız <b>ücretsiz</b> — skorunuzu ve eksik listenizi görün; düzeltmek isterseniz uzmanlarımız hazır.',
+    landing_close_btn: 'Taramaya Başlayın ↑',
     private_scan_label: 'Özel tarama (geçmişe kaydedilmez)',
     // Bu cumle 2026-08-03'e kadar DOGRU DEGILDI: SQS modunda sonuc, polling
     // okuyabilsin diye audits satirina yaziliyor ve orada kaliyordu. Artik
@@ -97,15 +110,15 @@ export const translations = {
     wizard_accuracy_note: 'Bu bilgiler yalnızca sizi doğru tespit etmek için kullanılır: ne kadar doğru doldurursanız, adaş karışması ve yanlış eşleşme riski o kadar azalır, rapor o kadar isabetli olur.',
     wizard_next: 'İleri →',
     wizard_step_count: 'Adım',
-    submit_site: 'Ücretsiz Taramayı Başlat',
+    submit_site: 'Taramayı Başlat',
     submit_person: "AI'da Beni Ara",
     submit_brand: 'Markamı Sorgula',
 
     // ── Nasıl çalışır ──
     how_title: 'Nasıl çalışır',
     league_title: 'AI Görünürlük Ligi',
-    league_sub: "Yapay zekânın şu an en iyi tanıdığı siteler. Peki ya seninki?",
-    league_cta: 'Skorunu öğren →',
+    league_sub: "Yapay zekânın şu an en iyi tanıdığı siteler. Peki ya sizinki?",
+    league_cta: 'Skorunuzu öğrenin →',
     how_step1_title: 'Sorgula',
     how_step1_desc: "Sitenizi tarar, adınızı veya markanızı Claude, ChatGPT, Gemini ve Perplexity'ye gerçek zamanlı sorarız.",
     how_step2_title: 'Karşılaştır',
@@ -125,7 +138,7 @@ export const translations = {
     scan_sub: 'gerçek zamanlı çalışıyor',
     scan_sub_site: 'botlarının sitenize erişimi kontrol ediliyor',
     scan_starting: 'Başlatılıyor…',
-    scan_eta: 'Genelde birkaç dakika sürer. Bu ekranı kapatabilirsiniz — rapor hazır olunca e-postanıza gönderilir.',
+    scan_eta: 'Genelde ~2 dakika sürer. Bu ekranı kapatabilirsiniz — rapor hazır olunca e-postanıza gönderilir.',
     scan_cancel: 'Vazgeç',
 
     // ── Results (paylaşılan) ──
@@ -143,6 +156,9 @@ export const translations = {
     results_cta_sub_site: "ChatGPT, Perplexity ve Claude'un sizi kaynak olarak göstermesi kendiliğinden olmuyor — botlara erişim, doğru site yapısı ve güvenilir kaynaklarda görünürlük gibi somut adımlar gerekiyor. Rakipleriniz bu adımları çoktan attı.",
     results_cta_sub_brand: "ChatGPT, Gemini ve Claude'un sizi alanınızda kaynak olarak göstermesi kendiliğinden olmuyor — güvenilir kaynaklarda anılmak, doğru tanımlanmak ve alanınızla birlikte bilinmek gerekiyor. Rakipleriniz bu adımları çoktan attı.",
     results_sticky_upgrade: 'Skorunuzu yükseltmek ister misiniz?',
+    // TR sonek alir ("... tarihinde oluşturuldu"), EN onek ("Created on ...").
+    // Iki anahtar da HER dilde tanimli; kullanilmayan bos birakilir (M10).
+    results_created_at_prefix: '',
     results_created_at_suffix: 'tarihinde oluşturuldu',
     results_yes: 'Evet',
     results_no: 'Hayır',
@@ -162,7 +178,7 @@ export const translations = {
     // cok ihtiyaci olan dusuk skorlu kullanici onu HIC gormuyordu.
     // Sayilar scoreColor() ile BIREBIR ayni olmali (65/40); ayrica muhur esigi
     // 70 oldugu icin o da yaziliyor, yoksa "yesilim ama muhrum yok" sorusu cikar.
-    results_score_legend: '65+ iyi · 40-64 geliştirilmeli · 40 altı zayıf — mühür için 70 gerekir',
+    results_score_legend: '65+ iyi · 40-64 geliştirilmeli · 40 altı zayıf — mühür için 70+ skor ve en az 3 okunabilir sayfa gerekir',
     results_site_llmtxt_label: 'llm.txt durumunu gör',
     results_brand_score_label: 'AI Bilinirlik Skoru',
     breakdown_yanit_kalitesi: 'Yanıt Kalitesi',
@@ -199,20 +215,20 @@ export const translations = {
     sov_own_cited_prefix: 'Siteniz',
     sov_own_cited_suffix: 'yanıtta kaynak gösterildi.',
     sov_own_not_cited: 'Siteniz bu yanıtların hiçbirinde kaynak gösterilmedi — aşağıdaki sitelerde yer almak AI yanıtlarına girmenin en kısa yoludur.',
-    sov_gap_title: 'Atıf fırsatı — rakiplerini anlatan ama seni anmayan kaynaklar:',
-    sov_gap_sub: 'AI bu sitelerde rakiplerini görüyor, seni değil. Buralarda yer almak görünürlüğe en hızlı yol.',
+    sov_gap_title: 'Atıf fırsatı — rakiplerinizi anlatan ama sizi anmayan kaynaklar:',
+    sov_gap_sub: 'AI bu sitelerde rakiplerinizi görüyor, sizi değil. Buralarda yer almak görünürlüğe en hızlı yol.',
     /* Google AI Overview (2026-08-02) — Google aramanin ustundeki yapay zeka
        kutusu. SOV'dan AYRI bir yuzey: musteri bunu 10 saniyede kendi gozuyle
        dogrulayabilir, o yuzden satis degeri yuksek. */
     aio_title: 'Google AI Özeti',
-    aio_summary_suffix: 'sorguda geçtin',
-    aio_subtitle: 'Google aramanın en üstündeki yapay zekâ kutusunda adın geçiyor mu?',
+    aio_summary_suffix: 'sorguda geçiyorsunuz',
+    aio_subtitle: 'Google aramanın en üstündeki yapay zekâ kutusunda adınız geçiyor mu?',
     aio_present_prefix: 'Kutu',
     aio_present_suffix: 'sorguda çıktı.',
     aio_detail_label: 'AI Özeti detayları',
     aio_no_box: 'kutu yok',
     aio_sources_title: 'Google’ın AI özetini kurarken okuduğu kaynaklar:',
-    aio_own_cited_prefix: 'Siten',
+    aio_own_cited_prefix: 'Siteniz',
     aio_own_cited_suffix: 'özette kaynak gösterildi.',
     // Turkce'de sayidan sonra cogul eki gelmez -> tekil/cogul AYNI metin.
     // Anahtar yine de var: TR/EN simetrisi bozulmasin, istemci tek kod yolu kullansin.
@@ -222,7 +238,7 @@ export const translations = {
     // motoru seni onerdi mi", AIO = "Google'in kutusunda adin gecti mi".
     aio_in_box: 'Kutuda geçiyor',
     aio_not_in_box: 'Kutuda yok',
-    aio_own_not_cited: 'Bu kaynakların hiçbirinde siten geçmiyor — kutuya girmenin yolu buradan geçiyor.',
+    aio_own_not_cited: 'Bu kaynakların hiçbirinde siteniz geçmiyor — kutuya girmenin yolu buradan geçiyor.',
     aio_failed_note: 'sorgu ölçülemedi (sağlayıcı hatası). Bu “kutu yok” demek değildir; paydaya katılmadı.',
     /* SSR korlugu + eksik sayfa tipi (2026-08-02). SSR skora GIRIYOR
        (ai_access kesintisi) — musteri sebebini gorebilsin diye oneri listesinde.
@@ -231,17 +247,17 @@ export const translations = {
        Ingilizce'de tek bir ek dogru olmaz: 1st/2nd/3rd/4th. */
     sov_position_prefix: '',
     sov_position_suffix: '. sırada',
-    ssr_title: 'AI botları sayfanı göremiyor',
-    ssr_hidden_prefix: 'İçeriğin yaklaşık',
+    ssr_title: 'AI botları sayfalarınızı göremiyor',
+    ssr_hidden_prefix: 'İçeriğinizin yaklaşık',
     ssr_hidden_suffix: 'kadarı JavaScript sonrası oluşuyor — AI botları JavaScript çalıştırmaz.',
-    pagetype_title: 'Yanlış sayfa tipinde içerik üretiyorsun',
+    pagetype_title: 'Yanlış sayfa tipinde içerik üretiyorsunuz',
     pagetype_why_prefix: 'AI bu kategoride atıflarının',
-    pagetype_why_mid: 'kadarını karşılaştırma/liste sayfalarından alıyor; sende',
+    pagetype_why_mid: 'kadarını karşılaştırma/liste sayfalarından alıyor; sizde',
     pagetype_why_suffix: 'sayfa var.',
     // Alintilanabilirlik (golge mod — skora girmez, etiket bunu soyler).
-    cit_title: 'Sayfalarında alıntılanabilir bölüm yok',
+    cit_title: 'Sayfalarınızda alıntılanabilir bölüm yok',
     cit_why_prefix: 'AI, kendi başına ayakta duran 100-220 kelimelik blokları alıntılıyor. Taranan',
-    cit_why_mid: 'sayfanda bu uzunlukta bölüm neredeyse hiç yok; ortanca paragraf',
+    cit_why_mid: 'sayfanızda bu uzunlukta bölüm neredeyse hiç yok; ortanca paragraf',
     cit_why_suffix: 'kelime.',
     cit_tag: 'deneysel · skora katılmıyor',
     // Grok gölge motoru — bilgi notu, skora GİRMEZ.
@@ -251,29 +267,29 @@ export const translations = {
     grok_unique_desc: 'Bu siteler diğer dört motorun yanıtlarında geçmedi — çoğu X üzerinden geliyor.',
     // Kirilimin kalan dort boyutu. Metinler boyutun GERCEKTE olctugu seyi
     // anlatir (scoring.py docstring'lerinden), genel tavsiye degil.
-    fix_index_title: 'AI, sayfalarının çoğunu göremiyor',
+    fix_index_title: 'AI, sayfalarınızın çoğunu göremiyor',
     fix_index_why_prefix: 'Taradığımız sayfaların yalnızca',
     fix_index_why_suffix: 'kadarı arama motorlarının dizininde. Dizinde olmayan sayfa alıntılanamaz.',
-    fix_authority_title: 'Seni doğrulayan bağımsız kaynak az',
-    fix_authority_why: 'AI, başka sitelerin senden bahsedip bahsetmediğine bakıyor. Güvenilirlik Sinyali:',
-    fix_freshness_title: 'İçeriğin güncelliğini yitiriyor',
+    fix_authority_title: 'Sizi doğrulayan bağımsız kaynak az',
+    fix_authority_why: 'AI, başka sitelerin sizden bahsedip bahsetmediğine bakıyor. Güvenilirlik Sinyali:',
+    fix_freshness_title: 'İçeriğiniz güncelliğini yitiriyor',
     fix_freshness_why: 'Motorlar 90 günden eski içeriği belirgin şekilde daha az alıntılıyor. İçerik Güncelliği:',
-    fix_engagement_title: 'Üçüncü taraf platformlarda görünmüyorsun',
+    fix_engagement_title: 'Üçüncü taraf platformlarda görünmüyorsunuz',
     fix_engagement_why: 'LinkedIn, sektör dizinleri ve inceleme siteleri AI\'ın kontrol ettiği yerler. Etkileşim:',
-    brand_cached_note: 'Bu, yakın zamanda yaptığın taramanın sonucu (skorun tutarlı kalması için). Değişiklik yaptıysan yeniden ölçebilirsin.',
+    brand_cached_note: 'Bu, yakın zamanda yaptığınız taramanın sonucu (skorunuzun tutarlı kalması için). Değişiklik yaptıysanız yeniden ölçebilirsiniz.',
     res_shadow_engine: 'deneysel · skora katılmıyor',
 
     // ── Örnek rapor banner ──
     sample_banner_text: 'Bu bir',
     sample_banner_bold: 'örnek rapordur',
     sample_banner_rest: '— gerçek veri değildir.',
-    sample_banner_btn: 'Kendi Sitenizi Ücretsiz Tarayın →',
+    sample_banner_btn: 'Kendi Sitenizi Tarayın →',
 
     // ── Results (brand/person) ──
     results_brand_title: 'AI Bilinirlik Raporu',
     results_brand_queried_label: 'Sorgulanan',
     results_brand_breakdown_label: 'Model bazlı skor dökümünü gör',
-    results_brand_recognizing_models: 'Seni tanıyan AI',
+    results_brand_recognizing_models: 'Sizi tanıyan AI',
     results_brand_web_results: 'Web Sonucu',
     results_brand_claude_recognizes: 'Claude Tanıyor',
     results_brand_chatgpt_recognizes: 'ChatGPT Tanıyor',
@@ -291,10 +307,10 @@ export const translations = {
     // Ag hatasi ile "veri yok" AYRI seyler: eskiden gecici bir hata da bos
     // durum gibi gorunuyordu ("henuz tarama yok") ve tekrar-dene yolu yoktu.
     dash_load_error: 'Veriler yüklenemedi — bağlantınızı kontrol edip tekrar deneyin.',
-    dash_promo_title: 'Promosyon kodun var mı?',
-    dash_promo_placeholder: 'Kodu buraya yaz',
+    dash_promo_title: 'Promosyon kodunuz var mı?',
+    dash_promo_placeholder: 'Kodu buraya yazın',
     dash_promo_submit: 'Kullan',
-    dash_promo_ok: '{n} token hesabına eklendi.',
+    dash_promo_ok: '{n} token hesabınıza eklendi.',
     dash_load_retry: 'Tekrar dene',
     dash_profile_error: 'Hesap bilgileriniz yüklenemedi. Gösterilen plan ve bakiye güncel olmayabilir.',
 
@@ -324,6 +340,7 @@ export const translations = {
     dash_nav_tickets: 'AI Görünürlük Hizmetleri',
     dash_nav_my_tickets: 'Biletlerim',
     dash_nav_expert: 'Uzman Paneli',
+    dash_nav_admin: 'Admin Paneli',
     dash_tickets_title: 'AI Görünürlük Hizmetleri',
     dash_tickets_hint: 'Taramanızın bulduğu eksikleri uzmanlarımız sizin için giderir. Her iş; adım adım ilerleme takibi, uzmanla mesajlaşma ve teslim raporuyla gelir - ödeme token bakiyenizden.',
     dash_tickets_buy: 'Satın Al',
@@ -349,7 +366,7 @@ export const translations = {
     ticket_dispute_ph: 'İtiraz gerekçenizi yazın - admin ekibimiz inceleyip gerekirse işi uzmana iade edecek.',
     ticket_dispute_submit: 'İtirazı Gönder',
     ticket_confirm_cta: 'Tamam, teslim aldım',
-    share_cta: 'Skorunu paylaş',
+    share_cta: 'Skorunuzu paylaşın',
     engine_notice: 'Bu taramada {engines} motoruna erişilemedi. Skor, ölçülebilen diğer motorlarla hesaplandı.',
     creator_invite_title: 'İçerik üretiyor musun?',
     creator_invite_sub: 'Kitlenin sorduğu soruyu ölçen araç senin de olabilir — erken creator programına bak.',
@@ -357,8 +374,11 @@ export const translations = {
     share_copied: 'Kopyalandı — yapıştır ve gönder ✓',
     share_site_text: '{domain} — AI görünürlük skorum: {score}/100 👀 Seninki kaç? ChatGPT, Claude, Gemini, Perplexity seni görüyor mu?',
     share_brand_text: '{name} — AI görünürlük skoru: {score}/100 👀 Peki AI seni tanıyor mu? dakikalar içinde öğren:',
-    badge_title: 'Rozeti sitene ekle',
-    badge_hint: 'Skorun 70+ — tebrikler! Bu kodu sitene yapıştır: "AI Friendly · Checked by GEONI" rozetin sitende görünsün, tıklayan skor kartına gelsin.',
+    badge_title: 'Rozeti sitenize ekleyin',
+    // Rozet sarti EKSIKSIZ soylenir: 70+ skor VE >=3 okunabilir sayfa
+    // (lib/rozet.js). Sayfa sartini yazmamak "yesilim ama muhrum yok"
+    // sorusunu geri getirir (denetim M9).
+    badge_hint: 'Skorunuz 70+ ve sitenizin en az 3 sayfası okunabildi — tebrikler! Bu kodu sitenize yapıştırın: "AI Friendly · Checked by GEONI" rozeti sitenizde görünsün, tıklayan skor kartınıza gelsin.',
     badge_copy: 'Kodu kopyala',
     badge_copied: 'Kopyalandı ✓',
     ticket_confirm_hint: 'İş teslim edildi. Kontrol ettiyseniz onaylayın, talebiniz tamamlansın. Sonra bir sorun olursa itiraz edebilirsiniz.',
@@ -405,7 +425,7 @@ export const translations = {
     ticket_detail_status: 'Durum',
     ticket_detail_process: 'Süreç',
     ticket_impact_title: 'Etki',
-    ticket_impact_rescan: 'Yayınladıysan hedefi yeniden tara — görünürlük artışını burada gösterelim.',
+    ticket_impact_rescan: 'Yayınladıysanız hedefi yeniden tarayın — görünürlük artışını burada gösterelim.',
     ticket_impact_baseline: 'başlangıç',
     ticket_detail_files: 'Dosyalar',
     ticket_detail_details: 'Detaylar',
@@ -469,9 +489,17 @@ export const translations = {
     confirm_ok: 'Tamam',
     dash_watchlist_title: 'Takip Listesi',
     dash_watchlist_empty: 'Takip listeniz boş.',
-    dash_watchlist_empty_hint: "Bir tarama sonucunda \"İzlemeye Al\" butonuna tıklayarak buraya ekleyebilirsiniz.",
+    /* IZLEME UCRETLI (kurucu karari 2026-08-12, bkz. lib/otomatikIzleme.js):
+       15 gunde bir otomatik tarama, her tarama elle taramayla AYNI bedeli
+       duser (sunucudan /api/scan-costs ile gelir). UCRETSIZ DENEME YOK.
+       Bakiye yetmezse tarama atlanir, hedef listede kalir, "duraklatildi"
+       gosterilir; token yuklenince kendiliginden devam eder. Kullanici bu uc
+       gercegi (bedel, siklik, duraklama) IZLEMEYE ALMADAN ONCE gormeli. */
+    dash_watchlist_empty_hint: "Bir tarama sonucunda \"İzlemeye Al\" butonuna tıklayarak buraya ekleyebilirsiniz. İzlenen hedefler 15 günde bir otomatik taranır; her tarama normal tarama bedeli kadar token düşer.",
     watchlist_add: 'İzlemeye Al',
     watchlist_added: 'İzleniyor ✓',
+    watchlist_add_hint: 'İzlemeye alınca 15 günde bir otomatik taranır · her tarama {n} token düşer · bakiye yetmezse izleme duraklar, token yüklenince kendiliğinden sürer',
+    watchlist_add_hint_nocost: 'İzlemeye alınca 15 günde bir otomatik taranır · her tarama normal tarama bedeli kadar token düşer · bakiye yetmezse izleme duraklar, token yüklenince kendiliğinden sürer',
     watchlist_remove_confirm: 'Bu öğeyi takip listesinden çıkarmak istediğinize emin misiniz?',
     watchlist_rescan: 'Yeniden Tara',
     admin_tickets_search_ph: '#id, hedef, e-posta veya hizmet ara…',
@@ -479,8 +507,8 @@ export const translations = {
     watchlist_not_scanned_yet: 'Henüz taranmadı',
     watchlist_saved_target: 'Kayıtlı hedef — “Yeniden Tara” ile güncelleyin',
     watchlist_monitor_badge: 'Düzenli izleme açık (15 günde bir)',
-    watchlist_monitor_badge_free: 'Düzenli izleme açık (15 günde bir) · ilk ay ücretsiz',
-    watchlist_monitor_paused: 'İzleme duraklatıldı — devam etmek için token paketi alın',
+    watchlist_monitor_badge_cost: 'Düzenli izleme açık — 15 günde bir otomatik taranır · {n} token/tarama',
+    watchlist_monitor_paused: 'İzleme duraklatıldı (bakiye yetersiz) — hedef listede kalır, token yüklenince kendiliğinden devam eder',
     watchlist_monitor_off: 'İzleme kapalı',
     watchlist_queries_btn: 'Özel izleme soruları',
     watchlist_queries_count: 'özel soru',
@@ -507,14 +535,14 @@ export const translations = {
     judge_note_title: 'Bağımsız hakem: Claude.',
     judge_note_body: 'Her cevabı gerçek web verisiyle karşılaştırıp doğruluk puanı veriyor, çelişki ve uydurma arıyor.',
     sov_custom_note: 'Bu ölçümde izleme listenizde tanımladığınız özel sorular kullanıldı.',
-    invite_title: 'Davet et, ikiniz de kazanın',
-    invite_desc: 'Davet linkinle gelen kişi ilk taramasını yaptığında ikinize de {n} token geçer — tam bir marka/kişi taraması.',
+    invite_title: 'Davet edin, ikiniz de kazanın',
+    invite_desc: 'Davet linkinizle gelen kişi ilk taramasını yaptığında ikinize de {n} token geçer — tam bir marka/kişi taraması.',
     invite_copy: 'Linki kopyala',
     invite_copied: 'Kopyalandı ✓',
     invite_share: 'Paylaş',
     invite_stat_people: 'davet ettiğin kişi',
     invite_stat_earned: 'kazandığın token',
-    invite_welcome: 'Davetle geldin — ilk taraman bizden. Taramanı tamamlayınca hesabına {n} token geçecek.',
+    invite_welcome: 'Davetle geldiniz — ilk taramanız bizden. Taramanızı tamamlayınca hesabınıza {n} token geçecek.',
     dash_credits_title: 'Cüzdan',
     dash_credits_current: 'mevcut token',
     dash_credits_purchased: 'Toplam satın alınan:',
@@ -541,6 +569,10 @@ export const translations = {
     dash_settings_theme: 'Görünüm',
     dash_settings_theme_dark: 'Koyu',
     dash_settings_theme_light: 'Açık',
+    theme_to_light: 'Açık temaya geç',
+    theme_to_dark: 'Koyu temaya geç',
+    lightbox_close: 'Kapat',
+    social_handle_too_short: 'Kullanıcı adı en az 2 karakter olmalı.',
     dash_settings_membership: 'Üyelik',
     dash_credits_rates: 'Site taraması {web} token · Kişi ve marka taraması {brand} token · Sosyal tarama {social} token',
     dash_credits_scans: '≈ {site} site veya {kisi} kişi taraması',
@@ -554,15 +586,17 @@ export const translations = {
     problur_default_label: 'Kilitli',
     problur_upgrade: 'Tam raporu aç →',
     // Sosyal (influencer) sonuç varyantı
-    social_ai_knows_you: 'AI seni şöyle tanıyor',
-    social_needs_niche: 'Asıl skorun kategori görünürlüğü (AI seni öneriyor mu). Bunu ölçmek için nişini gir — hangi konuda takip edilmek istiyorsun?',
-    social_add_niche: 'Nişini gir & ölç →',
+    social_ai_knows_you: 'AI sizi şöyle tanıyor',
+    social_needs_niche: 'Asıl skorunuz kategori görünürlüğü (AI sizi öneriyor mu). Bunu ölçmek için nişinizi girin — hangi konuda takip edilmek istiyorsunuz?',
+    social_add_niche: 'Nişinizi girin & ölçün →',
 
     // ── Hatalar ──
-    error_audit_failed: 'Tarama başarısız',
-    error_audit_timeout: 'Tarama beklenenden uzun sürüyor (büyük siteler dakikalar alabilir). Arka planda devam ediyor — sonuç hazır olunca e-postana göndereceğiz.',
-    error_query_failed: 'Sorgu başarısız',
-    error_query_timeout: 'Sorgu beklenenden uzun sürüyor. Arka planda devam ediyor — sonuç hazır olunca e-postana göndereceğiz.',
+    // Eyleme donuk hata: ne oldu + ne yapmali + kime yazmali. "Jeton iade
+    // edildi" YAZILMAZ — iade davranisi backend'de dogrulanmadan vaat olur.
+    error_audit_failed: 'Tarama tamamlanamadı. Lütfen tekrar deneyin; sorun sürerse mail@geoni.ai adresine yazın.',
+    error_audit_timeout: 'Tarama beklenenden uzun sürüyor (büyük siteler dakikalar alabilir). Arka planda devam ediyor — sonuç hazır olunca e-postanıza göndereceğiz.',
+    error_query_failed: 'Sorgu tamamlanamadı. Lütfen tekrar deneyin; sorun sürerse mail@geoni.ai adresine yazın.',
+    error_query_timeout: 'Sorgu beklenenden uzun sürüyor. Arka planda devam ediyor — sonuç hazır olunca e-postanıza göndereceğiz.',
     error_request_failed: 'İşlem tamamlanamadı. İnternet bağlantınızı kontrol edip tekrar deneyin; sorun sürerse mail@geoni.ai adresine yazın.',
     error_connection: 'Bağlantı kurulamadı. İnternetinizi kontrol edip tekrar deneyin.',
 
@@ -830,7 +864,7 @@ export const translations = {
   en: {
     // ── Page title ──
     page_title: 'GEONI | AI Visibility Scan',
-    page_description: 'Measure how ChatGPT, Claude, Gemini and Perplexity see you. Free AI visibility scan.',
+    page_description: 'Measure how ChatGPT, Claude, Gemini and Perplexity see you. First scan free.',
 
     // ── Nav (shared) ──
     nav_login: 'Log In',
@@ -842,13 +876,13 @@ export const translations = {
     hero_eyebrow: 'AI Visibility Scan',
     hero_headline_1: 'Your competitor is in every AI answer.',
     hero_headline_2: "You're not.",
-    hero_subhead: 'Measure how ChatGPT, Claude, Gemini and Perplexity see you in minutes — then hand the gaps to our experts in one click.',
+    hero_subhead: 'Measure how ChatGPT, Claude, Gemini and Perplexity see you in ~2 minutes — then hand the gaps to our experts in one click.',
     hero_eyeline_scans: 'scans completed today',
-    scan_card_title: 'Free AI Visibility Scan',
-    scan_card_eta: '⏱ ~5 minutes',
+    scan_card_title: 'AI Visibility Scan',
+    scan_card_eta: '⏱ ~2 minutes',
     scan_peek_text: "<b>What you'll see when the scan finishes:</b> your score, engine-by-engine access status and your personal gap list.",
     hero_sample_btn: 'See a sample report first →',
-    hero_trust: 'No credit card required · Results in minutes',
+    hero_trust: 'No credit card required · Results in ~2 minutes',
     app_slogan_1: "If AI can't see you, no one can.",
     app_slogan_2: "Your customers aren't asking Google anymore — they're asking AI.",
     app_slogan_3: 'Every AI answer is a storefront — are you in it?',
@@ -859,12 +893,12 @@ export const translations = {
     tab_desc_person: 'Personal brand',
     tab_desc_brand: 'Company / product',
     tab_desc_social: 'Does AI recommend you?',
-    trust_free: 'Free',
+    trust_free: 'First scan free',
     scan_trust_line: 'No credit card · Your score, per-engine access status and your personal gap list',
     underlink_how: 'How does it work?',
     hero_trust_scans: '+ scans completed ·',
-    landing_close_text: 'Your score and gap list are <b>free</b> — and our experts are ready when you want the gaps fixed.',
-    landing_close_btn: 'Start a Free Scan ↑',
+    landing_close_text: 'Your first scan is <b>free</b> — see your score and gap list; our experts are ready when you want the gaps fixed.',
+    landing_close_btn: 'Start Scanning ↑',
     private_scan_label: "Private scan (won't be saved to history)",
     private_scan_banner: 'This was a private scan — the result was deleted from our servers after it was shown to you. Your permanent copy is in your email.',
     private_scan_toast: 'Your search will be private — the result is deleted from our servers after you see it, and a copy goes to your email.',
@@ -921,7 +955,7 @@ export const translations = {
     wizard_accuracy_note: 'These details are used solely to correctly identify you: the more accurate they are, the lower the risk of namesake mix-ups and false matches — and the more accurate your report.',
     wizard_next: 'Next →',
     wizard_step_count: 'Step',
-    submit_site: 'Start Free Scan',
+    submit_site: 'Start Scan',
     submit_person: 'Search for Me in AI',
     submit_brand: 'Check My Brand',
 
@@ -949,7 +983,7 @@ export const translations = {
     scan_sub: 'running in real time',
     scan_sub_site: 'bot access to your site is being checked',
     scan_starting: 'Starting…',
-    scan_eta: 'Usually a few minutes. You can close this screen — we email the report when it\'s ready.',
+    scan_eta: 'Usually about 2 minutes. You can close this screen — we email the report when it\'s ready.',
     scan_cancel: 'Cancel',
 
     // ── Results (shared) ──
@@ -967,7 +1001,9 @@ export const translations = {
     results_cta_sub_site: 'Getting ChatGPT, Perplexity and Claude to cite you as a source doesn\'t happen on its own — it takes concrete steps: bot access, correct site structure, and visibility on trusted sources. Your competitors already took them.',
     results_cta_sub_brand: 'Getting ChatGPT, Gemini and Claude to cite you as a source in your field doesn\'t happen on its own — it takes being mentioned by trusted sources, described correctly, and known for your field. Your competitors already took those steps.',
     results_sticky_upgrade: 'Want to raise your score?',
-    results_created_at_suffix: 'created on',
+    // EN uses the prefix ("Created on August 12, 2026"); suffix stays empty.
+    results_created_at_prefix: 'Created on',
+    results_created_at_suffix: '',
     results_yes: 'Yes',
     results_no: 'No',
 
@@ -981,7 +1017,7 @@ export const translations = {
     results_site_perplexity_access: 'Perplexity Bot Access',
     results_site_gemini_access: 'Gemini Bot Access',
     results_site_llms_access: 'AI Bot Permission (llms.txt)',
-    results_score_legend: '65+ good · 40-64 needs work · below 40 weak — the seal needs 70',
+    results_score_legend: '65+ good · 40-64 needs work · below 40 weak — the seal needs a 70+ score and at least 3 readable pages',
     results_site_llmtxt_label: 'See llm.txt status',
     results_brand_score_label: 'AI Recognition Score',
     breakdown_yanit_kalitesi: 'Response Quality',
@@ -1070,7 +1106,7 @@ export const translations = {
     sample_banner_text: 'This is a',
     sample_banner_bold: 'sample report',
     sample_banner_rest: '— not real data.',
-    sample_banner_btn: 'Scan Your Own Site for Free →',
+    sample_banner_btn: 'Scan Your Own Site →',
 
     // ── Results (brand/person) ──
     results_brand_title: 'AI Recognition Report',
@@ -1125,6 +1161,7 @@ export const translations = {
     dash_nav_tickets: 'AI Visibility Services',
     dash_nav_my_tickets: 'My Tickets',
     dash_nav_expert: 'Expert Panel',
+    dash_nav_admin: 'Admin Panel',
     dash_tickets_title: 'AI Visibility Services',
     dash_tickets_hint: "Our experts fix the gaps your scan found. Every job comes with step-by-step progress, expert messaging and a delivery report - paid from your token balance.",
     dash_tickets_buy: 'Buy',
@@ -1158,7 +1195,7 @@ export const translations = {
     share_site_text: '{domain} — my AI visibility score: {score}/100 👀 What’s yours? Do ChatGPT, Claude, Gemini, Perplexity see you?',
     share_brand_text: '{name} — AI visibility score: {score}/100 👀 Does AI know you? Find out in minutes:',
     badge_title: 'Add the badge to your site',
-    badge_hint: 'Your score is 70+ — congrats! Paste this code into your site: the "AI Friendly · Checked by GEONI" seal shows up, and clicks land on your score card.',
+    badge_hint: 'Your score is 70+ and at least 3 of your pages could be read — congrats! Paste this code into your site: the "AI Friendly · Checked by GEONI" seal shows up, and clicks land on your score card.',
     badge_copy: 'Copy code',
     badge_copied: 'Copied ✓',
     ticket_confirm_hint: 'The work has been delivered. Once you’ve checked it, confirm to complete your request. You can still raise an issue afterwards.',
@@ -1270,9 +1307,11 @@ export const translations = {
     confirm_ok: 'OK',
     dash_watchlist_title: 'Watchlist',
     dash_watchlist_empty: 'Your watchlist is empty.',
-    dash_watchlist_empty_hint: 'Add items here by clicking "Add to Watchlist" on any scan result.',
+    dash_watchlist_empty_hint: 'Add items here by clicking "Add to Watchlist" on any scan result. Watched targets are scanned automatically every 15 days; each scan costs the regular scan price in tokens.',
     watchlist_add: 'Add to Watchlist',
     watchlist_added: 'Watching ✓',
+    watchlist_add_hint: 'Watching means an automatic scan every 15 days · each scan costs {n} tokens · if your balance runs short, monitoring pauses and resumes once you top up',
+    watchlist_add_hint_nocost: 'Watching means an automatic scan every 15 days · each scan costs the regular scan price in tokens · if your balance runs short, monitoring pauses and resumes once you top up',
     watchlist_remove_confirm: 'Remove this item from your watchlist?',
     watchlist_rescan: 'Rescan',
     admin_tickets_search_ph: 'Search #id, target, email or service…',
@@ -1280,8 +1319,8 @@ export const translations = {
     watchlist_not_scanned_yet: 'Not scanned yet',
     watchlist_saved_target: 'Saved target — refresh it with “Rescan”',
     watchlist_monitor_badge: 'Monitoring on (every 15 days)',
-    watchlist_monitor_badge_free: 'Monitoring on (every 15 days) · first month free',
-    watchlist_monitor_paused: 'Monitoring paused — buy a token package to continue',
+    watchlist_monitor_badge_cost: 'Monitoring on — scanned automatically every 15 days · {n} tokens/scan',
+    watchlist_monitor_paused: 'Monitoring paused (insufficient balance) — the target stays on your list and resumes automatically once you top up',
     watchlist_monitor_off: 'Monitoring off',
     watchlist_queries_btn: 'Custom monitoring questions',
     watchlist_queries_count: 'custom questions',
@@ -1339,6 +1378,10 @@ export const translations = {
     dash_settings_theme: 'Appearance',
     dash_settings_theme_dark: 'Dark',
     dash_settings_theme_light: 'Light',
+    theme_to_light: 'Switch to light theme',
+    theme_to_dark: 'Switch to dark theme',
+    lightbox_close: 'Close',
+    social_handle_too_short: 'Handle must be at least 2 characters.',
     dash_settings_membership: 'Membership',
     dash_credits_rates: 'Site scan {web} tokens · Person and brand scan {brand} tokens · Social scan {social} tokens',
     dash_credits_scans: '≈ {site} site or {kisi} person scans',
@@ -1357,9 +1400,9 @@ export const translations = {
     social_add_niche: 'Add your niche & measure →',
 
     // ── Errors ──
-    error_audit_failed: 'Scan failed',
+    error_audit_failed: 'The scan could not be completed. Please try again; if it keeps happening, email mail@geoni.ai.',
     error_audit_timeout: 'The scan is taking longer than expected (large sites can take minutes). It continues in the background — we\'ll email you the result when it\'s ready.',
-    error_query_failed: 'Query failed',
+    error_query_failed: 'The query could not be completed. Please try again; if it keeps happening, email mail@geoni.ai.',
     error_query_timeout: 'The query is taking longer than expected. It continues in the background — we\'ll email you the result when it\'s ready.',
     error_request_failed: "We couldn't complete this. Check your connection and try again — email mail@geoni.ai if it keeps happening.",
     error_connection: "Couldn't connect. Check your internet and try again.",

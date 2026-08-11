@@ -196,7 +196,10 @@ export default function BrandCheckResultsPage({ result, jobId = null, onReset, u
             <h1 className="results__title">{t('results_brand_title')}</h1>
             {formattedDate && (
               <div className="results__date">
-                {formattedDate}{formattedTime && <span style={{ marginLeft: 8, opacity: .7 }}>{formattedTime}</span>} {t('results_created_at_suffix')}
+                {/* Bkz. ResultsPage'deki not (M10): TR sonek, EN önek. */}
+                {t('results_created_at_prefix') && `${t('results_created_at_prefix')} `}
+                {formattedDate}{formattedTime && <span style={{ marginLeft: 8, opacity: .7 }}>{formattedTime}</span>}
+                {t('results_created_at_suffix') && ` ${t('results_created_at_suffix')}`}
               </div>
             )}
           </div>

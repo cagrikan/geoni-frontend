@@ -126,7 +126,12 @@ const SAMPLE_RESULT_BY_LANG = {
     score_breakdown: { index_coverage: 74, authority: 61, freshness: 55, schema: 82, ai_access: 88, engagement: 63, brand_recall: 71 },
     total_pages: 142,
     indexed_pages: 118,
-    platforms: { chatgpt: true, anthropic: true, google: false },
+    // Ornek rapor VITRIN: perplexity/llms_txt anahtarlari eksikti ve ekran
+    // bunlari kirmizi "Hayir" / "—" ciziyordu — ornek, iki motoru engelli bir
+    // site izlenimi veriyordu (denetim M2). google:false BILEREK kaldi: ornek
+    // tamamen kusursuz olmasin, "eksik nasil gorunur" de gorunsun.
+    platforms: { chatgpt: true, anthropic: true, google: false, perplexity: true },
+    llms_txt: true,
     top_topics: [
       { topic: 'Kurumsal Sürdürülebilirlik Raporlaması', platforms: ['chatgpt', 'claude'] },
       { topic: 'B2B E-ticaret Entegrasyonları', platforms: ['chatgpt', 'claude', 'gemini'] },
@@ -157,7 +162,10 @@ const SAMPLE_RESULT_BY_LANG = {
     score_breakdown: { index_coverage: 74, authority: 61, freshness: 55, schema: 82, ai_access: 88, engagement: 63, brand_recall: 71 },
     total_pages: 142,
     indexed_pages: 118,
-    platforms: { chatgpt: true, anthropic: true, google: false },
+    // Bkz. TR ornegindeki not: perplexity/llms_txt eksikligi "engelli motor"
+    // izlenimi veriyordu (M2).
+    platforms: { chatgpt: true, anthropic: true, google: false, perplexity: true },
+    llms_txt: true,
     top_topics: [
       { topic: 'Corporate Sustainability Reporting', platforms: ['chatgpt', 'claude'] },
       { topic: 'B2B E-commerce Integrations', platforms: ['chatgpt', 'claude', 'gemini'] },
@@ -240,6 +248,13 @@ function AppInner() {
   const [statusKey, setStatusKey] = useState('queued')
   const [progressLog, setProgressLog] = useState([])
 
+  // Ilerleme listesi SINIRSIZ buyumesin: poll penceresi ~35 dk ve cok mesajli
+  // taramada liste "Vazgec" butonunu ekran disina itebiliyordu (denetim M7).
+  // Son PROGRESS_TAVAN adim tutulur; App.css'te .scan-steps ayrica kaydirilir.
+  const PROGRESS_TAVAN = 60
+  const progressEkle = (mesaj) =>
+    setProgressLog(prev => [...prev.slice(-(PROGRESS_TAVAN - 1)), mesaj])
+
   // Sync URL with view
   useEffect(() => {
     const path = window.location.pathname
@@ -303,12 +318,11 @@ function AppInner() {
       if (scanGenRef.current !== gen) return  // iptal edildi / yeni tarama basladi
       try {
         const res = await fetch(`${API_URL}/api/audit/${jobId}`, { headers: langHeaders() })
-        if (!res.ok) {
-          // Kodu hataya iliştir: 404 "iş şu an bulunamadı" demek, "iş yok" değil.
-          const e = new Error((await res.json().catch(() => ({}))).detail || t('error_audit_failed'))
-          e.status = res.status
-          throw e
-        }
+        // apiErrorFrom hem HTTP kodunu iliştirir (404 "iş şu an bulunamadı"
+        // demek, "iş yok" değil) hem de yapısal `detail` nesnesini okunur
+        // mesaja çevirir — eski `detail || ...` hali nesne dönerse ekrana
+        // "[object Object]" düşürüyordu (denetim Ö5).
+        if (!res.ok) throw await apiErrorFrom(res, t('error_audit_failed'))
         const data = await res.json()
         errStreak = 0
         if (scanGenRef.current !== gen) return
@@ -356,11 +370,9 @@ function AppInner() {
       if (scanGenRef.current !== gen) return
       try {
         const res = await fetch(`${API_URL}/api/brand-check/${jobId}`, { headers: langHeaders() })
-        if (!res.ok) {
-          const e = new Error((await res.json().catch(() => ({}))).detail || t('error_query_failed'))
-          e.status = res.status
-          throw e
-        }
+        // Yukarıdaki tarama döngüsüyle aynı kural: apiErrorFrom kodu iliştirir
+        // ve yapısal detail'i okunur mesaja çevirir (Ö5).
+        if (!res.ok) throw await apiErrorFrom(res, t('error_query_failed'))
         const data = await res.json()
         errStreak = 0
         if (scanGenRef.current !== gen) return
@@ -374,6 +386,18 @@ function AppInner() {
       }
     }
     if (scanGenRef.current === gen) { setError(t('error_query_timeout')); pushView('landing') }
+  }
+
+  // 402 free_limit_reached: kullanıcı Cüzdan sekmesine yönlendirilir ama eski
+  // halde mesaj yalnız landing'de çiziliyordu — kullanıcı dashboard'a gidince
+  // "neden buradayım" cümlesini hiç görmüyordu (denetim M8). Mesajı yolculuğa
+  // ekliyoruz: DashboardPage 'geoni_pending_notice'i bir kez gösterip siler.
+  const freeLimitYonlendir = (err) => {
+    if (err?.code !== 'free_limit_reached') return false
+    try { localStorage.setItem('geoni_pending_notice', err.message) } catch { /* ignore */ }
+    setError(err.message)
+    handleUpgrade()
+    return true
   }
 
   const handleAudit = async (domain, email, isPrivate = false, customQueries = null, turnstileToken = '') => {
@@ -400,7 +424,7 @@ function AppInner() {
         es.onmessage = (evt) => {
           try {
             const parsed = JSON.parse(evt.data)
-            if (parsed.message) setProgressLog(prev => [...prev, parsed.message])
+            if (parsed.message) progressEkle(parsed.message)
             if (parsed.done) es.close()
           } catch { /* ignore malformed event */ }
         }
@@ -409,7 +433,7 @@ function AppInner() {
       await pollAuditJob(jobId, gen)
       es?.close()
     } catch (err) {
-      if (err?.code === 'free_limit_reached') { setError(err.message); handleUpgrade(); return }
+      if (freeLimitYonlendir(err)) return
       setError(err.message || t('error_connection')); pushView('landing')
     }
   }
@@ -452,7 +476,7 @@ function AppInner() {
           try {
             const parsed = JSON.parse(evt.data)
             if (parsed.message) {
-              setProgressLog(prev => [...prev, parsed.message])
+              progressEkle(parsed.message)
             }
             if (parsed.done) es.close()
           } catch { /* ignore malformed event */ }
@@ -462,15 +486,16 @@ function AppInner() {
       await pollBrandJob(data.job_id, payload.type, gen)
       es?.close()
     } catch (err) {
-      if (err?.code === 'free_limit_reached') { setError(err.message); handleUpgrade(); return }
+      if (freeLimitYonlendir(err)) return
       setError(err.message || t('error_connection')); pushView('landing')
     }
   }
 
   const handleSocialCheck = async ({ handle, niche, email, turnstile_token = '' }) => {
-    // Anonim sosyal gorunurluk taramasi (giris gerekmez). /api/social-check
-    // marka-recall motorunu @handle + nis ile calistirir; sonuc brand-check
-    // sekliyle doner, ayni ekranlarda gosterilir.
+    // Sosyal gorunurluk taramasi — GIRIS GEREKIR (anonim tarama 2026-08-03'te
+    // kapatildi; API 401 doner, loginDuvari formu saklayip login'e yollar).
+    // /api/social-check marka-recall motorunu @handle + nis ile calistirir;
+    // sonuc brand-check sekliyle doner, ayni ekranlarda gosterilir.
     setError(null); setIsPrivateResult(false); setScanKind('brand'); setScanTarget('@' + handle); setProgressLog([])
     const gen = ++scanGenRef.current
     pushView('loading')
@@ -499,14 +524,14 @@ function AppInner() {
       try {
         es = new EventSource(`${API_URL}/api/brand-check/${data.job_id}/stream`)
         es.onmessage = (evt) => {
-          try { const p = JSON.parse(evt.data); if (p.message) setProgressLog(prev => [...prev, p.message]); if (p.done) es.close() } catch { /* ignore */ }
+          try { const p = JSON.parse(evt.data); if (p.message) progressEkle(p.message); if (p.done) es.close() } catch { /* ignore */ }
         }
         es.onerror = () => es.close()
       } catch { /* polling yeterli */ }
       await pollBrandJob(data.job_id, 'brand', gen)
       es?.close()
     } catch (err) {
-      if (err?.code === 'free_limit_reached') { setError(err.message); handleUpgrade(); return }
+      if (freeLimitYonlendir(err)) return
       setError(err.message || t('error_connection')); pushView('landing')
     }
   }

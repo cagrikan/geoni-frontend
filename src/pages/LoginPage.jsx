@@ -54,7 +54,7 @@ export default function LoginPage({ onSuccess, onHome }) {
         </div>
 
         <p className="login-terms">
-          {t('login_terms_prefix')} <a href="https://geoni.ai/privacy" target="_blank">{t('login_terms_privacy')}</a>{t('login_terms_privacy_suffix')} {t('login_terms_and')} <a href="https://geoni.ai/terms" target="_blank">{t('login_terms_of_use')}</a>{t('login_terms_of_use_suffix')}
+          {t('login_terms_prefix')} <a href="https://geoni.ai/privacy" target="_blank" rel="noopener">{t('login_terms_privacy')}</a>{t('login_terms_privacy_suffix')} {t('login_terms_and')} <a href="https://geoni.ai/terms" target="_blank" rel="noopener">{t('login_terms_of_use')}</a>{t('login_terms_of_use_suffix')}
         </p>
       </div>
     </div>

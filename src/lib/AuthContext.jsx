@@ -12,6 +12,36 @@ function getSupabase() {
   return _sbPromise
 }
 
+// Kayit damgasi (ulke/saat dilimi/dil) yalnizca AuthCallback sayfasindan
+// tetikleniyordu. Iki sorun vardi: (1) o sayfa `getSession()`i ANINDA cagiriyor,
+// OAuth kod degisimi henuz bitmemisse session null donuyor ve damga hic
+// atilmiyordu — 21 google kaydindan yalniz 1'i damgali, o da 2 Temmuz'dan;
+// (2) callback yoluna hic ugramayan giris bicimleri kapsam disi kaliyordu.
+// Damga artik oturumun olustugu HER yerde, `onAuthStateChange` ile tetikleniyor:
+// zamanlama yarisindan etkilenmez. Uc idempotent ("yalniz bossa yaz",
+// signup-country.js:57-60), bu yuzden tekrar cagrilmasi zararsiz; yine de
+// TOKEN_REFRESHED selinde bosuna istek atmamak icin kullanici basina tek sefer
+// calisir. Hata yutulur: giris akisi ASLA bloke olmaz.
+// NOT: mobil (React Native) bu kodu calistirmaz — oradaki kayitlar hala
+// damgasiz kalir, ayri bir degisiklik gerekir.
+const _damgalananlar = new Set()
+function kayitDamgasiGonder(session) {
+  const uid = session?.user?.id
+  if (!uid || _damgalananlar.has(uid)) return
+  _damgalananlar.add(uid)
+  fetch('/api/signup-country', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      lang: navigator.language
+    })
+  }).catch(() => {})
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [profile, setProfile] = useState(null)
@@ -47,12 +77,12 @@ export function AuthProvider({ children }) {
       if (!active) return
       supabase.auth.getSession().then(({ data: { session } }) => {
         setUser(session?.user ?? null)
-        if (session?.user) fetchProfile(session.user.id)
+        if (session?.user) { kayitDamgasiGonder(session); fetchProfile(session.user.id) }
         else setLoading(false)
       })
       const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
         setUser(session?.user ?? null)
-        if (session?.user) fetchProfile(session.user.id)
+        if (session?.user) { kayitDamgasiGonder(session); fetchProfile(session.user.id) }
         else { setProfile(null); setLoading(false) }
       })
       unsub = () => subscription.unsubscribe()

@@ -22,8 +22,10 @@ function getSupabase() {
 // signup-country.js:57-60), bu yuzden tekrar cagrilmasi zararsiz; yine de
 // TOKEN_REFRESHED selinde bosuna istek atmamak icin kullanici basina tek sefer
 // calisir. Hata yutulur: giris akisi ASLA bloke olmaz.
-// NOT: mobil (React Native) bu kodu calistirmaz — oradaki kayitlar hala
-// damgasiz kalir, ayri bir degisiklik gerekir.
+// NOT: mobil (React Native) bu kodu calistirmaz; ayni damga orada AYRI olarak
+// kuruldu — `geoni-mobile/lib/kayit-damgasi*.ts` (4bb29c0), ayni ucu ayni
+// kurallarla cagiriyor. Iki istemciden birinde degisiklik yapilirsa oteki de
+// gozden gecirilmeli: kural motoru (`is_signup_blocked`) ikisini ayirt etmiyor.
 const _damgalananlar = new Set()
 function kayitDamgasiGonder(session) {
   const uid = session?.user?.id

@@ -1,0 +1,22 @@
+# app.geoni.ai — uygulama alan adi.
+#
+# NEDEN VAR: bu alan adinin robots.txt'i YOKTU (404 donuyordu) ve Search Console
+# mulku `sc-domain:geoni.ai` oldugu icin alt alan adlarini da kapsiyor. Googlebot
+# uygulama ve API yollarini tarayip 4xx aliyordu; 17 Agu 2026'da geoni.ai raporuna
+# "Baska bir 4xx sorunu nedeniyle engellendi" uyarisi dustu.
+#
+# Karar: kok acik kalir (marka aramalarinda gorunurluk icin), oturum gerektiren
+# ekranlar ve API yollari kapatilir — bunlarin arama sonucunda isi yok ve
+# taranmalari yalnizca hata uretiyor.
+#
+# 🪤 Asagidaki yollar UYDURULMADI, src/App.jsx'teki gercek rotalardan alindi:
+#    /auth/callback · /dashboard · /admin · /login  (App.jsx:235-238)
+
+User-agent: *
+Disallow: /api/
+Disallow: /auth/
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /login
+
+Sitemap: https://geoni.ai/sitemap.xml

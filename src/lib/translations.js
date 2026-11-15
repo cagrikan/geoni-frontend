@@ -495,9 +495,9 @@ export const translations = {
        Bakiye yetmezse tarama atlanir, hedef listede kalir, "duraklatildi"
        gosterilir; token yuklenince kendiliginden devam eder. Kullanici bu uc
        gercegi (bedel, siklik, duraklama) IZLEMEYE ALMADAN ONCE gormeli. */
-    dash_watchlist_empty_hint: "Bir tarama sonucunda \"İzlemeye Al\" butonuna tıklayarak buraya ekleyebilirsiniz. İzlenen hedefler 15 günde bir otomatik taranır; her tarama normal tarama bedeli kadar token düşer.",
-    watchlist_add: 'İzlemeye Al',
-    watchlist_added: 'İzleniyor ✓',
+    dash_watchlist_empty_hint: 'Bir tarama sonucunda “Kaydet” düğmesine tıklayarak hedef ekleyebilirsiniz. “Yeniden Tara” ile güncelleyin. Otomatik tarama şu anda kapalıdır.',
+    watchlist_add: 'Kaydet',
+    watchlist_added: 'Kaydedildi ✓',
     watchlist_add_hint: 'İzlemeye alınca 15 günde bir otomatik taranır · her tarama {n} token düşer · bakiye yetmezse izleme duraklar, token yüklenince kendiliğinden sürer',
     watchlist_add_hint_nocost: 'İzlemeye alınca 15 günde bir otomatik taranır · her tarama normal tarama bedeli kadar token düşer · bakiye yetmezse izleme duraklar, token yüklenince kendiliğinden sürer',
     watchlist_remove_confirm: 'Bu öğeyi takip listesinden çıkarmak istediğinize emin misiniz?',
@@ -1307,9 +1307,9 @@ export const translations = {
     confirm_ok: 'OK',
     dash_watchlist_title: 'Watchlist',
     dash_watchlist_empty: 'Your watchlist is empty.',
-    dash_watchlist_empty_hint: 'Add items here by clicking "Add to Watchlist" on any scan result. Watched targets are scanned automatically every 15 days; each scan costs the regular scan price in tokens.',
-    watchlist_add: 'Add to Watchlist',
-    watchlist_added: 'Watching ✓',
+    dash_watchlist_empty_hint: 'Click “Save” on a scan result to add a target, then use Rescan to refresh it. Automatic scanning is currently off.',
+    watchlist_add: 'Save',
+    watchlist_added: 'Saved ✓',
     watchlist_add_hint: 'Watching means an automatic scan every 15 days · each scan costs {n} tokens · if your balance runs short, monitoring pauses and resumes once you top up',
     watchlist_add_hint_nocost: 'Watching means an automatic scan every 15 days · each scan costs the regular scan price in tokens · if your balance runs short, monitoring pauses and resumes once you top up',
     watchlist_remove_confirm: 'Remove this item from your watchlist?',
